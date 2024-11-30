@@ -1,36 +1,36 @@
 package com.example.Warehouse.domain.models;
 
-import com.example.Warehouse.domain.enums.Roles;
 import jakarta.persistence.*;
+import com.example.WarehouseContracts.enums.Roles;
 
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity {
-    private String userName;
-    private String email;
-    private String passwordHash;
     private Roles role;
+    private String email;
     private Integer points;
+    private String userName;
+    private String passwordHash;
     private Set<Purchase> purchases;
 
     protected User() {}
 
     public User(
-            String userName,
-            String email,
-            String passwordHash,
             Roles role,
-            Integer points) {
-        this.userName = userName;
-        this.email = email;
-        this.passwordHash = passwordHash;
+            String email,
+            Integer points,
+            String userName,
+            String passwordHash) {
         this.role = role;
+        this.email = email;
         this.points = points;
+        this.userName = userName;
+        this.passwordHash = passwordHash;
     }
 
-    @Column(name = "user_name", nullable = false)
+    @Column(name = "user_name", nullable = false, unique = true)
     public String getUserName() {
         return userName;
     }
@@ -40,7 +40,7 @@ public class User extends BaseEntity {
     }
 
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false)
     public String getEmail() {
         return email;
     }
@@ -48,7 +48,6 @@ public class User extends BaseEntity {
     public void setEmail(String email) {
         this.email = email;
     }
-
 
     @Column(name = "password_hash", nullable = false)
     public String getPasswordHash() {

@@ -1,14 +1,12 @@
 package com.example.Warehouse.domain.repository;
 
-import com.example.Warehouse.domain.enums.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.example.Warehouse.domain.models.Order;
 import org.springframework.stereotype.Repository;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import com.example.WarehouseContracts.enums.Status;
 
 @Repository
 public interface OrderRepository extends BaseRepository<Order> {
-    List<Order> findByOrderDate(LocalDateTime date);
-    List<Order> findByStatus(Status status);
+    Page<Order> findByStatus(Status status, Pageable pageable);
 }

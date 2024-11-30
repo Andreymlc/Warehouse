@@ -5,9 +5,9 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "order_items")
 public class OrderItem extends BaseEntity {
-    private Integer quantity;
     private Order order;
     private Product product;
+    private Integer quantity;
 
     protected OrderItem() {}
 

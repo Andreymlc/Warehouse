@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Админ категории</title>
+        <link rel="stylesheet" th:href="@{/css/navbar.css}">
+        <link rel="stylesheet" th:href="@{/css/home.css}">
+    </head>
+    <body>
+        <div th:replace="~{/navbar}">Navbar</div>
+        <aside>
+            <ul>
+                <li>
+                    <a th:href="@{/home/admin/warehouses(
+                             base.userName=${form.base.userName()},
+                             base.role=${form.base.role()})}">Все склады</a>
+                </li>
+                <li>
+                    <a th:href="@{/home/admin/products(
+                             base.userName=${form.base.userName()},
+                             priceSort=true,
+                             base.role=${form.base.role()})}">Каталог товаров</a>
+                </li>
+                <li>
+                    <a class="active-button" th:href="@{/home/admin/categories(
+                             base.userName=${form.base.userName()},
+                             base.role=${form.base.role()})}">Категории</a>
+                </li>
+            </ul>
+        </aside>
+        <main>
+            <form th:action="@{/home/admin/categories}"
+                  th:method="get"
+                  th:object="${form}">
+                <div class="search">
+                    <input type="text"
+                           th:field="*{pages.substring}"
+                           placeholder="Поиск категории по названию"/>
+                    <button type="submit">Поиск</button>
+                </div>
+                <input type="hidden" th:field="*{pages.page}" />
+                <input type="hidden" th:field="*{pages.size}" />
+                <input type="hidden" th:field="*{base.userName}" />
+                <input type="hidden" th:field="*{base.role}" />
+            </form>
+
+            <div class="products" th:if="${#lists.isEmpty(model.categories())}">
+                Категории не найдены
+            </div>
+
+            <div class="products" th:if="${not #lists.isEmpty(model.categories())}">
+                <div class="card" th:each="category : ${model.categories()}">
+                    <h2 th:text="'Название: ' + ${category.name()}">Название Категории</h2>
+                    <h4 th:text="'Скидка по категории: ' + ${category.discount()} + '%'">Скидка по категории</h4>
+                    <div>
+                        <a>Редактировать</a>
+                        <a onclick="return confirm('Вы уверены, что хотите удалить продукт?');">Удалить</a>
+                    </div>
+                </div>
+
+                <div class="pages" th:if="${model.base().totalPages() > 1}">
+                    <ul class="pages-ul">
+                        <li
+                                th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
+                                th:classappend="${pageNumber == form.pages.page()} ? 'active'">
+                            <a class="page-picker"
+                               th:href="@{/home/admin/categories(
+                             base.userName=${form.base.userName()},
+                             base.role=${form.base.role()},
+                             pages.page=${pageNumber},
+                             pages.size=${form.pages.size()},
+                             pages.substring=${form.pages.substring()}
+                         )}"
+                               th:text="${pageNumber}">1</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

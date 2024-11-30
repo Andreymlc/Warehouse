@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Пользователь главная</title>
+        <link rel="stylesheet" th:href="@{/css/navbar.css}">
+        <link rel="stylesheet" th:href="@{/css/home.css}">
+    </head>
+    <body class="user-body">
+        <div th:replace="~{/navbar}">Navbar</div>
+        <main class="user-main">
+            <form th:action="@{/home/user}"
+                  th:method="get"
+                  th:object="${form}">
+                <div class="filters">
+                    <input type="text"
+                           th:field="*{pages.substring}"
+                           placeholder="Поиск товара по названию"/>
+
+                    <select th:field="*{category}">
+                        <option value="" disabled>Выберите категорию</option>
+                        <option value="Все" selected>Все</option>
+                        <option th:each="category: ${model.categories}"
+                                th:value="${category}"
+                                th:text="${category}">
+                        </option>
+                    </select>
+                    <div class="sorting">
+                        <lable>
+                            <input th:field="*{priceSort}" type="radio" value="true">
+                            Сначала дешевле
+                        </lable>
+                        <lable>
+                            <input th:field="*{priceSort}" type="radio" value="false">
+                            Сначала дороже
+                        </lable>
+                    </div>
+                </div>
+                <input type="hidden" th:field="*{pages.page}" />
+                <input type="hidden" th:field="*{pages.size}" />
+                <input type="hidden" th:field="*{base.userName}" />
+                <input type="hidden" th:field="*{base.role}" />
+                <button class="search" type="submit">Поиск</button>
+            </form>
+
+            <div class="products" th:if="${#lists.isEmpty(model.products())}">
+                Продукты не найдены
+            </div>
+
+            <div class="products" th:if="${not #lists.isEmpty(model.products())}">
+                <div class="card" th:each="product : ${model.products()}">
+                    <h2 th:text="'Название: ' + ${product.name()}">Название Товара</h2>
+                    <h4 th:text="'Категория: ' + ${product.category()}">Категория</h4>
+                    <h4 th:text="'Стоимость: ' + ${product.price()}">Стоимость</h4>
+                    <a class="add-to-cart">Добавить в корзину</a>
+                </div>
+
+                <div class="pages" th:if="${model.base().totalPages() > 1}">
+                    <ul class="pages-ul">
+                        <li
+                                th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
+                                th:classappend="${pageNumber == form.pages.page()} ? 'active'">
+                            <a class="page-picker"
+                               th:href="@{/home/user(
+                                    base.userName=${form.base.userName()},
+                                    base.role=${form.base.role()},
+                                    category=${form.category()},
+                                    priceSort=${form.priceSort()},
+                                    pages.page=${pageNumber},
+                                    pages.size=${form.pages.size()},
+                                    pages.substring=${form.pages.substring()}
+                                )}"
+                               th:text="${pageNumber}">1</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

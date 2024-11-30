@@ -1,6 +1,6 @@
 package com.example.Warehouse.domain.repository;
 
-import com.example.Warehouse.domain.enums.Status;
+import com.example.WarehouseContracts.enums.Status;
 import com.example.Warehouse.domain.models.Purchase;
 import org.springframework.stereotype.Repository;
 

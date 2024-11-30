@@ -1,6 +1,6 @@
 package com.example.Warehouse.domain.models;
 
-import com.example.Warehouse.domain.enums.Status;
+import com.example.WarehouseContracts.enums.Status;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

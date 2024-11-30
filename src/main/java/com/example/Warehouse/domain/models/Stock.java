@@ -6,19 +6,18 @@ import jakarta.persistence.*;
 @Table(name = "stocks")
 public class Stock extends BaseEntity {
     private Integer quantity;
-    private String lastUpdated;
     private Integer minimumStock;
+
     private Product product;
     private Warehouse warehouse;
 
     protected Stock() {}
 
-    public Stock(Integer quantity, String lastUpdated, Integer minimumStock, Product product, Warehouse warehouse) {
-        this.quantity = quantity;
-        this.lastUpdated = lastUpdated;
-        this.minimumStock = minimumStock;
+    public Stock(Integer quantity, Integer minimumStock, Product product, Warehouse warehouse) {
         this.product = product;
+        this.quantity = quantity;
         this.warehouse = warehouse;
+        this.minimumStock = minimumStock;
     }
 
     @Column(name = "quantity", nullable = false)
@@ -28,15 +27,6 @@ public class Stock extends BaseEntity {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
-    }
-
-    @Column(name = "last_updated", nullable = false)
-    public String getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(String lastUpdated) {
-        this.lastUpdated = lastUpdated;
     }
 
     @Column(name = "minimum_stock", nullable = false)

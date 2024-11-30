@@ -1,6 +1,6 @@
 package com.example.Warehouse.domain.models;
 
-import com.example.Warehouse.domain.enums.Status;
+import com.example.WarehouseContracts.enums.Status;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -10,25 +10,23 @@ import java.util.Set;
 @Entity
 @Table(name = "orders")
 public class Order extends BaseEntity {
-    private LocalDateTime orderDate;
-    private BigDecimal totalAmount;
-    private Status status;
     private User user;
+    private Status status;
+    private BigDecimal totalAmount;
+    private LocalDateTime orderDate;
     private Set<OrderItem> orderItems;
 
     protected Order() {}
 
     public Order(
-            LocalDateTime orderDate,
-            BigDecimal totalAmount,
-            Status status,
             User user,
-            Set<OrderItem> orderItems) {
+            Status status,
+            BigDecimal totalAmount,
+            LocalDateTime orderDate) {
+        this.user = user;
+        this.status = status;
         this.orderDate = orderDate;
         this.totalAmount = totalAmount;
-        this.status = status;
-        this.user = user;
-        this.orderItems = orderItems;
     }
 
     @Column(name = "order_date", nullable = false)

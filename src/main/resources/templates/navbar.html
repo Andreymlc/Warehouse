@@ -1,0 +1,25 @@
+<nav xmlns:th="http://www.thymeleaf.org">
+    <ul>
+        <li>
+            <h2>Warehouse</h2>
+        </li>
+        <li th:if="${form.base.role()} == 'admin'">
+            <a th:href="@{/home/admin/warehouses(
+                     base.userName=${form.base.userName()},
+                     base.role=${form.base.role()})}">Главная</a>
+        </li>
+        <li th:if="${form.base.role()} == 'user'">
+            <a href="">Каталог</a>
+        </li>
+        <li th:if="${form.base.role()} == 'admin'">
+            <a href="">Заказы пользователей</a>
+        </li>
+        <li>
+            <a href="">Корзина</a>
+        </li>
+        <li th:if="${form.base.role()} == 'user'">
+            <p th:text="'Количество балов: ' + ${model.pointsCount}"></p>
+        </li>
+        <li th:text="${form.base.userName()}">UserName</li>
+    </ul>
+</nav>

@@ -11,19 +11,22 @@ public class Product extends BaseEntity {
     private String name;
     private BigDecimal price;
     private Category category;
+    private boolean isDeleted;
     private Set<Stock> stocks;
-    private Set<PurchaseItem> purchaseItems;
     private Set<OrderItem> orderItems;
+    private Set<PurchaseItem> purchaseItems;
 
     protected Product() {}
 
     public Product(
             String name,
             BigDecimal price,
-            Category category) {
+            Category category,
+            boolean isDeleted) {
         this.name = name;
         this.price = price;
         this.category = category;
+        this.isDeleted = isDeleted;
     }
 
     @Column(name = "name", nullable = false)
@@ -44,13 +47,22 @@ public class Product extends BaseEntity {
         this.price = price;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     public Category getCategory() {
         return category;
     }
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    @Column(name = "is_deleted", nullable = false)
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     @OneToMany(mappedBy = "product")
