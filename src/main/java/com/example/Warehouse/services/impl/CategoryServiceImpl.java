@@ -1,5 +1,6 @@
 package com.example.Warehouse.services.impl;
 
+import com.example.WarehouseContracts.dto.CategoryAddDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -10,6 +11,7 @@ import com.example.Warehouse.domain.models.Category;
 import com.example.WarehouseContracts.dto.CategoryDto;
 import com.example.Warehouse.services.CategoryService;
 import com.example.Warehouse.domain.repository.CategoryRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,12 +33,19 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
     }
 
+    @Override
     public Page<CategoryDto> getCategories(String substring, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("name"));
         Page<Category> categoryPage = substring != null
                 ? categoryRepo.findByNameContainingIgnoreCase(substring, pageable)
                 : categoryRepo.findAll(pageable);
-        return categoryPage.map(c -> new CategoryDto(c.getName(), c.getDiscount()));
+        return categoryPage.map(c -> modelMapper.map(c, CategoryDto.class));
+    }
+
+    @Override
+    @Transactional
+    public void setDiscount(String id, int discount) {
+        categoryRepo.setDiscount(id, 1 - (float) discount / 100);
     }
 
     @Override
@@ -48,7 +57,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public String addCategory(CategoryDto categoryDto) {
+    public String addCategory(CategoryAddDto categoryDto) {
+
         return categoryRepo.save(modelMapper.map(categoryDto, Category.class)).getId();
     }
 }

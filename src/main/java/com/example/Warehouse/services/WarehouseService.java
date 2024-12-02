@@ -6,6 +6,7 @@ import com.example.WarehouseContracts.dto.WarehouseAddDto;
 
 public interface WarehouseService {
     WarehouseDto getById(String id);
-    String addWarehouse(WarehouseAddDto warehouseDto);
+    void delete(String warehouseId);
+    String add(WarehouseAddDto warehouseDto);
     Page<WarehouseDto> getWarehouses(String substring, int page, int size);
 }

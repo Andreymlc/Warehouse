@@ -50,11 +50,13 @@ public class UserControllerImpl implements UserController {
         var result = userService.register(modelMapper.map(form, RegisterUserDto.class));
 
         if (result.role() == Roles.ADMIN) {
-            return "redirect:/home/admin?substring=&page=1&size=5&userName=" +
-                    form.userName() + "&role=" + result.role().name();
+            return "redirect:/home/admin?substring=&priceSort=true&" +
+                "base.userName=" + form.userName() +
+                "&base.role=" + result.role().name();
         } else {
-            return "redirect:/home/user?substring=&priceSort=asc&page=1&size=5&userName=" +
-                    form.userName() + "&role=" + result.role().name();
+            return "redirect:/home/user?substring=&priceSort=true&" +
+                "base.userName=" + form.userName() +
+                "&base.role=" + result.role().name();
         }
     }
 
@@ -81,10 +83,10 @@ public class UserControllerImpl implements UserController {
         var result = userService.login(modelMapper.map(form, LoginUserDto.class));
 
         if (result.role() == Roles.ADMIN) {
-            return "redirect:/home/admin?substring=&page=1&size=5&userName=" +
+            return "redirect:/home/admin?substring=&priceSort=true,&userName=" +
                     form.userName() + "&role=" + result.role().name();
         } else {
-            return "redirect:/home/user?substring=&priceSort=asc&page=1&size=5&userName=" +
+            return "redirect:/home/user?substring=&priceSort=true,&userName=" +
                     form.userName() + "&role=" + result.role().name();
         }
     }

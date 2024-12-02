@@ -5,7 +5,9 @@ import com.example.WarehouseContracts.dto.ProductDto;
 import com.example.WarehouseContracts.dto.ProductAddDto;
 
 public interface ProductService {
-    String addProduct(ProductAddDto productAddDto);
     ProductDto getById(String id);
+    void deleteProduct(String productId);
+    String addProduct(ProductAddDto productAddDto);
     Page<ProductDto> getProducts(String substring, int page, int size, String category, boolean priceSort);
+    Page<ProductDto> getProductsByWarehouse(String substring, int page, int size, String category, String warehouseId);
 }

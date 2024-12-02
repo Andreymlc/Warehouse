@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface WarehouseRepository extends BaseRepository<Warehouse> {
+    void deleteById(String id);
     Page<Warehouse>findByNameContainingIgnoreCase(String name, Pageable pageable);
-    Optional<Warehouse> findByName(String name);
 }

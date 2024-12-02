@@ -1,9 +1,6 @@
 package com.example.Warehouse.domain.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.Set;
 
@@ -45,7 +42,7 @@ public class Warehouse extends BaseEntity {
         this.location = location;
     }
 
-    @OneToMany(mappedBy = "warehouse")
+    @OneToMany(mappedBy = "warehouse", cascade = CascadeType.REMOVE)
     public Set<Stock> getStocks() {
         return stock;
     }

@@ -1,15 +1,16 @@
 package com.example.Warehouse.services.impl;
 
-import com.example.Warehouse.services.StockService;
-import com.example.WarehouseContracts.dto.ProductAddDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 import com.example.Warehouse.domain.models.Product;
 import org.springframework.data.domain.PageRequest;
+import com.example.Warehouse.services.StockService;
 import com.example.Warehouse.services.ProductService;
 import com.example.WarehouseContracts.dto.ProductDto;
+import com.example.WarehouseContracts.dto.ProductAddDto;
+import org.springframework.transaction.annotation.Transactional;
 import com.example.Warehouse.domain.repository.ProductRepository;
 import com.example.Warehouse.domain.repository.CategoryRepository;
 
@@ -58,7 +59,39 @@ public class ProductServiceImpl implements ProductService {
                 p.getPrice()
                     .multiply(BigDecimal.valueOf(p.getCategory().getDiscount()))
                     .setScale(2, RoundingMode. HALF_UP),
-                stockService.getQuantityByProductId(p.getId()),
+                stockService.getProductQuantityByProductId(p.getId()),
+                p.getPrice()
+            )
+        );
+    }
+
+    @Override
+    public Page<ProductDto> getProductsByWarehouse(String substring, int page, int size, String category, String warehouseId) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        Page<Product> products;
+
+        if (!substring.isBlank() && !category.isBlank()) {
+            products = productRepo.findByStocksWarehouseIdAndNameContainingIgnoreCase(warehouseId, substring, pageable);
+        }
+        else if (!substring.isBlank()) {
+            products = productRepo.findByStocksWarehouseIdAndNameContainingIgnoreCase(warehouseId, substring, pageable);
+        }
+        else if (!category.isBlank()) {
+            products = productRepo.findByStocksWarehouseIdAndCategoryName(warehouseId, category, pageable);
+        }
+        else {
+            products = productRepo.findByStocksWarehouseId(warehouseId, pageable);
+        }
+
+        return products.map(p -> new ProductDto(
+                p.getId(),
+                p.getName(),
+                p.getCategory().getName(),
+                p.getPrice()
+                .multiply(BigDecimal.valueOf(p.getCategory().getDiscount()))
+                .setScale(2, RoundingMode.HALF_UP),
+                stockService.getProductQuantityByWarehouseId(p.getId(), warehouseId),
                 p.getPrice()
             )
         );
@@ -71,10 +104,15 @@ public class ProductServiceImpl implements ProductService {
             new Product(
                 productAddDto.name(),
                 productAddDto.price(),
-                existingCategory.orElseThrow(),
-                false
+                existingCategory.orElseThrow()
             )
         ).getId();
+    }
+
+    @Override
+    @Transactional
+    public void deleteProduct(String productId) {
+        productRepo.deleteById(productId);
     }
 
     @Override
@@ -90,7 +128,7 @@ public class ProductServiceImpl implements ProductService {
                 .getPrice()
                 .multiply(BigDecimal.valueOf(category.getDiscount()))
                 .setScale(2, RoundingMode. HALF_UP),
-            stockService.getQuantityByProductId(product.getId()),
+            stockService.getProductQuantityByProductId(product.getId()),
             product.getPrice()
         );
     }

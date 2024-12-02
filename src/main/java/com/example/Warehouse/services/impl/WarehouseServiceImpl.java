@@ -26,12 +26,13 @@ public class WarehouseServiceImpl implements WarehouseService {
     public Page<WarehouseDto> getWarehouses(String substring, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("name"));
 
-        Page<Warehouse> warehousePage = substring != null
+        Page<Warehouse> warehouses = substring != null
                 ? warehouseRepo.findByNameContainingIgnoreCase(substring, pageable)
                 : warehouseRepo.findAll(pageable);
 
-        return warehousePage.map(w ->
-            new WarehouseDto(
+
+        return warehouses.map(w ->
+            new com.example.WarehouseContracts.dto.WarehouseDto(
                 w.getId(),
                 w.getName(),
                 w.getLocation()
@@ -43,11 +44,16 @@ public class WarehouseServiceImpl implements WarehouseService {
     public WarehouseDto getById(String id) {
         var warehouse = warehouseRepo.findById(id).orElseThrow();
 
-        return modelMapper.map(warehouse, WarehouseDto.class);
+        return modelMapper.map(warehouse, com.example.WarehouseContracts.dto.WarehouseDto.class);
     }
 
     @Override
-    public String addWarehouse(WarehouseAddDto warehouseDto) {
+    public String add(WarehouseAddDto warehouseDto) {
          return warehouseRepo.save(modelMapper.map(warehouseDto, Warehouse.class)).getId();
+    }
+
+    @Override
+    public void delete(String warehouseId) {
+        warehouseRepo.deleteById(warehouseId);
     }
 }

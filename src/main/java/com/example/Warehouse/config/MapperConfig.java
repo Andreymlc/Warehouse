@@ -52,19 +52,20 @@ public class MapperConfig {
             );
         });
 
-        modelMapper.typeMap(CategoryDto.class, Category.class).setProvider(ctx -> {
-            CategoryDto source = (CategoryDto) ctx.getSource();
+        modelMapper.typeMap(CategoryAddDto.class, Category.class).setProvider(ctx -> {
+            CategoryAddDto source = (CategoryAddDto) ctx.getSource();
             return new Category(
                     source.name(),
-                    source.discount()
+                1 - (float) source.discount() / 100
             );
         });
 
         modelMapper.typeMap(Category.class, CategoryDto.class).setProvider(ctx -> {
             Category source = (Category) ctx.getSource();
             return new CategoryDto(
-                    source.getName(),
-                    source.getDiscount()
+                source.getId(),
+                source.getName(),
+                Math.round(((1 - source.getDiscount()) * 100))
             );
         });
 

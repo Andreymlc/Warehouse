@@ -2,16 +2,43 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
-        <title>Пользователь главная</title>
+        <title>Управление складом</title>
         <link rel="stylesheet" th:href="@{/css/navbar.css}">
-        <link rel="stylesheet" th:href="@{/css/home.css}">
+        <link rel="stylesheet" th:href="@{/css/warehouse.css}">
     </head>
     <header>
         <div th:replace="~{/navbar}">Navbar</div>
     </header>
-    <body class="center-div">
-        <main class="center-main">
-            <form th:action="@{/home/user}"
+    <body>
+        <main>
+            <div class="forms">
+                <form class="edit-container" th:action="@{/warehouses/{id}/set-minimum(id=${form.warehouseId()})}"
+                      th:method="post"
+                      th:object="${editForm}">
+                    <h2>Установить минимум</h2>
+                    <input th:field="*{productId}" placeholder="Id продукта">
+                    <input type="number" min="0" th:field="*{minimum}" placeholder="Минимум для товара">
+                    <input type="hidden" th:field="*{base.userName}" />
+                    <input type="hidden" th:field="*{base.role}" />
+                    <input type="hidden" th:field="*{warehouseId}" />
+                    <button type="submit">Применить</button>
+                </form>
+                <form class="move-container" th:action="@{/warehouses/{warehouseId}/move(warehouseId=${form.warehouseId()})}"
+                      th:method="post"
+                      th:object="${moveForm}">
+                    <h2>Переместить продукт</h2>
+                    <input th:field="*{productId}" placeholder="Id продукта">
+                    <input th:field="*{newWarehouseId}" placeholder="Id склада назначения">
+                    <input type="number" min="0" th:field="*{countItems}" placeholder="Количество товара для транспортировки ">
+                    <input type="hidden" th:field="*{base.userName}" />
+                    <input type="hidden" th:field="*{base.userName}" />
+                    <input type="hidden" th:field="*{base.role}" />
+                    <input type="hidden" th:field="*{warehouseId}" />
+                    <button type="submit">Применить</button>
+                </form>
+            </div>
+            <hr width="100%" align="center" size="2px">
+            <form th:action="@{/warehouses/manage}"
                   th:method="get"
                   th:object="${form}">
                 <div class="search">
@@ -27,16 +54,6 @@
                                     th:text="${category}">
                             </option>
                         </select>
-                        <div class="sorting">
-                            <lable>
-                                <input th:field="*{priceSort}" type="radio" value="true">
-                                Сначала дешевле
-                            </lable>
-                            <lable>
-                                <input th:field="*{priceSort}" type="radio" value="false">
-                                Сначала дороже
-                            </lable>
-                        </div>
                     </div>
                     <button type="submit">Поиск</button>
                 </div>
@@ -44,22 +61,23 @@
                 <input type="hidden" th:field="*{pages.size}" />
                 <input type="hidden" th:field="*{base.userName}" />
                 <input type="hidden" th:field="*{base.role}" />
+                <input type="hidden" th:field="*{warehouseId}" />
             </form>
 
             <div class="pages" th:if="${model.base().totalPages() > 1}">
                 <ul class="pages-ul">
                     <li
-                        th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
-                        th:classappend="${pageNumber == form.pages.page()} ? 'active'">
+                            th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
+                            th:classappend="${pageNumber == form.pages.page()} ? 'active'">
                         <a class="page-picker"
-                           th:href="@{/home/user(
-                                    base.userName=${form.base.userName()},
-                                    base.role=${form.base.role()},
-                                    category=${form.category()},
-                                    priceSort=${form.priceSort()},
-                                    pages.page=${pageNumber},
-                                    pages.size=${form.pages.size()},
-                                    pages.substring=${form.pages.substring()}
+                           th:href="@{/warehouses/{warehouseId}/manage(
+                                warehouseId=${form.warehouseId},
+                                priceSort=true,
+                                base.userName=${form.base().userName()},
+                                base.role=${form.base().role()},
+                                pages.page=${pageNumber},
+                                pages.size=${form.pages().size()},
+                                pages.substring=${form.pages().substring()}
                                 )}"
                            th:text="${pageNumber}">1</a>
                     </li>
@@ -82,8 +100,8 @@
                         <h4 th:if="${product.price() == product.oldPrice()}"
                             th:text="'Цена: ' + ${product.price()}">Цена</h4>
                         <h4 th:text="'Количество: ' + ${product.quantity()}">Количество</h4>
-
-                        <a class="long-button">Добавить в корзину</a>
+                        <h4 th:text="'ID: ' + ${product.id()}">ID</h4>
+                        <a class="long-button">Редактировать</a>
                     </div>
                 </div>
             </div>

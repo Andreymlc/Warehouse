@@ -77,7 +77,7 @@ public class User extends BaseEntity {
         this.role = role;
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     public Set<Purchase> getPurchases() {
         return purchases;
     }

@@ -2,8 +2,8 @@ package com.example.Warehouse.domain.models;
 
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
 import java.util.Set;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "products")
@@ -11,7 +11,6 @@ public class Product extends BaseEntity {
     private String name;
     private BigDecimal price;
     private Category category;
-    private boolean isDeleted;
     private Set<Stock> stocks;
     private Set<OrderItem> orderItems;
     private Set<PurchaseItem> purchaseItems;
@@ -21,12 +20,10 @@ public class Product extends BaseEntity {
     public Product(
             String name,
             BigDecimal price,
-            Category category,
-            boolean isDeleted) {
+            Category category) {
         this.name = name;
         this.price = price;
         this.category = category;
-        this.isDeleted = isDeleted;
     }
 
     @Column(name = "name", nullable = false)
@@ -47,7 +44,7 @@ public class Product extends BaseEntity {
         this.price = price;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     public Category getCategory() {
         return category;
     }
@@ -56,16 +53,7 @@ public class Product extends BaseEntity {
         this.category = category;
     }
 
-    @Column(name = "is_deleted", nullable = false)
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
-    }
-
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     public Set<Stock> getStocks() {
         return stocks;
     }
@@ -74,7 +62,7 @@ public class Product extends BaseEntity {
         this.stocks = stock;
     }
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     public Set<PurchaseItem> getPurchaseItems() {
         return purchaseItems;
     }
@@ -83,7 +71,7 @@ public class Product extends BaseEntity {
         this.purchaseItems = purchaseItems;
     }
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     public Set<OrderItem> getOrderItems() {
         return orderItems;
     }

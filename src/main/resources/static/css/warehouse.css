@@ -2,92 +2,42 @@ body, html {
     height: 100%;
     width: 100%;
     display: flex;
-    position: fixed;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 main {
-    width: 85%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding-top: 20px;
-    margin-top: 75px;
-}
-
-.center-div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.create-form {
-    display: flex;
-    margin-top: 20px;
-    gap: 10px;
-    align-items: center;
-}
-
-.create-form h4 {
-    margin: 20px 0 0;
-    font-size: 20px;
-}
-
-.center-main {
-    display: flex;
     width: 100%;
-    align-items: center;
-}
-
-aside {
-    width: 15%;
-    margin-top: 75px;
-    margin-right: 20px;
-    padding-top: 30px;
-    border-right: 2px solid #555555 ;
-}
-
-aside ul {
-    list-style: none;
-    margin: 0 0 0 10px;
-    padding: 0;
     display: flex;
+    margin-top: 75px;
+    padding-top: 20px;
+    align-items: center;
     flex-direction: column;
-    gap: 16px;
-}
-
-aside a {
-    color: #555555;
-    text-decoration: none;
-    font-size: 24px;
-    padding: 2px 4px;
-    border-radius: 4px;
-    border: 1px dashed #555;
-    transition: background-color 0.3s;
-}
-
-aside a:hover {
-    color: white;
-    background-color: #555;
-}
-
-.active-button {
-    color: white;
-    background-color: #555;
 }
 
 form {
+    margin-top: 10px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     flex-direction: column;
 }
 
-lable {
+.forms {
     display: flex;
-    align-items: flex-end;
+    margin-top: 0;
+    gap: 20px;
+}
+
+.forms form {
+    margin-top: 0;
+}
+
+form h2 {
+    margin: 0;
 }
 
 input {
-    width: 500px;
+    width: 300px;
     height: 30px;
     padding: 5px 10px;
     border-radius: 4px;
@@ -95,35 +45,15 @@ input {
     font-size: 14px;
 }
 
-.small-input {
-    width: 50px;
-    height: 20px;
-}
-
-.default-input {
-    width: 200px;
-}
-
 .search {
     display: flex;
     align-items: center;
-    flex-direction: row;
 }
 
 .filters {
     display: flex;
     margin-left: 16px;
     height: 100%;
-}
-
-.sorting {
-    flex-direction: column;
-    padding: 0;
-}
-
-.sorting input {
-    width: max-content;
-    height: 20px;
 }
 
 button {
@@ -143,18 +73,6 @@ button {
 
 button:hover {
     background-color: #444;
-}
-
-button .active-button {
-    height: 36px;
-    width: 100px;
-    border: none;
-    border-radius: 0.5em;
-    color: white;
-    background-color: #555;
-    padding: 5px 10px;
-    cursor: pointer;
-    transition: background-color 0.3s;
 }
 
 .card {
@@ -185,6 +103,11 @@ button .active-button {
     border-radius: 0.5em;
     padding: 5px;
     transition: background-color 0.3s;
+}
+
+.decorated-text {
+    text-decoration: underline;
+    color: crimson;
 }
 
 .long-button {
@@ -237,12 +160,15 @@ button .active-button {
     justify-content: center;
 }
 
-.margin-top {
-    margin-top: 10px;
+.edit-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.decorated-text {
-    text-decoration: underline;
-    color: crimson;
-}
+.move-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 
+}
