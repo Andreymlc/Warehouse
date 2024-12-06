@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Админ редактирование продукта</title>
+        <link rel="stylesheet" th:href="@{/css/navbar.css}">
+        <link rel="stylesheet" th:href="@{/css/home.css}">
+    </head>
+    <header>
+        <div th:replace="~{/navbar}">Navbar</div>
+    </header>
+    <body>
+        <main class="center-main">
+            <form class="standard-form" th:action="@{/catalog/products/{id}/edit(id=${productId})}"
+                  th:method="post"
+                  th:object="${edit}">
+                <h4>Редактирование продукта</h4>
+                <input class="default-input" type="text" th:field="*{name}" placeholder="Название товара">
+                <input class="default-input" type="text" th:field="*{category}" placeholder="Категория">
+                <input class="default-input" type="number" min="0" th:field="*{price}" placeholder="Цена" >
+                <input type="hidden" th:field="*{base.userName}"/>
+                <input type="hidden" th:field="*{base.role}" />
+                <input type="hidden" th:field="*{id}" />
+                <button type="submit">Создать</button>
+            </form>
+        </main>
+    </body>
+</html>

@@ -29,7 +29,7 @@
                      base.role=${form.base.role()})}">Категории</a>
                 </li>
             </ul>
-            <form class="create-form" th:action="@{/warehouses/create}"
+            <form class="standard-form" th:action="@{/warehouses/create}"
                   th:method="post"
                   th:object="${create}">
                 <h4>Создание склада</h4>
@@ -92,8 +92,8 @@
                                 base.role=${form.base().role()})}">Редактировать</a>
                             <a  th:href="@{/warehouses/{warehouseId}/delete(
                                 warehouseId=${warehouse.id},
-                                base.userName=${form.base().userName()},
-                                base.role=${form.base().role()})}"
+                                userName=${form.base().userName()},
+                                role=${form.base().role()})}"
                                 onclick="return confirm('Вы уверены, что хотите удалить склад?');">Удалить</a>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 package com.example.Warehouse.services.impl;
 
-import com.example.WarehouseContracts.dto.CategoryAddDto;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -10,8 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import com.example.Warehouse.domain.models.Category;
 import com.example.WarehouseContracts.dto.CategoryDto;
 import com.example.Warehouse.services.CategoryService;
-import com.example.Warehouse.domain.repository.CategoryRepository;
+import com.example.WarehouseContracts.dto.CategoryAddDto;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.Warehouse.domain.repository.CategoryRepository;
 
 import java.util.List;
 
@@ -26,19 +27,23 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDto> getAllCategories() {
-        return  categoryRepo.findAll()
-                .stream()
-                .map(c -> modelMapper.map(c, CategoryDto.class))
-                .toList();
+    public String addCategory(CategoryAddDto categoryDto) {
+        return categoryRepo.save(modelMapper.map(categoryDto, Category.class)).getId();
     }
 
     @Override
-    public Page<CategoryDto> getCategories(String substring, int page, int size) {
+    public void deleteCategory(String id) {
+        categoryRepo.deleteById(id);
+    }
+
+    @Override
+    public Page<CategoryDto> findCategories(String substring, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("name"));
+
         Page<Category> categoryPage = substring != null
                 ? categoryRepo.findByNameContainingIgnoreCase(substring, pageable)
                 : categoryRepo.findAll(pageable);
+
         return categoryPage.map(c -> modelMapper.map(c, CategoryDto.class));
     }
 
@@ -49,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<String> getAllNameCategories() {
+    public List<String> findAllNameCategories() {
         return  categoryRepo.findAll()
                 .stream()
                 .map(Category::getName)
@@ -57,8 +62,22 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public String addCategory(CategoryAddDto categoryDto) {
+    public void editCategory(String id, String name, int discount) {
+        var category = categoryRepo.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
 
-        return categoryRepo.save(modelMapper.map(categoryDto, Category.class)).getId();
+        var isChanged = false;
+
+        if (name != null && !category.getName().equalsIgnoreCase(name)) {
+            category.setName(name);
+            isChanged = true;
+        }
+        if (category.getDiscount() != discount) {
+            category.setDiscount(1 - (float) discount / 100);
+            isChanged = true;
+        }
+        if (isChanged) {
+            categoryRepo.save(category);
+        }
     }
 }

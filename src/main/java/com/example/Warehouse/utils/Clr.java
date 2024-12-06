@@ -98,7 +98,8 @@ public class Clr implements CommandLineRunner {
                             random.nextInt(10),
                             product,
                             warehouse,
-                            1
+                            1,
+                            20
                         )
                     );
                 }

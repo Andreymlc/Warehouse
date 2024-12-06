@@ -1,7 +1,5 @@
 package com.example.Warehouse.controllers;
 
-import com.example.WarehouseContracts.dto.WarehouseAddDto;
-import com.example.WarehouseContracts.dto.forms.warehouse.WarehouseCreateForm;
 import jakarta.validation.Valid;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,14 +9,15 @@ import org.springframework.validation.BindingResult;
 import com.example.Warehouse.services.ProductService;
 import com.example.Warehouse.services.CategoryService;
 import com.example.Warehouse.services.WarehouseService;
+import com.example.WarehouseContracts.dto.WarehouseAddDto;
 import com.example.WarehouseContracts.dto.forms.base.BaseAdminForm;
 import com.example.WarehouseContracts.controllers.WarehouseController;
 import com.example.WarehouseContracts.dto.forms.product.ProductMoveForm;
+import com.example.WarehouseContracts.dto.forms.product.ProductSetMinMaxForm;
 import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
 import com.example.WarehouseContracts.dto.viewmodels.product.ProductViewModel;
-import com.example.WarehouseContracts.dto.forms.warehouse.WarehouseDeleteForm;
+import com.example.WarehouseContracts.dto.forms.warehouse.WarehouseCreateForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductWarehouseSearchForm;
-import com.example.WarehouseContracts.dto.viewmodels.product.ProductSetMinimumForm;
 import com.example.WarehouseContracts.dto.viewmodels.product.AdminProductsViewModel;
 
 @Controller
@@ -33,11 +32,39 @@ public class WarehouseControllerImpl implements WarehouseController {
         StockService stockService,
         ProductService productService,
         CategoryService categoryService,
-        WarehouseService warehouseService) {
+        WarehouseService warehouseService
+    ) {
         this.stockService = stockService;
         this.productService = productService;
         this.categoryService = categoryService;
         this.warehouseService = warehouseService;
+    }
+
+    @PostMapping("/create")
+    public String create(
+        @Valid @ModelAttribute("create")WarehouseCreateForm create,
+        BindingResult bindingResult,
+        Model model
+    ) {
+        warehouseService.add(new WarehouseAddDto(create.name(), create.location()));
+
+        return "redirect:/home/admin/warehouses?" +
+            "base.userName=" + create.base().userName() +
+            "&base.role=" + create.base().role();
+    }
+
+    @Override
+    @GetMapping("/{warehouseId}/delete")
+    public String delete(
+        @PathVariable("warehouseId") String warehouseId,
+        @Valid @ModelAttribute("form") BaseAdminForm form,
+        BindingResult bindingResult
+    ) {
+        warehouseService.delete(warehouseId);
+
+        return "redirect:/home/admin/warehouses?" +
+            "base.userName=" + form.userName() +
+            "&base.role=" + form.role();
     }
 
     @Override
@@ -45,9 +72,9 @@ public class WarehouseControllerImpl implements WarehouseController {
     public String showManagePage(
         @PathVariable("warehouseId") String warehouseId,
         @ModelAttribute("form") ProductWarehouseSearchForm form,
-        Model model) {
-
-        var productsPage = productService.getProductsByWarehouse(
+        Model model
+    ) {
+        var productsPage = productService.findProductsByWarehouse(
             form.pages().substring(),
             form.pages().page(),
             form.pages().size(),
@@ -55,7 +82,7 @@ public class WarehouseControllerImpl implements WarehouseController {
             warehouseId
         );
 
-        var categories = categoryService.getAllNameCategories();
+        var categories = categoryService.findAllNameCategories();
 
         var productViewModels = productsPage
             .stream()
@@ -78,7 +105,8 @@ public class WarehouseControllerImpl implements WarehouseController {
 
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
-        model.addAttribute("editForm", new ProductSetMinimumForm(null, null, "", "", new BaseAdminForm(form.base().role(), form.base().userName())));
+        model.addAttribute("minimum", new ProductSetMinMaxForm(null, null, "", "", new BaseAdminForm(form.base().role(), form.base().userName())));
+        model.addAttribute("maximum", new ProductSetMinMaxForm(null, null, "", "", new BaseAdminForm(form.base().role(), form.base().userName())));
         model.addAttribute("moveForm", new ProductMoveForm(null, null, null, new BaseAdminForm(form.base().role(), form.base().userName()), null, null));
 
         return "warehouse";
@@ -90,8 +118,8 @@ public class WarehouseControllerImpl implements WarehouseController {
         @PathVariable("warehouseId") String warehouseId,
         @Valid @ModelAttribute("moveForm") ProductMoveForm moveForm,
         BindingResult bindingResult,
-        Model model) {
-
+        Model model
+    ) {
         stockService.moveProduct(moveForm.productId(), warehouseId, moveForm.newWarehouseId(), moveForm.countItems());
 
         return "redirect:/warehouses/" + warehouseId + "/manage?" +
@@ -105,11 +133,11 @@ public class WarehouseControllerImpl implements WarehouseController {
     @PostMapping("/{warehouseId}/set-minimum")
     public String setMinimum(
         @PathVariable("warehouseId") String warehouseId,
-        @Valid @ModelAttribute("editForm")ProductSetMinimumForm editForm,
+        @Valid @ModelAttribute("minimum") ProductSetMinMaxForm editForm,
         BindingResult bindingResult,
-        Model model) {
-
-        stockService.setMinimum(editForm.minimum(), editForm.productId(), warehouseId);
+        Model model
+    ) {
+        stockService.setMinimum(editForm.value(), editForm.productId(), warehouseId);
 
         return "redirect:/warehouses/" + warehouseId + "/manage?" +
             "base.userName=" + editForm.base().userName() +
@@ -119,30 +147,20 @@ public class WarehouseControllerImpl implements WarehouseController {
     }
 
     @Override
-    @GetMapping("/{warehouseId}/delete")
-    public String delete(
+    @PostMapping("/{warehouseId}/set-maximum")
+    public String setMaximum(
         @PathVariable("warehouseId") String warehouseId,
-        @Valid @ModelAttribute("form") WarehouseDeleteForm form,
-        BindingResult bindingResult) {
-
-        warehouseService.delete(warehouseId);
-
-        return "redirect:/home/admin/warehouses?" +
-            "base.userName=" + form.base().userName() +
-            "&base.role=" + form.base().role();
-    }
-
-    @PostMapping("/create")
-    public String create(
-        @Valid @ModelAttribute("create")WarehouseCreateForm create,
+        @Valid @ModelAttribute("maximum") ProductSetMinMaxForm editForm,
         BindingResult bindingResult,
-        Model model) {
+        Model model
+    ) {
+        stockService.setMaximum(editForm.value(), editForm.productId(), warehouseId);
 
-        warehouseService.add(new WarehouseAddDto(create.name(), create.location()));
-
-        return "redirect:/home/admin/warehouses?" +
-            "base.userName=" + create.base().userName() +
-            "&base.role=" + create.base().role();
+        return "redirect:/warehouses/" + warehouseId + "/manage?" +
+            "base.userName=" + editForm.base().userName() +
+            "&base.role=" + editForm.base().role() +
+            "&priceSort=true" +
+            "&warehouseId=" + warehouseId;
     }
 
     @Override

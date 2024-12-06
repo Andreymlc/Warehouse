@@ -20,14 +20,14 @@ main {
     align-items: center;
 }
 
-.create-form {
+.standard-form {
     display: flex;
     margin-top: 20px;
     gap: 10px;
     align-items: center;
 }
 
-.create-form h4 {
+.standard-form h4 {
     margin: 20px 0 0;
     font-size: 20px;
 }

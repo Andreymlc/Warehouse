@@ -1,6 +1,5 @@
 package com.example.Warehouse.config;
 
-import com.example.Warehouse.domain.models.Product;
 import org.modelmapper.ModelMapper;
 import com.example.WarehouseContracts.dto.*;
 import com.example.Warehouse.domain.models.Order;

@@ -10,6 +10,7 @@ import com.example.WarehouseContracts.enums.Status;
 import org.springframework.data.domain.PageRequest;
 import com.example.Warehouse.services.OrderService;
 import com.example.WarehouseContracts.dto.OrderDto;
+import jakarta.persistence.EntityNotFoundException;
 import com.example.Warehouse.domain.repository.UserRepository;
 import com.example.Warehouse.domain.repository.OrderRepository;
 
@@ -22,7 +23,11 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepo;
     private final OrderRepository orderRepo;
 
-    public OrderServiceImpl(OrderRepository orderRepo, ModelMapper modelMapper, UserRepository userRepo) {
+    public OrderServiceImpl(
+        OrderRepository orderRepo,
+        ModelMapper modelMapper,
+        UserRepository userRepo
+    ) {
         this.orderRepo = orderRepo;
         this.modelMapper = modelMapper;
         this.userRepo = userRepo;
@@ -58,7 +63,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String addOrder(String userId, String status, BigDecimal price) {
-        var existingUser = userRepo.findById(userId).orElseThrow();
+        var existingUser = userRepo.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 
         return orderRepo.save(
             new Order(

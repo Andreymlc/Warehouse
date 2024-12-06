@@ -29,6 +29,16 @@
                              base.role=${form.base.role()})}">Категории</a>
                 </li>
             </ul>
+            <form class="standard-form" th:action="@{/catalog/categories/create}"
+                  th:method="post"
+                  th:object="${create}">
+                <h4>Создание категории</h4>
+                <input class="default-input" type="text" th:field="*{name}" placeholder="Навзание категории">
+                <input class="default-input" type="text" th:field="*{discount}" placeholder="Скидка" >
+                <input type="hidden" th:field="*{base.userName}"/>
+                <input type="hidden" th:field="*{base.role}" />
+                <button type="submit">Создать</button>
+            </form>
         </aside>
         <main>
             <form th:action="@{/home/admin/categories}"
@@ -73,17 +83,23 @@
                     <div class="card" th:each="category : ${model.categories()}">
                         <h2 th:text="'Название: ' + ${category.name()}">Название Категории</h2>
                         <h4 th:text="'Скидка по категории: ' + ${category.discount()} + '%'">Скидка по категории</h4>
-                        <form class="search" th:action="@{/products/{categoryId}/set-discount(categoryId=${category.id()})}"
+                        <form  class="search" th:action="@{/catalog/categories/{categoryId}/edit(categoryId=${category.id()})}"
                               th:method="post"
-                              th:object="${discount}">
+                              th:object="${edit}">
                             <input class="small-input" type="number" min="0" max="100" th:field="*{discount}" placeholder="Скидка">
                             <input type="hidden" th:field="*{base.userName}" />
                             <input type="hidden" th:field="*{base.role}" />
                             <button type="submit">Применить</button>
                         </form>
                         <div class="margin-top">
-                            <a>Редактировать</a>
-                            <a onclick="return confirm('Вы уверены, что хотите удалить продукт?');">Удалить</a>
+                            <a th:href="@{/catalog/categories/{id}/edit(
+                            id=${category.id()},
+                            name=${category.name()},
+                            discount=${category.discount()},
+                            base.userName=${form.base.userName()},
+                            base.role=${form.base.role()}
+                            )}">Редактировать</a>
+                            <a onclick="return confirm('Вы уверены, что хотите удалить категорию?');">Удалить</a>
                         </div>
                     </div>
                 </div>

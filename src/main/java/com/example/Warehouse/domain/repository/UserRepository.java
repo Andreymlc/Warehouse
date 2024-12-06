@@ -10,5 +10,4 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends BaseRepository<User> {
     Optional<User> findByUserName(String name);
-    List<User> findByRole(Roles role);
 }

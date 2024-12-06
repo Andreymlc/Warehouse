@@ -1,10 +1,6 @@
 package com.example.Warehouse.controllers;
 
-import com.example.WarehouseContracts.dto.forms.base.BaseAdminForm;
-import com.example.WarehouseContracts.dto.forms.category.CategorySetDiscountForm;
-import com.example.WarehouseContracts.dto.forms.product.ProductCreateForm;
-import com.example.WarehouseContracts.dto.forms.warehouse.WarehouseCreateForm;
-import com.example.WarehouseContracts.dto.viewmodels.product.AdminProductsViewModel;
+import com.example.WarehouseContracts.dto.forms.category.CategoryEditForm;
 import jakarta.validation.Valid;
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
@@ -18,12 +14,16 @@ import com.example.WarehouseContracts.dto.viewmodels.home.*;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.WarehouseContracts.controllers.HomeController;
-import com.example.WarehouseContracts.dto.forms.warehouse.WarehousesSearchForm;
+import com.example.WarehouseContracts.dto.forms.product.ProductCreateForm;
+import com.example.WarehouseContracts.dto.forms.category.CategoryCreateForm;
 import com.example.WarehouseContracts.dto.forms.category.CategorySearchForm;
 import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
 import com.example.WarehouseContracts.dto.viewmodels.product.ProductViewModel;
+import com.example.WarehouseContracts.dto.forms.warehouse.WarehouseCreateForm;
+import com.example.WarehouseContracts.dto.forms.warehouse.WarehousesSearchForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductsUserSearchForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductsAdminSearchForm;
+import com.example.WarehouseContracts.dto.viewmodels.product.AdminProductsViewModel;
 
 import java.math.BigDecimal;
 
@@ -37,7 +37,8 @@ public class HomeControllerImpl implements HomeController {
     public HomeControllerImpl(
         WarehouseService warehouseService,
         ProductService productService,
-        CategoryService categoryService) {
+        CategoryService categoryService
+    ) {
         this.productService = productService;
         this.categoryService = categoryService;
         this.warehouseService = warehouseService;
@@ -73,9 +74,14 @@ public class HomeControllerImpl implements HomeController {
                 warehouseViewModels
         );
 
-        model.addAttribute("model", viewModel);
-        model.addAttribute("create", new WarehouseCreateForm("", "", new BaseAdminForm(form.base().role(), form.base().userName())));
         model.addAttribute("form", form);
+        model.addAttribute("model", viewModel);
+        model.addAttribute("create",
+            new WarehouseCreateForm("",
+                "",
+                form.base()
+            )
+        );
 
         return "admin-warehouses";
     }
@@ -89,8 +95,7 @@ public class HomeControllerImpl implements HomeController {
 
         if (bindingResult.hasErrors()) return "admin-products";
 
-
-        var productsPage = productService.getProducts(
+        var productsPage = productService.findProducts(
                 form.pages().substring(),
                 form.pages().page(),
                 form.pages().size(),
@@ -98,7 +103,7 @@ public class HomeControllerImpl implements HomeController {
                 form.priceSort()
         );
 
-        var categories = categoryService.getAllNameCategories();
+        var categories = categoryService.findAllNameCategories();
 
         var productViewModels = productsPage
                 .stream()
@@ -119,9 +124,16 @@ public class HomeControllerImpl implements HomeController {
                 productViewModels
         );
 
-        model.addAttribute("model", viewModel);
-        //model.addAttribute("create", new ProductCreateForm(null, null, null, new BigDecimal(0), new BaseAdminForm(form.base().role(), form.base().userName())));
         model.addAttribute("form", form);
+        model.addAttribute("model", viewModel);
+        model.addAttribute("createProduct",
+            new ProductCreateForm(
+                null,
+                null,
+                new BigDecimal(0),
+                form.base()
+            )
+        );
 
         return "admin-products";
     }
@@ -138,7 +150,7 @@ public class HomeControllerImpl implements HomeController {
             return "admin-categories";
         }
 
-        var categoriesPage = categoryService.getCategories(
+        var categoriesPage = categoryService.findCategories(
             form.pages().substring(),
             form.pages().page(),
             form.pages().size()
@@ -158,9 +170,23 @@ public class HomeControllerImpl implements HomeController {
                 categoriesViewModels
         );
 
-        model.addAttribute("model", viewModel);
         model.addAttribute("form", form);
-        model.addAttribute("discount", new CategorySetDiscountForm(null, 0, null, new BaseAdminForm("admin", form.base().userName())));
+        model.addAttribute("model", viewModel);
+        model.addAttribute("create",
+            new CategoryCreateForm(
+                null,
+                0,
+                form.base()
+            )
+        );
+        model.addAttribute("edit",
+            new CategoryEditForm(
+                null,
+                null,
+                0,
+                form.base()
+            )
+        );
 
         return "admin-categories";
     }
@@ -174,7 +200,7 @@ public class HomeControllerImpl implements HomeController {
 
         if (bindingResult.hasErrors()) return "home-user";
 
-        var productsPage = productService.getProducts(
+        var productsPage = productService.findProducts(
                 form.pages().substring(),
                 form.pages().page(),
                 form.pages().size(),
@@ -182,7 +208,7 @@ public class HomeControllerImpl implements HomeController {
                 form.priceSort()
         );
 
-        var categories = categoryService.getAllNameCategories();
+        var categories = categoryService.findAllNameCategories();
 
         var productViewModels = productsPage
                 .stream()
@@ -209,8 +235,6 @@ public class HomeControllerImpl implements HomeController {
 
         return "home-user";
     }
-
-
 
     @Override
     public BasePagesViewModel createBaseViewModel(Integer totalPages, Integer countItemsInCart) {

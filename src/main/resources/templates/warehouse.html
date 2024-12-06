@@ -14,10 +14,21 @@
             <div class="forms">
                 <form class="edit-container" th:action="@{/warehouses/{id}/set-minimum(id=${form.warehouseId()})}"
                       th:method="post"
-                      th:object="${editForm}">
+                      th:object="${minimum}">
                     <h2>Установить минимум</h2>
                     <input th:field="*{productId}" placeholder="Id продукта">
-                    <input type="number" min="0" th:field="*{minimum}" placeholder="Минимум для товара">
+                    <input type="number" min="0" th:field="*{value}" placeholder="Минимум для товара">
+                    <input type="hidden" th:field="*{base.userName}" />
+                    <input type="hidden" th:field="*{base.role}" />
+                    <input type="hidden" th:field="*{warehouseId}" />
+                    <button type="submit">Применить</button>
+                </form>
+                <form class="edit-container" th:action="@{/warehouses/{id}/set-maximum(id=${form.warehouseId()})}"
+                      th:method="post"
+                      th:object="${maximum}">
+                    <h2>Установить максимум</h2>
+                    <input th:field="*{productId}" placeholder="Id продукта">
+                    <input type="number" min="0" th:field="*{value}" placeholder="Максиум для товара">
                     <input type="hidden" th:field="*{base.userName}" />
                     <input type="hidden" th:field="*{base.role}" />
                     <input type="hidden" th:field="*{warehouseId}" />
@@ -101,7 +112,6 @@
                             th:text="'Цена: ' + ${product.price()}">Цена</h4>
                         <h4 th:text="'Количество: ' + ${product.quantity()}">Количество</h4>
                         <h4 th:text="'ID: ' + ${product.id()}">ID</h4>
-                        <a class="long-button">Редактировать</a>
                     </div>
                 </div>
             </div>

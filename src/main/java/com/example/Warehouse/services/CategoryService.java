@@ -7,9 +7,11 @@ import com.example.WarehouseContracts.dto.CategoryAddDto;
 import java.util.List;
 
 public interface CategoryService {
-    List<String> getAllNameCategories();
-    List<CategoryDto> getAllCategories();
-    void setDiscount(String id, int discount);
+    void deleteCategory(String id);
+    void editCategory(String id, String name, int discount);
     String addCategory(CategoryAddDto categoryDto);
-    Page<CategoryDto> getCategories(String substring, int page, int size);
+    void setDiscount(String id, int discount);
+
+    List<String> findAllNameCategories();
+    Page<CategoryDto> findCategories(String substring, int page, int size);
 }

@@ -6,18 +6,20 @@ import jakarta.persistence.*;
 @Table(name = "stocks")
 public class Stock extends BaseEntity {
     private Integer quantity;
-    private Integer minimumStock;
+    private Integer minStock;
+    private Integer maxStock;
 
     private Product product;
     private Warehouse warehouse;
 
     protected Stock() {}
 
-    public Stock(Integer quantity, Integer minimumStock, Product product, Warehouse warehouse) {
+    public Stock(Integer quantity, Integer minStock, Integer maxStock, Product product, Warehouse warehouse) {
+        this.maxStock = maxStock;
         this.product = product;
         this.quantity = quantity;
         this.warehouse = warehouse;
-        this.minimumStock = minimumStock;
+        this.minStock = minStock;
     }
 
     @Column(name = "quantity", nullable = false)
@@ -30,12 +32,21 @@ public class Stock extends BaseEntity {
     }
 
     @Column(name = "minimum_stock", nullable = false)
-    public Integer getMinimumStock() {
-        return minimumStock;
+    public Integer getMinStock() {
+        return minStock;
     }
 
-    public void setMinimumStock(Integer minimumStock) {
-        this.minimumStock = minimumStock;
+    public void setMinStock(Integer minimumStock) {
+        this.minStock = minimumStock;
+    }
+
+    @Column(name = "maximum_stock", nullable = false)
+    public Integer getMaxStock() {
+        return maxStock;
+    }
+
+    public void setMaxStock(Integer maxStock) {
+        this.maxStock = maxStock;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

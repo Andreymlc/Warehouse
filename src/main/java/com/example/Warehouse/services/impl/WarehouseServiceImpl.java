@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import com.example.Warehouse.domain.models.Warehouse;
 import com.example.Warehouse.services.WarehouseService;
@@ -42,7 +43,8 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public WarehouseDto getById(String id) {
-        var warehouse = warehouseRepo.findById(id).orElseThrow();
+        var warehouse = warehouseRepo.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Склад не найден"));
 
         return modelMapper.map(warehouse, com.example.WarehouseContracts.dto.WarehouseDto.class);
     }
