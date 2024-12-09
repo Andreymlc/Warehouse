@@ -1,6 +1,7 @@
 package com.example.Warehouse.controllers;
 
-import com.example.WarehouseContracts.dto.forms.category.CategoryEditForm;
+import com.example.WarehouseContracts.dto.forms.base.BaseAdminForm;
+import com.example.WarehouseContracts.dto.forms.base.BaseUserForm;
 import jakarta.validation.Valid;
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
@@ -15,17 +16,18 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.example.WarehouseContracts.controllers.HomeController;
 import com.example.WarehouseContracts.dto.forms.product.ProductCreateForm;
+import com.example.WarehouseContracts.dto.forms.category.CategoryEditForm;
 import com.example.WarehouseContracts.dto.forms.category.CategoryCreateForm;
 import com.example.WarehouseContracts.dto.forms.category.CategorySearchForm;
 import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
+import com.example.WarehouseContracts.dto.forms.cart.AddProductToUserCartForm;
 import com.example.WarehouseContracts.dto.viewmodels.product.ProductViewModel;
 import com.example.WarehouseContracts.dto.forms.warehouse.WarehouseCreateForm;
+import com.example.WarehouseContracts.dto.forms.cart.AddProductToAdminCartForm;
 import com.example.WarehouseContracts.dto.forms.warehouse.WarehousesSearchForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductsUserSearchForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductsAdminSearchForm;
 import com.example.WarehouseContracts.dto.viewmodels.product.AdminProductsViewModel;
-
-import java.math.BigDecimal;
 
 @Controller
 @RequestMapping("/home")
@@ -76,12 +78,7 @@ public class HomeControllerImpl implements HomeController {
 
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
-        model.addAttribute("create",
-            new WarehouseCreateForm("",
-                "",
-                form.base()
-            )
-        );
+        model.addAttribute("create", new WarehouseCreateForm("", "", new BaseAdminForm(null, null, null)));
 
         return "admin-warehouses";
     }
@@ -103,17 +100,17 @@ public class HomeControllerImpl implements HomeController {
                 form.priceSort()
         );
 
-        var categories = categoryService.findAllNameCategories();
+        var categories = categoryService.findAllNamesCategories();
 
         var productViewModels = productsPage
                 .stream()
                 .map(p -> new ProductViewModel(
                         p.id(),
                         p.name(),
-                        p.category(),
-                        p.quantity(),
                         p.price(),
-                        p.oldPrice()
+                        p.oldPrice(),
+                        p.category(),
+                        p.quantity()
                     )
                 )
                 .toList();
@@ -126,14 +123,8 @@ public class HomeControllerImpl implements HomeController {
 
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
-        model.addAttribute("createProduct",
-            new ProductCreateForm(
-                null,
-                null,
-                new BigDecimal(0),
-                form.base()
-            )
-        );
+        model.addAttribute("add", new AddProductToAdminCartForm(null, new BaseAdminForm(null, null, null)));
+        model.addAttribute("createProduct", new ProductCreateForm(null, 0f, null, new BaseAdminForm(null, null, null)));
 
         return "admin-products";
     }
@@ -172,21 +163,8 @@ public class HomeControllerImpl implements HomeController {
 
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
-        model.addAttribute("create",
-            new CategoryCreateForm(
-                null,
-                0,
-                form.base()
-            )
-        );
-        model.addAttribute("edit",
-            new CategoryEditForm(
-                null,
-                null,
-                0,
-                form.base()
-            )
-        );
+        model.addAttribute("create", new CategoryCreateForm(null, 0, new BaseAdminForm(null, null, null)));
+        model.addAttribute("edit", new CategoryEditForm(null, null, 0, new BaseAdminForm(null, null, null)));
 
         return "admin-categories";
     }
@@ -208,36 +186,36 @@ public class HomeControllerImpl implements HomeController {
                 form.priceSort()
         );
 
-        var categories = categoryService.findAllNameCategories();
+        var categories = categoryService.findAllNamesCategories();
 
         var productViewModels = productsPage
                 .stream()
                 .map(p -> new ProductViewModel(
                         p.id(),
                         p.name(),
-                        p.category(),
-                        p.quantity(),
                         p.price(),
-                        p.oldPrice()
+                        p.oldPrice(),
+                        p.category(),
+                        p.quantity()
                     )
                 )
                 .toList();
 
         var viewModel = new HomeUserViewModel(
-                createBaseViewModel(productsPage.getTotalPages(), 0),
                 form.base().pointsCount(),
+                createBaseViewModel(productsPage.getTotalPages(), 0),
                 categories,
                 productViewModels
         );
 
-        model.addAttribute("model", viewModel);
         model.addAttribute("form", form);
-
+        model.addAttribute("model", viewModel);
+        model.addAttribute("add", new AddProductToUserCartForm(null, new BaseUserForm(null, null, null, 0)));
         return "home-user";
     }
 
     @Override
-    public BasePagesViewModel createBaseViewModel(Integer totalPages, Integer countItemsInCart) {
+    public BasePagesViewModel createBaseViewModel(int totalPages, int countItemsInCart) {
         return new BasePagesViewModel(totalPages, countItemsInCart);
     }
 }

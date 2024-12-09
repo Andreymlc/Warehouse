@@ -1,18 +1,18 @@
 package com.example.Warehouse.services.impl;
 
+import com.example.Warehouse.dto.ProductDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import com.example.Warehouse.dto.ProductAddDto;
 import org.springframework.data.domain.Pageable;
 import jakarta.persistence.EntityNotFoundException;
 import com.example.Warehouse.domain.models.Product;
-import org.springframework.data.domain.PageRequest;
 import com.example.Warehouse.services.StockService;
+import org.springframework.data.domain.PageRequest;
 import com.example.Warehouse.services.ProductService;
-import com.example.WarehouseContracts.dto.ProductDto;
-import com.example.WarehouseContracts.dto.ProductAddDto;
-import com.example.Warehouse.domain.repository.CategoryRepository;
-import com.example.Warehouse.domain.repository.contracts.ProductRepository;
+import com.example.Warehouse.domain.repository.contracts.product.ProductRepository;
+import com.example.Warehouse.domain.repository.contracts.category.CategoryRepository;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -26,7 +26,8 @@ public class ProductServiceImpl implements ProductService {
     public ProductServiceImpl(
         StockService stockService,
         ProductRepository productRepo,
-        CategoryRepository categoryRepo) {
+        CategoryRepository categoryRepo
+    ) {
         this.productRepo = productRepo;
         this.categoryRepo = categoryRepo;
         this.stockService = stockService;
@@ -67,9 +68,7 @@ public class ProductServiceImpl implements ProductService {
                 p.getId(),
                 p.getName(),
                 p.getCategory().getName(),
-                p.getPrice()
-                    .multiply(BigDecimal.valueOf(p.getCategory().getDiscount()))
-                    .setScale(2, RoundingMode. HALF_UP),
+            (float) Math.round(p.getPrice() * p.getCategory().getDiscount() * 100) / 100,
                 stockService.getProductQuantityByProductId(p.getId()),
                 p.getPrice()
             )
@@ -108,9 +107,7 @@ public class ProductServiceImpl implements ProductService {
                 p.getId(),
                 p.getName(),
                 p.getCategory().getName(),
-                p.getPrice()
-                .multiply(BigDecimal.valueOf(p.getCategory().getDiscount()))
-                .setScale(2, RoundingMode.HALF_UP),
+            (float) Math.round(p.getPrice() * p.getCategory().getDiscount() * 100) / 100,
                 stockService.getProductQuantityByWarehouseId(p.getId(), warehouseId),
                 p.getPrice()
             )
@@ -123,7 +120,7 @@ public class ProductServiceImpl implements ProductService {
             .orElseThrow(() ->
                 new EntityNotFoundException("Категория не найдена"));
 
-        return productRepo.saveProduct(
+        return productRepo.save(
             new Product(
                 productAddDto.name(),
                 productAddDto.price(),
@@ -147,38 +144,23 @@ public class ProductServiceImpl implements ProductService {
             product.getId(),
             product.getName(),
             category.getName(),
-            product
-                .getPrice()
-                .multiply(BigDecimal.valueOf(category.getDiscount()))
-                .setScale(2, RoundingMode. HALF_UP),
+            (float) Math.round(product.getPrice() * category.getDiscount() * 100) / 100,
             stockService.getProductQuantityByProductId(product.getId()),
             product.getPrice()
         );
     }
 
-    public void editProduct(String id, String name, String categoryName, BigDecimal price) {
+    public void editProduct(String id, String name, String categoryName, float price) {
         var product = productRepo.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Продукт не найден"));
+        product.setName(name);
 
-        var isChanged = false;
+        var category = categoryRepo.findByName(categoryName)
+            .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
+        product.setCategory(category);
 
-        if (!product.getName().equalsIgnoreCase(name)) {
-            product.setName(name);
-            isChanged = true;
-        }
-        if (product.getCategory().getName().equalsIgnoreCase(categoryName)) {
-            var category = categoryRepo.findByName(categoryName)
-                .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
+        product.setPrice(price);
 
-            product.setCategory(category);
-            isChanged = true;
-        }
-        if (!product.getPrice().equals(price)) {
-            product.setPrice(price);
-            isChanged = true;
-        }
-        if (isChanged) {
-            productRepo.saveProduct(product);
-        }
+        productRepo.save(product);
     }
 }

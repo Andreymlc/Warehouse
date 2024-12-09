@@ -13,10 +13,8 @@ public class OrderItem extends BaseEntity {
 
     public OrderItem(
             Integer quantity,
-            Order order,
             Product product) {
         this.quantity = quantity;
-        this.order = order;
         this.product = product;
     }
 
@@ -29,7 +27,7 @@ public class OrderItem extends BaseEntity {
         this.quantity = quantity;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     public Order getOrder() {
         return order;
     }
@@ -38,7 +36,7 @@ public class OrderItem extends BaseEntity {
         this.order = order;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     public Product getProduct() {
         return product;
     }

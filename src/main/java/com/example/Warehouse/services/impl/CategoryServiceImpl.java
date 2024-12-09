@@ -1,18 +1,17 @@
 package com.example.Warehouse.services.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import com.example.Warehouse.dto.CategoryDto;
 import org.springframework.stereotype.Service;
+import com.example.Warehouse.dto.CategoryAddDto;
 import org.springframework.data.domain.Pageable;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import com.example.Warehouse.domain.models.Category;
-import com.example.WarehouseContracts.dto.CategoryDto;
 import com.example.Warehouse.services.CategoryService;
-import com.example.WarehouseContracts.dto.CategoryAddDto;
-import org.springframework.transaction.annotation.Transactional;
-import com.example.Warehouse.domain.repository.CategoryRepository;
+import com.example.Warehouse.domain.repository.contracts.category.CategoryRepository;
 
 import java.util.List;
 
@@ -48,13 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional
-    public void setDiscount(String id, int discount) {
-        categoryRepo.setDiscount(id, 1 - (float) discount / 100);
-    }
-
-    @Override
-    public List<String> findAllNameCategories() {
+    public List<String> findAllNamesCategories() {
         return  categoryRepo.findAll()
                 .stream()
                 .map(Category::getName)

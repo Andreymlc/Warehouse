@@ -1,6 +1,9 @@
 package com.example.Warehouse.utils;
 
-import com.example.WarehouseContracts.dto.*;
+import com.example.Warehouse.dto.AddStockDto;
+import com.example.Warehouse.dto.CategoryAddDto;
+import com.example.Warehouse.dto.ProductAddDto;
+import com.example.Warehouse.dto.WarehouseAddDto;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.CommandLineRunner;
 import com.example.Warehouse.services.StockService;
@@ -28,7 +31,8 @@ public class Clr implements CommandLineRunner {
         StockService stockService,
         ProductService productService,
         CategoryService categoryService,
-        WarehouseService warehouseService) {
+        WarehouseService warehouseService
+    ) {
         this.stockService = stockService;
         this.productService = productService;
         this.categoryService = categoryService;
@@ -62,9 +66,11 @@ public class Clr implements CommandLineRunner {
             }
 
             var initialCategories = Arrays.asList(
-                    new CategoryAddDto("Мебель", 0),
-                    new CategoryAddDto("Одежда", 0),
-                    new CategoryAddDto("Еда", 0)
+                    new CategoryAddDto("Мебель", 1),
+                    new CategoryAddDto("Одежда", 1),
+                    new CategoryAddDto("Концелярия", 1),
+                    new CategoryAddDto("Обувь", 1),
+                    new CategoryAddDto("Еда", 1)
             );
 
             for (var category: initialCategories) {
@@ -72,18 +78,18 @@ public class Clr implements CommandLineRunner {
             }
 
             List<ProductAddDto> initialProducts = Arrays.asList(
-                    new ProductAddDto("Помидор", "Еда", BigDecimal.valueOf(10)),
-                    new ProductAddDto("Огурец", "Еда", BigDecimal.valueOf(11)),
-                    new ProductAddDto("Стол", "Мебель", BigDecimal.valueOf(1999.99)),
-                    new ProductAddDto("Стул", "Мебель", BigDecimal.valueOf(989.99)),
-                    new ProductAddDto("Футболка", "Одежда", BigDecimal.valueOf(4115.99)),
-                    new ProductAddDto("Штаны", "Одежда", BigDecimal.valueOf(5199.99)),
-                    new ProductAddDto("Куртка", "Одежда", BigDecimal.valueOf(8129.99)),
-                    new ProductAddDto("Ботинки", "Одежда", BigDecimal.valueOf(15199.99)),
-                    new ProductAddDto("Торт", "Еда", BigDecimal.valueOf(599.99)),
-                    new ProductAddDto("Сметана", "Еда", BigDecimal.valueOf(87.99)),
-                    new ProductAddDto("Шкаф", "Мебель", BigDecimal.valueOf(10111.99)),
-                    new ProductAddDto("Полка", "Мебель", BigDecimal.valueOf(1199.99))
+                    new ProductAddDto("Помидор", "Еда", 10f),
+                    new ProductAddDto("Огурец", "Еда", 11f),
+                    new ProductAddDto("Стол", "Мебель", 1999.99f),
+                    new ProductAddDto("Стул", "Мебель", 989.99f),
+                    new ProductAddDto("Футболка", "Одежда", 4115.99f),
+                    new ProductAddDto("Штаны", "Одежда", 5199.99f),
+                    new ProductAddDto("Куртка", "Одежда", 8129.99f),
+                    new ProductAddDto("Ботинки", "Одежда", 15199.99f),
+                    new ProductAddDto("Торт", "Еда", 599.99f),
+                    new ProductAddDto("Сметана", "Еда", 87.99f),
+                    new ProductAddDto("Шкаф", "Мебель", 10111.99f),
+                    new ProductAddDto("Полка", "Мебель", 1199.99f)
             );
 
             List<String> productsIds = new ArrayList<>();

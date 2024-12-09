@@ -4,12 +4,12 @@ import jakarta.validation.Valid;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
+import com.example.Warehouse.dto.WarehouseAddDto;
 import com.example.Warehouse.services.StockService;
 import org.springframework.validation.BindingResult;
 import com.example.Warehouse.services.ProductService;
 import com.example.Warehouse.services.CategoryService;
 import com.example.Warehouse.services.WarehouseService;
-import com.example.WarehouseContracts.dto.WarehouseAddDto;
 import com.example.WarehouseContracts.dto.forms.base.BaseAdminForm;
 import com.example.WarehouseContracts.controllers.WarehouseController;
 import com.example.WarehouseContracts.dto.forms.product.ProductMoveForm;
@@ -82,17 +82,17 @@ public class WarehouseControllerImpl implements WarehouseController {
             warehouseId
         );
 
-        var categories = categoryService.findAllNameCategories();
+        var categories = categoryService.findAllNamesCategories();
 
         var productViewModels = productsPage
             .stream()
             .map(p -> new ProductViewModel(
                     p.id(),
                     p.name(),
-                    p.category(),
-                    p.quantity(),
                     p.price(),
-                    p.oldPrice()
+                    p.oldPrice(),
+                    p.category(),
+                    p.quantity()
                 )
             )
             .toList();
@@ -105,9 +105,9 @@ public class WarehouseControllerImpl implements WarehouseController {
 
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
-        model.addAttribute("minimum", new ProductSetMinMaxForm(null, null, "", "", new BaseAdminForm(form.base().role(), form.base().userName())));
-        model.addAttribute("maximum", new ProductSetMinMaxForm(null, null, "", "", new BaseAdminForm(form.base().role(), form.base().userName())));
-        model.addAttribute("moveForm", new ProductMoveForm(null, null, null, new BaseAdminForm(form.base().role(), form.base().userName()), null, null));
+        model.addAttribute("minimum", new ProductSetMinMaxForm(null, null, "", "", new BaseAdminForm(null, null, null)));
+        model.addAttribute("maximum", new ProductSetMinMaxForm(null, null, "", "", new BaseAdminForm(null, null, null)));
+        model.addAttribute("moveForm", new ProductMoveForm(null, null, null, new BaseAdminForm(null, null, null), null, null));
 
         return "warehouse";
     }
@@ -164,7 +164,7 @@ public class WarehouseControllerImpl implements WarehouseController {
     }
 
     @Override
-    public BasePagesViewModel createBaseViewModel(Integer totalPages, Integer countItemsInCart) {
+    public BasePagesViewModel createBaseViewModel(int totalPages, int countItemsInCart) {
         return new BasePagesViewModel(totalPages, countItemsInCart);
     }
 }

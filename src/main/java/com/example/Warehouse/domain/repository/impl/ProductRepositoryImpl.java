@@ -4,15 +4,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import com.example.Warehouse.domain.models.Product;
-import com.example.Warehouse.domain.repository.contracts.ProductRepository;
-import com.example.Warehouse.domain.repository.contracts.DefaultProductRepository;
+import com.example.Warehouse.domain.repository.contracts.product.ProductRepository;
+import com.example.Warehouse.domain.repository.contracts.product.BaseProductRepository;
 
 import java.util.Optional;
 
 @Repository
-public class ProductRepositoryImpl extends BaseRepository<DefaultProductRepository> implements ProductRepository {
+public class ProductRepositoryImpl extends BaseRepository<BaseProductRepository> implements ProductRepository {
     @Override
-    public Product saveProduct(Product product) {
+    public Product save(Product product) {
         return repository.save(product);
     }
 

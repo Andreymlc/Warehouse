@@ -1,9 +1,8 @@
 package com.example.Warehouse.domain.models;
 
-import com.example.WarehouseContracts.enums.Status;
+import com.example.Warehouse.domain.enums.Status;
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -11,7 +10,7 @@ import java.util.Set;
 @Table(name = "purchases")
 public class Purchase extends BaseEntity {
     private LocalDateTime purchaseDate;
-    private BigDecimal totalAmount;
+    private Float totalAmount;
     private Integer pointsSpent;
     private Status status;
     private User user;
@@ -21,7 +20,7 @@ public class Purchase extends BaseEntity {
 
     public Purchase(
             LocalDateTime purchaseDate,
-            BigDecimal totalAmount,
+            Float totalAmount,
             Integer pointsSpent,
             Status status,
             User user,
@@ -54,11 +53,11 @@ public class Purchase extends BaseEntity {
     }
 
     @Column(name = "total_amount", nullable = false)
-    public BigDecimal getTotalAmount() {
+    public Float getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(BigDecimal totalAmount) {
+    public void setTotalAmount(Float totalAmount) {
         this.totalAmount = totalAmount;
     }
 
@@ -71,7 +70,7 @@ public class Purchase extends BaseEntity {
         this.pointsSpent = pointsSpent;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     public User getUser() {
         return user;
     }

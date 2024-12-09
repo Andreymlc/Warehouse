@@ -14,14 +14,14 @@
             <form class="standard-form" th:action="@{/catalog/products/{id}/edit(id=${productId})}"
                   th:method="post"
                   th:object="${edit}">
-                <h4>Редактирование продукта</h4>
+                <h2>Редактирование продукта</h2>
                 <input class="default-input" type="text" th:field="*{name}" placeholder="Название товара">
                 <input class="default-input" type="text" th:field="*{category}" placeholder="Категория">
-                <input class="default-input" type="number" min="0" th:field="*{price}" placeholder="Цена" >
+                <input class="default-input" type="number" step="any" min="0" th:field="*{price}" placeholder="Цена" >
                 <input type="hidden" th:field="*{base.userName}"/>
                 <input type="hidden" th:field="*{base.role}" />
                 <input type="hidden" th:field="*{id}" />
-                <button type="submit">Создать</button>
+                <button type="submit">Применить</button>
             </form>
         </main>
     </body>

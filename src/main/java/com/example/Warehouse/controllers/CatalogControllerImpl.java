@@ -8,8 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import com.example.Warehouse.services.ProductService;
 import com.example.Warehouse.services.CategoryService;
-import com.example.WarehouseContracts.dto.ProductAddDto;
-import com.example.WarehouseContracts.dto.CategoryAddDto;
+import com.example.Warehouse.dto.ProductAddDto;
+import com.example.Warehouse.dto.CategoryAddDto;
 import com.example.WarehouseContracts.dto.forms.base.BaseAdminForm;
 import com.example.WarehouseContracts.controllers.CatalogController;
 import com.example.WarehouseContracts.dto.forms.category.CategoryEditForm;
@@ -84,14 +84,13 @@ public class CatalogControllerImpl implements CatalogController {
         BindingResult bindingResult
     ) {
 
-        productService.editProduct(productId, form.name(), form.name(), form.price());
+        productService.editProduct(productId, form.name(), form.category(), form.price());
 
         return "redirect:/home/admin/products?" +
             "priceSort=true&" +
             "base.userName=" + form.base().userName() +
             "&base.role=" + form.base().role();
     }
-
 
     @Override
     @PostMapping("/categories/create")
@@ -151,7 +150,7 @@ public class CatalogControllerImpl implements CatalogController {
     }
 
     @Override
-    public BasePagesViewModel createBaseViewModel(Integer totalPages, Integer countItemsInCart) {
+    public BasePagesViewModel createBaseViewModel(int totalPages, int countItemsInCart) {
         return null;
     }
 }

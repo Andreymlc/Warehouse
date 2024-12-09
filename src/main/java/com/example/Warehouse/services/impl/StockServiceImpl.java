@@ -1,25 +1,25 @@
 package com.example.Warehouse.services.impl;
 
+import com.example.Warehouse.dto.AddStockDto;
 import org.springframework.stereotype.Service;
 import com.example.Warehouse.domain.models.Stock;
 import jakarta.persistence.EntityNotFoundException;
 import com.example.Warehouse.services.StockService;
-import com.example.WarehouseContracts.dto.AddStockDto;
 import com.example.Warehouse.exceptions.InvalidDataException;
-import com.example.Warehouse.domain.repository.StockRepository;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.Warehouse.domain.repository.OldProductRepository;
-import com.example.Warehouse.domain.repository.WarehouseRepository;
+import com.example.Warehouse.domain.repository.contracts.stock.StockRepository;
+import com.example.Warehouse.domain.repository.contracts.product.ProductRepository;
+import com.example.Warehouse.domain.repository.contracts.warehouse.WarehouseRepository;
 
 @Service
 public class StockServiceImpl implements StockService {
     private final StockRepository stockRepo;
-    private final OldProductRepository productRepo;
+    private final ProductRepository productRepo;
     private final WarehouseRepository warehouseRepo;
 
     public StockServiceImpl(
         StockRepository stockRepo,
-        OldProductRepository productRepo,
+        ProductRepository productRepo,
         WarehouseRepository warehouseRepo
     ) {
         this.stockRepo = stockRepo;

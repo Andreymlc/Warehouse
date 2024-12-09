@@ -1,12 +1,11 @@
 package com.example.Warehouse.services;
 
-import com.example.WarehouseContracts.dto.ResponseUserDto;
-import com.example.WarehouseContracts.enums.Roles;
-import com.example.WarehouseContracts.dto.LoginUserDto;
-import com.example.WarehouseContracts.dto.RegisterUserDto;
+import com.example.Warehouse.dto.ResponseUserDto;
+import com.example.Warehouse.dto.LoginUserDto;
+import com.example.Warehouse.dto.RegisterUserDto;
 
 
 public interface UserService {
-    ResponseUserDto register(RegisterUserDto registerUserDto);
     ResponseUserDto login(LoginUserDto loginUserDto);
+    ResponseUserDto register(RegisterUserDto registerUserDto);
 }

@@ -49,7 +49,7 @@ public class Stock extends BaseEntity {
         this.maxStock = maxStock;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     public Product getProduct() {
         return product;
     }
@@ -58,7 +58,7 @@ public class Stock extends BaseEntity {
         this.product = product;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     public Warehouse getWarehouse() {
         return warehouse;
     }

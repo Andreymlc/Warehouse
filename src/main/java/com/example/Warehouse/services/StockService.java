@@ -1,6 +1,6 @@
 package com.example.Warehouse.services;
 
-import com.example.WarehouseContracts.dto.AddStockDto;
+import com.example.Warehouse.dto.AddStockDto;
 
 public interface StockService {
     void addStock(AddStockDto addStockDto);

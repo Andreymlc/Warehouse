@@ -1,9 +1,9 @@
 package com.example.Warehouse.domain.models;
 
+import jakarta.persistence.Table;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "purchase_items")
@@ -28,7 +28,7 @@ public class PurchaseItem extends BaseEntity {
         this.quantity = quantity;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     public Product getProduct() {
         return product;
     }
@@ -37,7 +37,7 @@ public class PurchaseItem extends BaseEntity {
         this.product = product;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     public Purchase getPurchase() {
         return purchase;
     }

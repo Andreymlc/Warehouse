@@ -1,20 +1,26 @@
 package com.example.Warehouse.config;
 
+import com.example.Warehouse.dto.*;
 import org.modelmapper.ModelMapper;
-import com.example.WarehouseContracts.dto.*;
 import com.example.Warehouse.domain.models.Order;
+import org.modelmapper.record.RecordModule;
 import org.springframework.context.annotation.Bean;
 import com.example.Warehouse.domain.models.Category;
-import com.example.Warehouse.domain.models.Warehouse;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Configuration;
 import com.example.WarehouseContracts.dto.forms.auth.LoginForm;
 import com.example.WarehouseContracts.dto.forms.auth.RegisterForm;
 
+import static org.modelmapper.config.Configuration.AccessLevel.PRIVATE;
+
 @Configuration
 public class MapperConfig {
+
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.registerModule(new RecordModule());
+
         modelMapper.typeMap(RegisterForm.class, RegisterUserDto.class).setProvider(ctx -> {
             RegisterForm source = (RegisterForm) ctx.getSource();
             return new RegisterUserDto(
@@ -34,23 +40,6 @@ public class MapperConfig {
             );
         });
 
-        modelMapper.typeMap(WarehouseAddDto.class, Warehouse.class).setProvider(ctx -> {
-            WarehouseAddDto source = (WarehouseAddDto) ctx.getSource();
-            return new Warehouse(
-                    source.name(),
-                    source.location()
-            );
-        });
-
-        modelMapper.typeMap(Warehouse.class, WarehouseDto.class).setProvider(ctx -> {
-            Warehouse source = (Warehouse) ctx.getSource();
-            return new WarehouseDto(
-                source.getId(),
-                source.getName(),
-                source.getLocation()
-            );
-        });
-
         modelMapper.typeMap(CategoryAddDto.class, Category.class).setProvider(ctx -> {
             CategoryAddDto source = (CategoryAddDto) ctx.getSource();
             return new Category(
@@ -64,7 +53,7 @@ public class MapperConfig {
             return new CategoryDto(
                 source.getId(),
                 source.getName(),
-                Math.round(((1 - source.getDiscount()) * 100))
+                Math.round((1 - source.getDiscount()) * 100)
             );
         });
 

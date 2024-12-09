@@ -1,8 +1,8 @@
 package com.example.Warehouse.services;
 
 import org.springframework.data.domain.Page;
-import com.example.WarehouseContracts.dto.WarehouseDto;
-import com.example.WarehouseContracts.dto.WarehouseAddDto;
+import com.example.Warehouse.dto.WarehouseDto;
+import com.example.Warehouse.dto.WarehouseAddDto;
 
 public interface WarehouseService {
     WarehouseDto getById(String id);

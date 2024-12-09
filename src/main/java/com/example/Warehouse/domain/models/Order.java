@@ -1,31 +1,36 @@
 package com.example.Warehouse.domain.models;
 
-import com.example.WarehouseContracts.enums.Status;
+import com.example.Warehouse.domain.enums.Status;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "orders")
 public class Order extends BaseEntity {
-    private User user;
     private Status status;
-    private BigDecimal totalAmount;
+    private Float totalAmount;
     private LocalDateTime orderDate;
-    private Set<OrderItem> orderItems;
+
+    private User user;
+    private List<OrderItem> orderItems;
 
     protected Order() {}
 
     public Order(
             User user,
             Status status,
-            BigDecimal totalAmount,
-            LocalDateTime orderDate) {
+            Float totalAmount,
+            LocalDateTime orderDate,
+            List<OrderItem> orderItems
+    ) {
         this.user = user;
         this.status = status;
         this.orderDate = orderDate;
+        this.orderItems = orderItems;
         this.totalAmount = totalAmount;
     }
 
@@ -49,15 +54,15 @@ public class Order extends BaseEntity {
     }
 
     @Column(name = "total_amount", nullable = false)
-    public BigDecimal getTotalAmount() {
+    public Float getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(BigDecimal totalAmount) {
+    public void setTotalAmount(Float totalAmount) {
         this.totalAmount = totalAmount;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     public User getUser() {
         return user;
     }
@@ -66,12 +71,12 @@ public class Order extends BaseEntity {
         this.user = user;
     }
 
-    @OneToMany(mappedBy = "order")
-    public Set<OrderItem> getOrderItems() {
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    public List<OrderItem> getOrderItems() {
         return orderItems;
     }
 
-    public void setOrderItems(Set<OrderItem> orderItems) {
+    public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
     }
 }

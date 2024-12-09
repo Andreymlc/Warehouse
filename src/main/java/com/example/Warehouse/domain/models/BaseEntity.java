@@ -16,7 +16,6 @@ public abstract class BaseEntity {
     @GeneratedValue(generator = "uuid-string")
     @GenericGenerator(name = "uuid-string",
             strategy = "org.hibernate.id.UUIDGenerator")
-
     public String getId() {
         return id;
     }

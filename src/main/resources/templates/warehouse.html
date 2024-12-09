@@ -98,21 +98,18 @@
             <div class="products" th:if="${#lists.isEmpty(model.products())}">
                 Продукты не найдены
             </div>
-
-            <div class="products" th:if="${not #lists.isEmpty(model.products())}">
-                <div class="cards cards-center">
-                    <div class="card" th:each="product : ${model.products()}">
-                        <h2 th:text="'Название: ' + ${product.name()}">Название Товара</h2>
-                        <h4 th:text="'Категория: ' + ${product.category()}">Категория</h4>
-                        <h4 class="decorated-text" th:if="${product.price() != product.oldPrice()}"
-                            th:text="'Актуальная цена: ' + ${product.price()}">Актуальная цена</h4>
-                        <h4 th:if="${product.price() != product.oldPrice()}"
-                            th:text="'Старая цена: ' + ${product.oldPrice()}">Старая цена</h4>
-                        <h4 th:if="${product.price() == product.oldPrice()}"
-                            th:text="'Цена: ' + ${product.price()}">Цена</h4>
-                        <h4 th:text="'Количество: ' + ${product.quantity()}">Количество</h4>
-                        <h4 th:text="'ID: ' + ${product.id()}">ID</h4>
-                    </div>
+            <div class="cards cards-center" th:if="${not #lists.isEmpty(model.products())}">
+                <div class="card" th:each="product : ${model.products()}">
+                    <h2 th:text="'Название: ' + ${product.name()}">Название Товара</h2>
+                    <h4 th:text="'Категория: ' + ${product.category()}">Категория</h4>
+                    <h4 class="decorated-text" th:if="${product.price() != product.oldPrice()}"
+                        th:text="'Актуальная цена: ' + ${product.price()}">Актуальная цена</h4>
+                    <h4 th:if="${product.price() != product.oldPrice()}"
+                        th:text="'Старая цена: ' + ${product.oldPrice()}">Старая цена</h4>
+                    <h4 th:if="${product.price() == product.oldPrice()}"
+                        th:text="'Цена: ' + ${product.price()}">Цена</h4>
+                    <h4 th:text="'Количество: ' + ${product.quantity()}">Количество</h4>
+                    <h4 th:text="'ID: ' + ${product.id()}">ID</h4>
                 </div>
             </div>
         </main>

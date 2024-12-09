@@ -70,7 +70,7 @@ public class OrderControllerImpl implements OrderController {
         BindingResult bindingResult,
         Model model) {
 
-        return "ordersa";
+        return "orders";
     }
 
     @Override
@@ -80,21 +80,23 @@ public class OrderControllerImpl implements OrderController {
         BindingResult bindingResult,
         Model model) {
 
-        return "ordersa";
+        return "orders";
     }
 
     @Override
     @PostMapping("/user/create-order")
     public String createUserOrder(
-        @Valid @ModelAttribute("form")CreateOrderUserForm form,
+        @Valid @ModelAttribute("form") CreateOrderUserForm form,
         BindingResult bindingResult,
         Model model) {
 
-        return "ordersa";
+        orderService.addOrder(form.base().id());
+
+        return "orders";
     }
 
     @Override
-    public BasePagesViewModel createBaseViewModel(Integer totalPages, Integer countItemsInCart) {
+    public BasePagesViewModel createBaseViewModel(int totalPages, int countItemsInCart) {
         return new BasePagesViewModel(totalPages, countItemsInCart);
     }
 }

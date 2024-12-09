@@ -4,14 +4,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import com.example.Warehouse.dto.WarehouseDto;
 import org.springframework.data.domain.Pageable;
+import com.example.Warehouse.dto.WarehouseAddDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import com.example.Warehouse.domain.models.Warehouse;
 import com.example.Warehouse.services.WarehouseService;
-import com.example.WarehouseContracts.dto.WarehouseDto;
-import com.example.WarehouseContracts.dto.WarehouseAddDto;
-import com.example.Warehouse.domain.repository.WarehouseRepository;
+import com.example.Warehouse.domain.repository.contracts.warehouse.WarehouseRepository;
 
 @Service
 public class WarehouseServiceImpl implements WarehouseService {
@@ -33,7 +33,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
 
         return warehouses.map(w ->
-            new com.example.WarehouseContracts.dto.WarehouseDto(
+            new WarehouseDto(
                 w.getId(),
                 w.getName(),
                 w.getLocation()
@@ -46,7 +46,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         var warehouse = warehouseRepo.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Склад не найден"));
 
-        return modelMapper.map(warehouse, com.example.WarehouseContracts.dto.WarehouseDto.class);
+        return modelMapper.map(warehouse, WarehouseDto.class);
     }
 
     @Override

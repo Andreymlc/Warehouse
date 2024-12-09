@@ -2,16 +2,17 @@ package com.example.Warehouse.domain.models;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
 import java.util.Set;
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "products")
 public class Product extends BaseEntity {
     private String name;
-    private BigDecimal price;
+    private Float price;
     private Category category;
     private Set<Stock> stocks;
+    private Set<CartItem> cartItems;
     private Set<OrderItem> orderItems;
     private Set<PurchaseItem> purchaseItems;
 
@@ -19,7 +20,7 @@ public class Product extends BaseEntity {
 
     public Product(
             String name,
-            BigDecimal price,
+            Float price,
             Category category) {
         this.name = name;
         this.price = price;
@@ -36,15 +37,15 @@ public class Product extends BaseEntity {
     }
 
     @Column(name = "price", nullable = false)
-    public BigDecimal getPrice() {
+    public Float getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Float price) {
         this.price = price;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     public Category getCategory() {
         return category;
     }
@@ -78,5 +79,26 @@ public class Product extends BaseEntity {
 
     public void setOrderItems(Set<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    @OneToMany(mappedBy = "product")
+    public Set<CartItem> getCartItems() {
+        return cartItems;
+    }
+
+    public void setCartItems(Set<CartItem> cartItems) {
+        this.cartItems = cartItems;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Product product)) return false;
+        return name.equalsIgnoreCase(product.name) && price.equals(product.price);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, price);
     }
 }

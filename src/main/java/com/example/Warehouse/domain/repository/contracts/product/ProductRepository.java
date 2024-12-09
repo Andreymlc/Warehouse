@@ -1,10 +1,17 @@
-package com.example.Warehouse.domain.repository.contracts;
+package com.example.Warehouse.domain.repository.contracts.product;
 
 import com.example.Warehouse.domain.models.Product;
+import com.example.Warehouse.domain.repository.contracts.BaseDeleteRepository;
+import com.example.Warehouse.domain.repository.contracts.BaseSaveRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface DefaultProductRepository extends DefaultRepository<Product> {
+import java.util.Optional;
+
+public interface ProductRepository extends BaseSaveRepository<Product>, BaseDeleteRepository {
+    Optional<Product> findById(String id);
+    Page<Product> findAll(Pageable pageable);
+
     Page<Product> findByCategoryName(String category, Pageable pageable);
     Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
     Page<Product> findByCategoryNameAndNameContainingIgnoreCase(String category, String name, Pageable pageable);
