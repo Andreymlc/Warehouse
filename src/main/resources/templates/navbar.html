@@ -4,35 +4,46 @@
             <h2>Warehouse</h2>
         </li>
         <li th:if="${form.base.role()} == 'ADMIN'">
-            <a th:href="@{/home/admin/warehouses(
-                     base.userName=${form.base.userName()},
-                     base.role=${form.base.role()})}">Главная</a>
+            <a th:href="@{/home/admin(
+                     priceSort=true,
+                     base.id=${form.base.id()},
+                     base.role=${form.base.role()},
+                     base.userName=${form.base.userName()})}">Главная</a>
         </li>
         <li th:if="${form.base.role()} == 'USER'">
             <a th:href="@{/home/user(
                     base.userName=${form.base.userName()},
                     base.role=${form.base.role()},
                     base.id=${form.base.id()},
-                    priceSort=true,)}">Каталог</a>
+                    priceSort=true)}">Каталог</a>
         </li>
         <li th:if="${form.base.role()} == 'ADMIN'">
-            <a href="">Заказы пользователей</a>
-        </li>
-        <li><!--th:if="${form.base.countItemsInCart > 0}"-->
-            <a th:if="${form.base.role()} == 'ADMIN'" th:href="@{/cart/admin(
+            <a th:href="@{/orders/admin(
                         base.id=${form.base.id()},
-                        base.userName=${form.base.userName()},
                         base.role=${form.base.role()},
-            )}">Корзина <span  th:text="4"></span></a>
-            <a th:if="${form.base.role()} == 'USER'" th:href="@{/cart/user(
-                        base.id=${form.base.id()},
-                        base.userName=${form.base.userName()},
-                        base.role=${form.base.role()},
-                        base.pointsCount=${form.base.pointsCount()}
-            )}">Корзина <span  th:text="4"></span></a>
+                        base.userName=${form.base.userName()}
+            )}">Мои заказы</a>
         </li>
         <li th:if="${form.base.role()} == 'USER'">
-            <p th:text="'Количество балов: ' + ${model.pointsCount}"></p>
+            <a th:href="@{/orders/user(
+                        base.id=${form.base.id()},
+                        base.role=${form.base.role()},
+                        base.userName=${form.base.userName()}
+            )}">Мои заказы</a>
+        </li>
+        <li th:if="${form.base.role()} == 'ADMIN'">
+            <a th:href="@{/orders/manage-purchase(
+                        base.id=${form.base.id()},
+                        base.role=${form.base.role()},
+                        base.userName=${form.base.userName()}
+            )}">Заказы пользователей</a>
+        </li>
+        <li>
+            <a th:href="@{/cart(
+                        base.id=${form.base.id()},
+                        base.role=${form.base.role()},
+                        base.userName=${form.base.userName()}
+            )}">Корзина <span th:text="4"></span></a>
         </li>
         <li th:text="${form.base.userName()}">UserName</li>
     </ul>

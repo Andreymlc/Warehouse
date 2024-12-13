@@ -1,82 +1,92 @@
 package com.example.Warehouse.services.impl;
 
-import com.example.Warehouse.domain.models.BaseEntity;
+import com.example.Warehouse.domain.models.Order;
 import com.example.Warehouse.domain.models.OrderItem;
-import com.example.Warehouse.domain.repository.contracts.cart.CartRepository;
-import org.modelmapper.ModelMapper;
+import com.example.Warehouse.domain.repositories.contracts.order.OrderRepository;
+import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
+import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
 import com.example.Warehouse.dto.OrderDto;
+import com.example.Warehouse.dto.OrderItemDto;
+import com.example.Warehouse.services.OrderService;
+import com.example.Warehouse.services.WarehouseService;
+import jakarta.persistence.EntityNotFoundException;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Pageable;
-import com.example.Warehouse.domain.models.Order;
-import com.example.Warehouse.domain.enums.Status;
-import org.springframework.data.domain.PageRequest;
-import com.example.Warehouse.services.OrderService;
-import jakarta.persistence.EntityNotFoundException;
-import com.example.Warehouse.domain.repository.contracts.user.UserRepository;
-import com.example.Warehouse.domain.repository.contracts.order.OrderRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class OrderServiceImpl implements OrderService {
+    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
     private final ModelMapper modelMapper;
     private final UserRepository userRepo;
-    private final CartRepository cartRepo;
     private final OrderRepository orderRepo;
+    private final WarehouseRepository warehouseRepo;
+    private final WarehouseService warehouseService;
 
     public OrderServiceImpl(
-        CartRepository cartRepo,
         ModelMapper modelMapper,
         UserRepository userRepo,
-        OrderRepository orderRepo
+        OrderRepository orderRepo,
+        WarehouseService warehouseService,
+        WarehouseRepository warehouseRepo
     ) {
         this.userRepo = userRepo;
-        this.cartRepo = cartRepo;
         this.orderRepo = orderRepo;
         this.modelMapper = modelMapper;
+        this.warehouseRepo = warehouseRepo;
+        this.warehouseService = warehouseService;
     }
 
     @Override
-    public OrderDto getOrderByNumber(String number) {
+    public OrderDto findOrderByNumber(String number) {
         var order = orderRepo.findById(number).orElseThrow();
         return modelMapper.map(order, OrderDto.class);
     }
 
     @Override
-    public Page<OrderDto> getOrders(String status, boolean dateSort, int page, int size) {
-        Sort sort = dateSort ? Sort.by("date").ascending() : Sort.by("date").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
+    public Page<OrderDto> findOrders(String userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("date").descending());
 
-        Page<Order> orderPage;
-        if(!status.isBlank()) {
-            orderPage = orderRepo.findByStatus(Status.valueOf(status), pageable);
-        } else {
-            orderPage = orderRepo.findAll(pageable);
-        }
+        var orderPage = orderRepo.findByUserId(userId, pageable);
 
-        return orderPage.map(p ->
-            new OrderDto(
-                p.getId(),
-                p.getStatus(),
-                p.getOrderDate(),
-                p.getTotalAmount()
-            )
-        );
+        return orderPage.map(o -> modelMapper.map(o, OrderDto.class));
+    }
+
+    public List<OrderDto> findOrdersByUserId(String userId, int page, int size) {
+
+        var existingUser = userRepo.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("Пользоватль не найден"));
+
+        return existingUser
+            .getOrders()
+            .stream()
+            .map(o -> modelMapper.map(o, OrderDto.class))
+            .toList();
     }
 
     @Override
     @Transactional
-    public void addOrder(String userId) {
+    public void addOrder(String userId, String warehouseId) {
         var existingUser = userRepo.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+
+        var existingWarehouse = warehouseRepo.findById(warehouseId)
+            .orElseThrow(() -> new EntityNotFoundException("Склад не найден"));
 
         var orderItems = existingUser
             .getCart()
             .stream()
-            .map(c -> new OrderItem(c.getQuantity(), c.getProduct()))
+            .map(c -> new OrderItem(c.getProduct(), c.getQuantity()))
             .toList();
 
         float totalPrice = 0;
@@ -89,16 +99,31 @@ public class OrderServiceImpl implements OrderService {
 
         var order = new Order(
             existingUser,
-            Status.CREATED,
+            generateOrderNumber(),
             totalPrice,
             LocalDateTime.now(),
+            existingWarehouse,
             orderItems
         );
 
         orderItems.forEach(item -> item.setOrder(order));
+        existingUser.getOrders().add(order);
 
-        orderRepo.save(order);
+        warehouseService.fill(
+            warehouseId,
+            orderItems
+                .stream()
+                .map(oi -> new OrderItemDto(
+                    oi.getProduct().getId(),
+                    oi.getQuantity())
+                ).toList()
+        );
 
-        cartRepo.deleteAll(existingUser.getCart());
+        existingUser.getCart().clear();
+        userRepo.save(existingUser);
+    }
+
+    private String generateOrderNumber() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
     }
 }

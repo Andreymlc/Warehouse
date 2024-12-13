@@ -12,10 +12,11 @@ public class OrderItem extends BaseEntity {
     protected OrderItem() {}
 
     public OrderItem(
-            Integer quantity,
-            Product product) {
-        this.quantity = quantity;
+            Product product,
+            Integer quantity
+    ) {
         this.product = product;
+        this.quantity = quantity;
     }
 
     @Column(name = "quantity", nullable = false)

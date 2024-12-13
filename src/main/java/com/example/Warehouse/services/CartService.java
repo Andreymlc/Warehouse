@@ -4,7 +4,7 @@ import com.example.Warehouse.dto.CartDto;
 
 public interface CartService {
     CartDto findCart(String userId);
-    int getItemQuantity(String userId);
+    int getItemsQuantity(String userId);
     void deleteProductFromCart(String userId, String productId);
     void addProductToCart(String userId, String productId);
 }

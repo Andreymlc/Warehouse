@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказы пользователей</title>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/orders.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<header>
+    <div th:replace="~{/navbar}">Navbar</div>
+</header>
+<body>
+<main>
+    <div class="pages" th:if="${model.base().totalPages() > 1}">
+        <ul class="pages-ul">
+            <li
+                    th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
+                    th:classappend="${pageNumber == form.pages.page()} ? 'active'">
+                <a class="page-picker"
+                   th:href="@{/orders(
+                         base.userName=${form.base.userName()},
+                         base.role=${form.base.role()},
+                         base.id=${form.base.id()},
+                         pages.page=${pageNumber},
+                         pages.size=${form.pages.size()},
+                         pages.substring=${form.pages.substring()}
+                     )}"
+                   th:text="${pageNumber}">1</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="products" th:if="${#lists.isEmpty(model.purchases())}">
+        Пользователи пока что не сделали ни одного заказа ☹
+    </div>
+
+    <div class="cards" th:if="${not #lists.isEmpty(model.purchases())}">
+        <div class="card" th:each="purchase : ${model.purchases()}">
+            <h2 th:text="'Статус: ' + ${purchase.status()}">Статус</h2>
+            <h2 th:text="'Номер заказа: ' + ${purchase.number()}">Номер заказа</h2>
+            <h4 th:text="'Итоговая цена: ' + ${purchase.totalPrice()}">Итоговая цена</h4>
+            <h4 th:text="'Полученно баллов: ' + ${purchase.cashback()}">Получено баллов</h4>
+            <h4 th:text="'Дата заказа: ' + ${#temporals.format(purchase.date(), 'HH:mm dd-MM')}">Дата заказа</h4>
+            <a th:if="${purchase.status() != 'DELIVERED' && purchase.status() != 'CANCELED'}" th:href="@{/orders/check(
+                            purchaseNumber=${purchase.number()},
+                            base.userName=${form.base().userName()},
+                            base.id=${form.base.id()},
+                            base.role=${form.base().role()}
+                            )}">Отметить</a>
+            <a class="delete-button" th:if="${purchase.status() != 'CANCELED'}" th:href="@{/orders/canceled(
+                            purchaseNumber=${purchase.number()},
+                            base.userName=${form.base().userName()},
+                            base.id=${form.base.id()},
+                            base.role=${form.base().role()}
+                            )}">Отменить заказ</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

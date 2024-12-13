@@ -3,43 +3,52 @@ package com.example.Warehouse.domain.models;
 import com.example.Warehouse.domain.enums.Status;
 import jakarta.persistence.*;
 
+import java.util.List;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Table(name = "purchases")
 public class Purchase extends BaseEntity {
-    private LocalDateTime purchaseDate;
-    private Float totalAmount;
-    private Integer pointsSpent;
     private Status status;
-    private User user;
-    private Set<PurchaseItem> purchaseItems;
+    private String number;
+    private Float totalPrice;
+    private Integer cashback;
+    private LocalDateTime date;
+    private Integer pointsSpent;
 
-    protected Purchase() {}
+    private User user;
+    private List<PurchaseItem> purchaseItems;
+
+    protected Purchase() {
+    }
 
     public Purchase(
-            LocalDateTime purchaseDate,
-            Float totalAmount,
-            Integer pointsSpent,
-            Status status,
-            User user,
-            Set<PurchaseItem> purchaseItems) {
-        this.purchaseDate = purchaseDate;
-        this.totalAmount = totalAmount;
-        this.pointsSpent = pointsSpent;
-        this.status = status;
+        User user,
+        Status status,
+        String number,
+        Float totalPrice,
+        Integer cashback,
+        LocalDateTime date,
+        Integer pointsSpent,
+        List<PurchaseItem> purchaseItems
+    ) {
         this.user = user;
+        this.date = date;
+        this.number = number;
+        this.status = status;
+        this.cashback = cashback;
+        this.totalPrice = totalPrice;
+        this.pointsSpent = pointsSpent;
         this.purchaseItems = purchaseItems;
     }
 
-    @Column(name = "purchase_date", nullable = false)
-    public LocalDateTime getPurchaseDate() {
-        return purchaseDate;
+    @Column(name = "date", nullable = false)
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setPurchaseDate(LocalDateTime purchaseDate) {
-        this.purchaseDate = purchaseDate;
+    public void setDate(LocalDateTime purchaseDate) {
+        this.date = purchaseDate;
     }
 
     @Enumerated(EnumType.STRING)
@@ -52,13 +61,17 @@ public class Purchase extends BaseEntity {
         this.status = status;
     }
 
-    @Column(name = "total_amount", nullable = false)
-    public Float getTotalAmount() {
-        return totalAmount;
+    public void nextStatus() {
+        this.status = this.status.next();
     }
 
-    public void setTotalAmount(Float totalAmount) {
-        this.totalAmount = totalAmount;
+    @Column(name = "total_price", nullable = false)
+    public Float getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Float totalAmount) {
+        this.totalPrice = totalAmount;
     }
 
     @Column(name = "points_spent", nullable = false)
@@ -70,7 +83,7 @@ public class Purchase extends BaseEntity {
         this.pointsSpent = pointsSpent;
     }
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     public User getUser() {
         return user;
     }
@@ -80,11 +93,29 @@ public class Purchase extends BaseEntity {
     }
 
     @OneToMany(mappedBy = "purchase")
-    public Set<PurchaseItem> getPurchaseItems() {
+    public List<PurchaseItem> getPurchaseItems() {
         return purchaseItems;
     }
 
-    public void setPurchaseItems(Set<PurchaseItem> purchaseItems) {
+    public void setPurchaseItems(List<PurchaseItem> purchaseItems) {
         this.purchaseItems = purchaseItems;
+    }
+
+    @Column(name = "number", unique = true)
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    @Column(name = "cashback")
+    public Integer getCashback() {
+        return cashback;
+    }
+
+    public void setCashback(Integer cashback) {
+        this.cashback = cashback;
     }
 }

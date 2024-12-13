@@ -1,5 +1,7 @@
 nav {
     position: fixed;
+    font-family: 'Popins', sans-serif ;
+    line-height: 1.6;
     top: 0;
     left: 0;
     width: 100%;

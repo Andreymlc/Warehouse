@@ -1,15 +1,15 @@
 package com.example.Warehouse.services.impl;
 
-import com.example.Warehouse.dto.AddStockDto;
-import org.springframework.stereotype.Service;
 import com.example.Warehouse.domain.models.Stock;
-import jakarta.persistence.EntityNotFoundException;
-import com.example.Warehouse.services.StockService;
+import com.example.Warehouse.domain.repositories.contracts.product.ProductRepository;
+import com.example.Warehouse.domain.repositories.contracts.stock.StockRepository;
+import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
+import com.example.Warehouse.dto.AddStockDto;
 import com.example.Warehouse.exceptions.InvalidDataException;
+import com.example.Warehouse.services.StockService;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.Warehouse.domain.repository.contracts.stock.StockRepository;
-import com.example.Warehouse.domain.repository.contracts.product.ProductRepository;
-import com.example.Warehouse.domain.repository.contracts.warehouse.WarehouseRepository;
 
 @Service
 public class StockServiceImpl implements StockService {
@@ -46,12 +46,12 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public int getProductQuantityByProductId(String productId) {
+    public int findProductQuantityByProductId(String productId) {
         return stockRepo.findQuantityByProductId(productId).orElse(0);
     }
 
     @Override
-    public int getProductQuantityByWarehouseId(String productId, String warehouseId) {
+    public int findProductQuantityByWarehouseId(String productId, String warehouseId) {
         return stockRepo.findProductQuantityByWarehouseId(productId, warehouseId).orElse(0);
     }
 
@@ -91,6 +91,34 @@ public class StockServiceImpl implements StockService {
             .orElseThrow(() -> new EntityNotFoundException("Склад с таким продуктом не найден"));
 
         stock.setMaxStock(maximum);
+
+        stockRepo.save(stock);
+    }
+
+    @Override
+    public void incrStockQuantity(String warehouseId, String productId, int quantity) {
+        var stock = stockRepo.findByProductIdAndWarehouseId(productId, warehouseId)
+            .orElseThrow(() -> new EntityNotFoundException("Запас не найден"));
+
+        if (stock.getMaxStock() >= stock.getQuantity() + quantity) {
+            stock.setQuantity(stock.getQuantity() + quantity);
+        } else {
+            throw new InvalidDataException("На складе нет места");
+        }
+
+        stockRepo.save(stock);
+    }
+
+    @Override
+    public void decrStockQuantity(String warehouseId, String productId, int quantity) {
+        var stock = stockRepo.findByProductIdAndWarehouseId(productId, warehouseId)
+            .orElseThrow(() -> new EntityNotFoundException("Запас не найден"));
+
+        if (stock.getQuantity() - quantity >= 0) {
+            stock.setQuantity(stock.getQuantity() - quantity);
+        } else {
+            throw new InvalidDataException("На складе нет столько товара");
+        }
 
         stockRepo.save(stock);
     }

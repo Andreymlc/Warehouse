@@ -10,6 +10,8 @@ import java.util.Set;
 public class Product extends BaseEntity {
     private String name;
     private Float price;
+    private boolean isDeleted;
+
     private Category category;
     private Set<Stock> stocks;
     private Set<CartItem> cartItems;
@@ -21,10 +23,13 @@ public class Product extends BaseEntity {
     public Product(
             String name,
             Float price,
-            Category category) {
+            Category category,
+            boolean isDeleted
+    ) {
         this.name = name;
         this.price = price;
         this.category = category;
+        this.isDeleted = isDeleted;
     }
 
     @Column(name = "name", nullable = false)
@@ -100,5 +105,14 @@ public class Product extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(name, price);
+    }
+
+    @Column(name = "is_deleted", nullable = false)
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }

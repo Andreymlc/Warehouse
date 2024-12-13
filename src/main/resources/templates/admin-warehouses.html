@@ -5,6 +5,7 @@
         <title>Админ склады</title>
         <link rel="stylesheet" th:href="@{/css/navbar.css}">
         <link rel="stylesheet" th:href="@{/css/home.css}">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     </head>
     <header>
         <div th:replace="~{/navbar}">Navbar</div>
@@ -19,7 +20,7 @@
                      base.role=${form.base.role()})}">Все склады</a>
                 </li>
                 <li>
-                    <a th:href="@{/home/admin/products(
+                    <a th:href="@{/home/admin(
                      base.userName=${form.base.userName()},
                      priceSort=true,
                      base.id=${form.base.id()},
@@ -93,6 +94,7 @@
                         <a th:href="@{/warehouses/{warehouseId}/manage(
                             warehouseId=${warehouse.id},
                             priceSort=true,
+                            pages.size=10,
                             base.userName=${form.base().userName()},
                             base.id=${form.base.id()},
                             base.role=${form.base().role()}

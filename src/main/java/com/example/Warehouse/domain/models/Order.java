@@ -1,56 +1,56 @@
 package com.example.Warehouse.domain.models;
 
-import com.example.Warehouse.domain.enums.Status;
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "orders")
 public class Order extends BaseEntity {
-    private Status status;
+    private String number;
     private Float totalAmount;
-    private LocalDateTime orderDate;
+    private LocalDateTime date;
 
     private User user;
+    private Warehouse warehouse;
     private List<OrderItem> orderItems;
 
-    protected Order() {}
+    protected Order() {
+    }
 
     public Order(
-            User user,
-            Status status,
-            Float totalAmount,
-            LocalDateTime orderDate,
-            List<OrderItem> orderItems
+        User user,
+        String number,
+        Float totalAmount,
+        LocalDateTime date,
+        Warehouse warehouse,
+        List<OrderItem> orderItems
     ) {
         this.user = user;
-        this.status = status;
-        this.orderDate = orderDate;
+        this.date = date;
+        this.number = number;
+        this.warehouse = warehouse;
         this.orderItems = orderItems;
         this.totalAmount = totalAmount;
     }
 
-    @Column(name = "order_date", nullable = false)
-    public LocalDateTime getOrderDate() {
-        return orderDate;
+    @Column(name = "date", nullable = false)
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
+    public void setDate(LocalDateTime orderDate) {
+        this.date = orderDate;
     }
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    public Status getStatus() {
-        return status;
+    @Column(name = "number", nullable = false, unique = true)
+    public String getNumber() {
+        return number;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     @Column(name = "total_amount", nullable = false)
@@ -78,5 +78,14 @@ public class Order extends BaseEntity {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    public Warehouse getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(Warehouse warehouse) {
+        this.warehouse = warehouse;
     }
 }

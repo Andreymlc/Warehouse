@@ -1,18 +1,18 @@
 package com.example.Warehouse.services.impl;
 
+import com.example.Warehouse.domain.models.CartItem;
+import com.example.Warehouse.domain.repositories.contracts.cart.CartRepository;
+import com.example.Warehouse.domain.repositories.contracts.product.ProductRepository;
+import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
 import com.example.Warehouse.dto.CartDto;
-import org.springframework.stereotype.Service;
 import com.example.Warehouse.dto.ProductCartDto;
+import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.services.CartService;
 import jakarta.persistence.EntityNotFoundException;
-import com.example.Warehouse.domain.models.CartItem;
-import com.example.Warehouse.exceptions.InvalidDataException;
-import com.example.Warehouse.domain.repository.contracts.user.UserRepository;
-import com.example.Warehouse.domain.repository.contracts.cart.CartRepository;
-import com.example.Warehouse.domain.repository.contracts.product.ProductRepository;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -31,8 +31,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public int getItemQuantity(String userId) {
-        return cartRepo.findProductQuantityByUserId(userId);
+    public int getItemsQuantity(String userId) {
+        return cartRepo.findItemsQuantityByUserId(userId);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class CartServiceImpl implements CartService {
                     product.getName(),
                     category.getName(),
                     item.getQuantity(),
-                (float) Math.round(product.getPrice() * category.getDiscount() * 100) / 100 * item.getQuantity()
+                    (float) Math.round(product.getPrice() * category.getDiscount() * 100) / 100 * item.getQuantity()
                 )
             );
 
@@ -81,10 +81,11 @@ public class CartServiceImpl implements CartService {
         if (existingCartItem.isPresent()) {
             var item = existingCartItem.get();
             item.incrQuantity();
-            cartRepo.save(item);
+            userRepo.save(existingUser);
         } else {
             CartItem newCartItem = new CartItem(existingUser, existingProduct, 1);
-            cartRepo.save(newCartItem);
+            existingCart.add(newCartItem);
+            userRepo.save(existingUser);
         }
     }
 
@@ -105,11 +106,13 @@ public class CartServiceImpl implements CartService {
         if (existingCartItem.isPresent()) {
             var item = existingCartItem.get();
 
-            if (item.getQuantity() > 1){
+            if (item.getQuantity() > 1) {
                 item.decrQuantity();
-                cartRepo.save(item);
+                userRepo.save(existingUser);
+            } else if (item.getQuantity() == 1) {
+                existingCart.remove(item);
+                userRepo.save(existingUser);
             }
-            else if (item.getQuantity() == 1) cartRepo.deleteById(item.getId());
         } else {
             throw new InvalidDataException("Продукт для удаления не найден");
         }

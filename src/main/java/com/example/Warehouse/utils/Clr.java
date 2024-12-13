@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.math.BigDecimal;
 
 @Component
 public class Clr implements CommandLineRunner {
@@ -43,7 +42,7 @@ public class Clr implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         Random random = new Random();
-        var existingWarehouse = warehouseService.getWarehouses("", 1, 5);
+        var existingWarehouse = warehouseService.findWarehouses("", 1, 5);
 
         if (existingWarehouse.isEmpty()) {
             System.out.println("База дынных пуста. Заполняем..");
@@ -101,7 +100,7 @@ public class Clr implements CommandLineRunner {
                 for (var product : productsIds) {
                     stockService.addStock(
                         new AddStockDto(
-                            random.nextInt(10),
+                            random.nextInt(9) + 1,
                             product,
                             warehouse,
                             1,

@@ -1,7 +1,7 @@
 package com.example.Warehouse.domain.models;
 
-import jakarta.persistence.*;
 import com.example.Warehouse.domain.enums.Roles;
+import jakarta.persistence.*;
 
 import java.util.List;
 import java.util.Set;
@@ -15,20 +15,20 @@ public class User extends BaseEntity {
     private String userName;
     private String passwordHash;
 
-    private Set<Order> orders;
+    private List<Order> orders;
     private List<CartItem> cart;
     private Set<Purchase> purchases;
 
-    protected User() {}
+    protected User() {
+    }
 
     public User(
         Roles role,
         String email,
         Integer points,
         String userName,
-        List<CartItem> cart,
-        String passwordHash) {
-        this.cart = cart;
+        String passwordHash
+    ) {
         this.role = role;
         this.email = email;
         this.points = points;
@@ -83,7 +83,7 @@ public class User extends BaseEntity {
         this.role = role;
     }
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     public Set<Purchase> getPurchases() {
         return purchases;
     }
@@ -92,7 +92,7 @@ public class User extends BaseEntity {
         this.purchases = purchases;
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<CartItem> getCart() {
         return cart;
     }
@@ -106,11 +106,11 @@ public class User extends BaseEntity {
     }
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    public Set<Order> getOrders() {
+    public List<Order> getOrders() {
         return orders;
     }
 
-    public void setOrders(Set<Order> orders) {
+    public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
 }

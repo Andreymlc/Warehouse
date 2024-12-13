@@ -1,18 +1,16 @@
 package com.example.Warehouse.services.impl;
 
-import org.springframework.stereotype.Service;
-import com.example.Warehouse.dto.LoginUserDto;
-import com.example.Warehouse.domain.models.User;
 import com.example.Warehouse.domain.enums.Roles;
-import com.example.Warehouse.dto.ResponseUserDto;
+import com.example.Warehouse.domain.models.User;
+import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
+import com.example.Warehouse.dto.LoginUserDto;
 import com.example.Warehouse.dto.RegisterUserDto;
-import com.example.Warehouse.services.UserService;
-import jakarta.persistence.EntityNotFoundException;
+import com.example.Warehouse.dto.ResponseUserDto;
 import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.exceptions.UserAlreadyExistsException;
-import com.example.Warehouse.domain.repository.contracts.user.UserRepository;
-
-import java.util.*;
+import com.example.Warehouse.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -35,7 +33,6 @@ public class UserServiceImpl implements UserService {
                 registerUserDto.email(),
                 0,
                 registerUserDto.userName(),
-                new ArrayList<>(),
                 registerUserDto.password()
             )
         );
@@ -44,10 +41,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public int getPointsCount(String userId) {
+        return userRepo.findPointsCount(userId);
+    }
+
+    @Override
     public ResponseUserDto login(LoginUserDto loginUserDto) {
         var existingUser = userRepo.findByUserName(loginUserDto.userName())
-                .orElseThrow(() ->
-                    new EntityNotFoundException("Пользователь с именем " + loginUserDto.userName() + "не найден"));
+            .orElseThrow(() ->
+                new EntityNotFoundException("Пользователь не найден"));
 
         if (!existingUser.getPasswordHash().equals(loginUserDto.password())) {
             throw new InvalidDataException("Неправильное имя пользователя или пароль");

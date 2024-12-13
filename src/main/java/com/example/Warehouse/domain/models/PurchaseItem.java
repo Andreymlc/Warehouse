@@ -1,9 +1,8 @@
 package com.example.Warehouse.domain.models;
 
-import jakarta.persistence.Table;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "purchase_items")
@@ -12,12 +11,15 @@ public class PurchaseItem extends BaseEntity {
     private Product product;
     private Purchase purchase;
 
-    protected PurchaseItem() {}
+    protected PurchaseItem() {
+    }
 
-    public PurchaseItem(Integer quantity, Product product, Purchase purchase) {
-        this.quantity = quantity;
+    public PurchaseItem(
+        Product product,
+        Integer quantity
+    ) {
         this.product = product;
-        this.purchase = purchase;
+        this.quantity = quantity;
     }
 
     public Integer getQuantity() {

@@ -9,7 +9,10 @@ import java.util.Set;
 public class Warehouse extends BaseEntity {
     private String name;
     private String location;
+    private boolean isDeleted;
+
     private Set<Stock> stock;
+    private Set<Order> orders;
 
     protected Warehouse() {}
 
@@ -49,5 +52,23 @@ public class Warehouse extends BaseEntity {
 
     public void setStocks(Set<Stock> stock) {
         this.stock = stock;
+    }
+
+    @OneToMany(mappedBy = "warehouse", cascade = CascadeType.REMOVE)
+    public Set<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(Set<Order> orders) {
+        this.orders = orders;
+    }
+
+    @Column(name = "is_deleted", nullable = false)
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }

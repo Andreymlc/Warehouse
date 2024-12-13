@@ -1,21 +1,22 @@
 package com.example.Warehouse.controllers;
 
-import com.example.WarehouseContracts.dto.forms.product.ProductEditForm;
-import jakarta.validation.Valid;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import com.example.Warehouse.services.ProductService;
-import com.example.Warehouse.services.CategoryService;
-import com.example.Warehouse.dto.ProductAddDto;
 import com.example.Warehouse.dto.CategoryAddDto;
-import com.example.WarehouseContracts.dto.forms.base.BaseAdminForm;
+import com.example.Warehouse.dto.ProductAddDto;
+import com.example.Warehouse.services.CategoryService;
+import com.example.Warehouse.services.ProductService;
+import com.example.Warehouse.utils.UrlUtil;
 import com.example.WarehouseContracts.controllers.CatalogController;
+import com.example.WarehouseContracts.dto.forms.base.BaseForm;
+import com.example.WarehouseContracts.dto.forms.category.CategoryCreateForm;
 import com.example.WarehouseContracts.dto.forms.category.CategoryEditForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductCreateForm;
-import com.example.WarehouseContracts.dto.forms.category.CategoryCreateForm;
+import com.example.WarehouseContracts.dto.forms.product.ProductEditForm;
 import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
+import jakarta.validation.Valid;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/catalog")
@@ -43,25 +44,19 @@ public class CatalogControllerImpl implements CatalogController {
             )
         );
 
-        return "redirect:/home/admin/products?" +
-            "priceSort=true" +
-            "&base.userName=" + create.base().userName() +
-            "&base.role=" + create.base().role();
+        return "redirect:" + UrlUtil.homeUrl(create.base());
     }
 
     @Override
     @GetMapping("/products/{productId}/delete")
     public String deleteProduct(
         @PathVariable("productId") String productId,
-        @Valid @ModelAttribute("form") BaseAdminForm form,
+        @Valid @ModelAttribute("form") BaseForm form,
         BindingResult bindingResult
     ) {
         productService.deleteProduct(productId);
 
-        return "redirect:/home/admin/products?" +
-            "priceSort=true&" +
-            "base.userName=" + form.userName() +
-            "&base.role=" + form.role();
+        return "redirect:" + UrlUtil.homeUrl(form);
     }
 
     @Override
@@ -86,10 +81,7 @@ public class CatalogControllerImpl implements CatalogController {
 
         productService.editProduct(productId, form.name(), form.category(), form.price());
 
-        return "redirect:/home/admin/products?" +
-            "priceSort=true&" +
-            "base.userName=" + form.base().userName() +
-            "&base.role=" + form.base().role();
+        return "redirect:" + UrlUtil.homeUrl(form.base());
     }
 
     @Override
@@ -101,25 +93,19 @@ public class CatalogControllerImpl implements CatalogController {
     ) {
         categoryService.addCategory(new CategoryAddDto(create.name(), create.discount()));
 
-        return "redirect:/home/admin/categories?" +
-            "priceSort=true&" +
-            "base.userName=" + create.base().userName() +
-            "&base.role=" + create.base().role();
+        return "redirect:" + UrlUtil.categoriesUrl(create.base());
     }
 
     @Override
     @GetMapping("/categories/{categoryId}/delete")
     public String deleteCategory(
         @PathVariable("categoryId") String categoryId,
-        @Valid @ModelAttribute("form") BaseAdminForm form,
+        @Valid @ModelAttribute("form") BaseForm form,
         BindingResult bindingResult
     ) {
         categoryService.deleteCategory(categoryId);
 
-        return "redirect:/home/admin/categories?" +
-            "priceSort=true&" +
-            "base.userName=" + form.userName() +
-            "&base.role=" + form.role();
+        return "redirect:" + UrlUtil.categoriesUrl(form);
     }
 
     @Override
@@ -143,10 +129,7 @@ public class CatalogControllerImpl implements CatalogController {
     ) {
         categoryService.editCategory(categoryId, edit.name(), edit.discount());
 
-        return "redirect:/home/admin/categories?" +
-            "priceSort=true&" +
-            "base.userName=" + edit.base().userName() +
-            "&base.role=" + edit.base().role();
+        return "redirect:" + UrlUtil.categoriesUrl(edit.base());
     }
 
     @Override

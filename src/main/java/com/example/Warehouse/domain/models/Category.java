@@ -9,13 +9,20 @@ import java.util.Set;
 public class Category extends BaseEntity {
     private String name;
     private Float discount;
+    private boolean isDeleted;
+
     private Set<Product> products;
 
     protected Category() {}
 
-    public Category(String name, Float discount) {
+    public Category(
+        String name,
+        Float discount,
+        boolean isDeleted
+    ) {
         this.name = name;
         this.discount = discount;
+        this.isDeleted = isDeleted;
     }
 
     @Column(name = "name", nullable = false, unique = true)
@@ -43,5 +50,14 @@ public class Category extends BaseEntity {
 
     public void setProducts(Set<Product> products) {
         this.products = products;
+    }
+
+    @Column(name = "is_deleted", nullable = false)
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }

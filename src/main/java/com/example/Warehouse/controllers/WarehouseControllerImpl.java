@@ -1,24 +1,25 @@
 package com.example.Warehouse.controllers;
 
-import jakarta.validation.Valid;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
 import com.example.Warehouse.dto.WarehouseAddDto;
-import com.example.Warehouse.services.StockService;
-import org.springframework.validation.BindingResult;
-import com.example.Warehouse.services.ProductService;
 import com.example.Warehouse.services.CategoryService;
+import com.example.Warehouse.services.ProductService;
+import com.example.Warehouse.services.StockService;
 import com.example.Warehouse.services.WarehouseService;
-import com.example.WarehouseContracts.dto.forms.base.BaseAdminForm;
+import com.example.Warehouse.utils.UrlUtil;
 import com.example.WarehouseContracts.controllers.WarehouseController;
+import com.example.WarehouseContracts.dto.forms.base.BaseForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductMoveForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductSetMinMaxForm;
-import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
-import com.example.WarehouseContracts.dto.viewmodels.product.ProductViewModel;
-import com.example.WarehouseContracts.dto.forms.warehouse.WarehouseCreateForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductWarehouseSearchForm;
+import com.example.WarehouseContracts.dto.forms.warehouse.WarehouseCreateForm;
+import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
 import com.example.WarehouseContracts.dto.viewmodels.product.AdminProductsViewModel;
+import com.example.WarehouseContracts.dto.viewmodels.product.ProductViewModel;
+import jakarta.validation.Valid;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/warehouses")
@@ -42,29 +43,25 @@ public class WarehouseControllerImpl implements WarehouseController {
 
     @PostMapping("/create")
     public String create(
-        @Valid @ModelAttribute("create")WarehouseCreateForm create,
+        @Valid @ModelAttribute("create") WarehouseCreateForm create,
         BindingResult bindingResult,
         Model model
     ) {
         warehouseService.add(new WarehouseAddDto(create.name(), create.location()));
 
-        return "redirect:/home/admin/warehouses?" +
-            "base.userName=" + create.base().userName() +
-            "&base.role=" + create.base().role();
+        return "redirect:" + UrlUtil.warehousesUrl(create.base());
     }
 
     @Override
     @GetMapping("/{warehouseId}/delete")
     public String delete(
         @PathVariable("warehouseId") String warehouseId,
-        @Valid @ModelAttribute("form") BaseAdminForm form,
+        @Valid @ModelAttribute("form") BaseForm form,
         BindingResult bindingResult
     ) {
         warehouseService.delete(warehouseId);
 
-        return "redirect:/home/admin/warehouses?" +
-            "base.userName=" + form.userName() +
-            "&base.role=" + form.role();
+        return "redirect:" + UrlUtil.warehousesUrl(form);
     }
 
     @Override
@@ -75,10 +72,10 @@ public class WarehouseControllerImpl implements WarehouseController {
         Model model
     ) {
         var productsPage = productService.findProductsByWarehouse(
-            form.pages().substring(),
             form.pages().page(),
             form.pages().size(),
             form.category(),
+            form.pages().substring(),
             warehouseId
         );
 
@@ -105,9 +102,9 @@ public class WarehouseControllerImpl implements WarehouseController {
 
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
-        model.addAttribute("minimum", new ProductSetMinMaxForm(null, null, "", "", new BaseAdminForm(null, null, null)));
-        model.addAttribute("maximum", new ProductSetMinMaxForm(null, null, "", "", new BaseAdminForm(null, null, null)));
-        model.addAttribute("moveForm", new ProductMoveForm(null, null, null, new BaseAdminForm(null, null, null), null, null));
+        model.addAttribute("minimum", new ProductSetMinMaxForm(null, null, "", "", form.base()));
+        model.addAttribute("maximum", new ProductSetMinMaxForm(null, null, "", "", form.base()));
+        model.addAttribute("moveForm", new ProductMoveForm(null, null, null, form.base(), null, null));
 
         return "warehouse";
     }
@@ -122,11 +119,7 @@ public class WarehouseControllerImpl implements WarehouseController {
     ) {
         stockService.moveProduct(moveForm.productId(), warehouseId, moveForm.newWarehouseId(), moveForm.countItems());
 
-        return "redirect:/warehouses/" + warehouseId + "/manage?" +
-            "base.userName=" + moveForm.base().userName() +
-            "&base.role=" + moveForm.base().role() +
-            "&priceSort=true" +
-            "&warehouseId=" + warehouseId;
+        return "redirect:" + UrlUtil.warehouseManageUrl(moveForm.base(), warehouseId);
     }
 
     @Override
@@ -139,11 +132,7 @@ public class WarehouseControllerImpl implements WarehouseController {
     ) {
         stockService.setMinimum(editForm.value(), editForm.productId(), warehouseId);
 
-        return "redirect:/warehouses/" + warehouseId + "/manage?" +
-            "base.userName=" + editForm.base().userName() +
-            "&base.role=" + editForm.base().role() +
-            "&priceSort=true" +
-            "&warehouseId=" + warehouseId;
+        return "redirect:" + UrlUtil.warehouseManageUrl(editForm.base(), warehouseId);
     }
 
     @Override
@@ -156,11 +145,7 @@ public class WarehouseControllerImpl implements WarehouseController {
     ) {
         stockService.setMaximum(editForm.value(), editForm.productId(), warehouseId);
 
-        return "redirect:/warehouses/" + warehouseId + "/manage?" +
-            "base.userName=" + editForm.base().userName() +
-            "&base.role=" + editForm.base().role() +
-            "&priceSort=true" +
-            "&warehouseId=" + warehouseId;
+        return "redirect:" + UrlUtil.warehouseManageUrl(editForm.base(), warehouseId);
     }
 
     @Override

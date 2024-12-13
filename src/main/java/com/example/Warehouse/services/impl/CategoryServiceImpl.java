@@ -1,17 +1,17 @@
 package com.example.Warehouse.services.impl;
 
+import com.example.Warehouse.domain.models.Category;
+import com.example.Warehouse.domain.repositories.contracts.category.CategoryRepository;
+import com.example.Warehouse.dto.CategoryAddDto;
+import com.example.Warehouse.dto.CategoryDto;
+import com.example.Warehouse.services.CategoryService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import com.example.Warehouse.dto.CategoryDto;
-import org.springframework.stereotype.Service;
-import com.example.Warehouse.dto.CategoryAddDto;
-import org.springframework.data.domain.Pageable;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
-import com.example.Warehouse.domain.models.Category;
-import com.example.Warehouse.services.CategoryService;
-import com.example.Warehouse.domain.repository.contracts.category.CategoryRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -32,7 +32,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(String id) {
-        categoryRepo.deleteById(id);
+        var category = categoryRepo.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
+
+        category.setDeleted(true);
+        categoryRepo.save(category);
     }
 
     @Override
@@ -40,18 +44,18 @@ public class CategoryServiceImpl implements CategoryService {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("name"));
 
         Page<Category> categoryPage = substring != null
-                ? categoryRepo.findByNameContainingIgnoreCase(substring, pageable)
-                : categoryRepo.findAll(pageable);
+            ? categoryRepo.findByNameContainingIgnoreCase(substring, pageable)
+            : categoryRepo.findAll(pageable);
 
         return categoryPage.map(c -> modelMapper.map(c, CategoryDto.class));
     }
 
     @Override
     public List<String> findAllNamesCategories() {
-        return  categoryRepo.findAll()
-                .stream()
-                .map(Category::getName)
-                .toList();
+        return categoryRepo.findAll()
+            .stream()
+            .map(Category::getName)
+            .toList();
     }
 
     @Override

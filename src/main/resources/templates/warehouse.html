@@ -5,6 +5,7 @@
         <title>Управление складом</title>
         <link rel="stylesheet" th:href="@{/css/navbar.css}">
         <link rel="stylesheet" th:href="@{/css/warehouse.css}">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     </head>
     <header>
         <div th:replace="~{/navbar}">Navbar</div>
@@ -49,7 +50,7 @@
                 </form>
             </div>
             <hr width="100%" align="center" size="2px">
-            <form th:action="@{/warehouses/manage}"
+            <form th:action="@{/warehouses/{warehouseId}/manage(warehouseId=${form.warehouseId()})}"
                   th:method="get"
                   th:object="${form}">
                 <div class="search">
@@ -109,7 +110,7 @@
                     <h4 th:if="${product.price() == product.oldPrice()}"
                         th:text="'Цена: ' + ${product.price()}">Цена</h4>
                     <h4 th:text="'Количество: ' + ${product.quantity()}">Количество</h4>
-                    <h4 th:text="'ID: ' + ${product.id()}">ID</h4>
+                    <h5 th:text="'ID: ' + ${product.id()}">ID</h5>
                 </div>
             </div>
         </main>
