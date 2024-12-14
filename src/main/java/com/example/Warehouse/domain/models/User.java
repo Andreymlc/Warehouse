@@ -1,6 +1,5 @@
 package com.example.Warehouse.domain.models;
 
-import com.example.Warehouse.domain.enums.Roles;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -9,12 +8,12 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity {
-    private Roles role;
     private String email;
     private Integer points;
-    private String userName;
+    private String username;
     private String passwordHash;
 
+    private List<Role> roles;
     private List<Order> orders;
     private List<CartItem> cart;
     private Set<Purchase> purchases;
@@ -23,26 +22,24 @@ public class User extends BaseEntity {
     }
 
     public User(
-        Roles role,
         String email,
         Integer points,
-        String userName,
+        String username,
         String passwordHash
     ) {
-        this.role = role;
         this.email = email;
         this.points = points;
-        this.userName = userName;
+        this.username = username;
         this.passwordHash = passwordHash;
     }
 
-    @Column(name = "user_name", nullable = false, unique = true)
-    public String getUserName() {
-        return userName;
+    @Column(name = "username", nullable = false, unique = true)
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String userName) {
+        this.username = userName;
     }
 
 
@@ -73,14 +70,14 @@ public class User extends BaseEntity {
         this.points = points;
     }
 
-    @Enumerated(EnumType.STRING)
+    @ManyToMany(fetch = FetchType.EAGER)
     @Column(name = "role", nullable = false)
-    public Roles getRole() {
-        return role;
+    public List<Role> getRoles() {
+        return roles;
     }
 
-    public void setRole(Roles role) {
-        this.role = role;
+    public void setRoles(List<Role> role) {
+        this.roles = role;
     }
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

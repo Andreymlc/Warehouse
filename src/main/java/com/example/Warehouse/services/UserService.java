@@ -8,7 +8,7 @@ import com.example.Warehouse.dto.ResponseUserDto;
 public interface UserService {
     ResponseUserDto login(LoginUserDto loginUserDto);
 
-    ResponseUserDto register(RegisterUserDto registerUserDto);
+    void register(RegisterUserDto registerUserDto);
 
     int getPointsCount(String userId);
 }

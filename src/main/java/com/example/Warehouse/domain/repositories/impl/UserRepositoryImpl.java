@@ -20,7 +20,7 @@ public class UserRepositoryImpl extends BaseRepository<BaseUserRepository> imple
     }
 
     @Override
-    public Optional<User> findByUserName(String name) {
+    public Optional<User> findByUsername(String name) {
         return repository.findByUserName(name);
     }
 
