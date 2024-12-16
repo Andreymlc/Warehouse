@@ -95,6 +95,15 @@ public class Product extends BaseEntity {
         this.cartItems = cartItems;
     }
 
+    @Column(name = "is_deleted", nullable = false)
+    public boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -105,14 +114,5 @@ public class Product extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(name, price);
-    }
-
-    @Column(name = "is_deleted", nullable = false)
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
     }
 }

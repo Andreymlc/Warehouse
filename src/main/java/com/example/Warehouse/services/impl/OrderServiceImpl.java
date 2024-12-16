@@ -5,10 +5,10 @@ import com.example.Warehouse.domain.models.OrderItem;
 import com.example.Warehouse.domain.repositories.contracts.order.OrderRepository;
 import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
-import com.example.Warehouse.dto.OrderDto;
-import com.example.Warehouse.dto.OrderItemDto;
-import com.example.Warehouse.services.OrderService;
-import com.example.Warehouse.services.WarehouseService;
+import com.example.Warehouse.dto.order.OrderDto;
+import com.example.Warehouse.dto.order.OrderItemDto;
+import com.example.Warehouse.services.contracts.OrderService;
+import com.example.Warehouse.services.contracts.WarehouseService;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -21,12 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
     private final ModelMapper modelMapper;
     private final UserRepository userRepo;
     private final OrderRepository orderRepo;
@@ -54,30 +52,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderDto> findOrders(String userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("date").descending());
+    public Page<OrderDto> findOrders(String username, int page, int size) {
+        var sort = Sort.by("date").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-        var orderPage = orderRepo.findByUserId(userId, pageable);
+        var orderPage = orderRepo.findByUsername(username, pageable);
 
         return orderPage.map(o -> modelMapper.map(o, OrderDto.class));
     }
 
-    public List<OrderDto> findOrdersByUserId(String userId, int page, int size) {
-
-        var existingUser = userRepo.findById(userId)
-            .orElseThrow(() -> new EntityNotFoundException("Пользоватль не найден"));
-
-        return existingUser
-            .getOrders()
-            .stream()
-            .map(o -> modelMapper.map(o, OrderDto.class))
-            .toList();
-    }
-
     @Override
     @Transactional
-    public void addOrder(String userId, String warehouseId) {
-        var existingUser = userRepo.findById(userId)
+    public void addOrder(String username, String warehouseId) {
+        var existingUser = userRepo.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 
         var existingWarehouse = warehouseRepo.findById(warehouseId)

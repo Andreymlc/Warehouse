@@ -7,13 +7,16 @@ import com.example.Warehouse.domain.models.Stock;
 import com.example.Warehouse.domain.repositories.contracts.purchase.PurchaseRepository;
 import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
-import com.example.Warehouse.dto.PurchaseDto;
-import com.example.Warehouse.dto.PurchaseItemDto;
+import com.example.Warehouse.dto.PageForRedis;
+import com.example.Warehouse.dto.purchase.PurchaseDto;
+import com.example.Warehouse.dto.purchase.PurchaseItemDto;
 import com.example.Warehouse.exceptions.InvalidDataException;
-import com.example.Warehouse.services.PurchaseService;
-import com.example.Warehouse.services.StockService;
+import com.example.Warehouse.services.contracts.PurchaseService;
+import com.example.Warehouse.services.contracts.StockService;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,8 +54,9 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional
-    public void addPurchase(String userId, int pointsSpent) {
-        var user = userRepo.findById(userId)
+
+    public void addPurchase(String username, int pointsSpent) {
+        var user = userRepo.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 
         var purchaseItems = user
@@ -105,6 +109,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @Cacheable(value = "purchase")
     public PurchaseDto findPurchaseByNumber(String number) {
         var existingPurchase = purchaseRepo.findByNumber(number)
             .orElseThrow(() -> new EntityNotFoundException("Покупка не найдена"));
@@ -113,24 +118,33 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Page<PurchaseDto> findPurchases(String userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("status").descending());
+    @Cacheable(value = "purchases", key = "#username + '-' + #page + '-' + #size")
+    public PageForRedis<PurchaseDto> findPurchases(String username, int page, int size) {
+        var sortByStatus = Sort.by("status").descending();
+        var sortByDate = Sort.by("date").descending();
 
-        return purchaseRepo
-            .findByUserId(userId, pageable)
-            .map(o -> modelMapper.map(o, PurchaseDto.class));
+        Pageable pageable = PageRequest.of(page - 1, size, sortByStatus.and(sortByDate));
+
+        return new PageForRedis<>(purchaseRepo
+            .findByUserName(username, pageable)
+            .map(o -> modelMapper.map(o, PurchaseDto.class))
+        );
     }
 
     @Override
-    public Page<PurchaseDto> findAllPurchases(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("status").descending());
+    @Cacheable(value = "purchases", key = "#page + '-' + #size")
+    public PageForRedis<PurchaseDto> findAllPurchases(int page, int size) {
+        var sortByStatus = Sort.by("status").descending();
+        var sortByDate = Sort.by("date").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sortByStatus.and(sortByDate));
 
-        return purchaseRepo
-            .findAll(pageable)
-            .map(p -> modelMapper.map(p, PurchaseDto.class));
+        return new PageForRedis<>(purchaseRepo
+            .findAll(pageable).map(p -> modelMapper.map(p, PurchaseDto.class))
+        );
     }
 
     @Override
+    @CacheEvict(value = "purchases", allEntries = true)
     public void check(String purchaseNumber) {
         var purchase = purchaseRepo.findByNumber(purchaseNumber)
             .orElseThrow(() -> new EntityNotFoundException("Заказ с таким номером не найден"));
@@ -144,6 +158,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    @CacheEvict(value = "purchases", allEntries = true)
     public void setCanceled(String purchaseNumber) {
         var purchase = purchaseRepo.findByNumber(purchaseNumber)
             .orElseThrow(() -> new EntityNotFoundException("Заказ с таким номером не найден"));

@@ -1,11 +1,10 @@
 package com.example.Warehouse.controllers;
 
-import com.example.Warehouse.services.CartService;
-import com.example.Warehouse.services.UserService;
-import com.example.Warehouse.utils.UrlUtil;
+import com.example.Warehouse.services.contracts.CartService;
+import com.example.Warehouse.services.contracts.UserService;
+import com.example.WarehouseContracts.controllers.CartController;
+import com.example.WarehouseContracts.dto.forms.cart.AddProductToAdminCartForm;
 import com.example.WarehouseContracts.dto.forms.cart.AddProductToUserCartForm;
-import com.example.WarehouseContracts.dto.forms.cart.CartUserForm;
-import com.example.WarehouseContracts.dto.forms.cart.DeleteProductFromUserCartFrom;
 import com.example.WarehouseContracts.dto.forms.order.OrderCreateForm;
 import com.example.WarehouseContracts.dto.forms.purchase.PurchaseCreateForm;
 import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
@@ -13,17 +12,15 @@ import com.example.WarehouseContracts.dto.viewmodels.cart.CartAdminViewModel;
 import com.example.WarehouseContracts.dto.viewmodels.cart.CartUserViewModel;
 import com.example.WarehouseContracts.dto.viewmodels.product.ProductInCartViewModel;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/cart")
-public class CartControllerImpl {
+public class CartControllerImpl implements CartController {
     private final CartService cartService;
     private final UserService userService;
 
@@ -35,13 +32,13 @@ public class CartControllerImpl {
         this.userService = userService;
     }
 
-    @GetMapping
-    public String cartPage(
-        @Valid @ModelAttribute("form") CartUserForm form,
-        BindingResult bindingResult,
+    @Override
+    @GetMapping("/user")
+    public String userCartPage(
+        Authentication authentication,
         Model model
     ) {
-        var cart = cartService.findCart(form.base().id());
+        var cart = cartService.findCart(authentication.getName());
 
         var productsViewModel = cart
             .products()
@@ -56,62 +53,105 @@ public class CartControllerImpl {
             )
             .toList();
 
-        var viewModel = switch (form.base().role()) {
-            case "USER" -> {
-                var pointsCount = userService.getPointsCount(form.base().id());
+        var pointsCount = userService.getPointsCount(authentication.getName());
 
-                model.addAttribute("orderCreate", new PurchaseCreateForm(form.base(), 0));
+        var viewModel = new CartUserViewModel(
+            cart.totalPrice(),
+            pointsCount,
+            createBaseViewModel(0, productsViewModel.size()),
+            productsViewModel
+        );
 
-                yield new CartUserViewModel(
-                    cart.totalPrice(),
-                    pointsCount,
-                    createBaseViewModel(0, productsViewModel.size()),
-                    productsViewModel
-                );
-            }
-
-            case "ADMIN" -> {
-                model.addAttribute("orderCreate", new OrderCreateForm(form.base(), null));
-
-                yield new CartAdminViewModel(
-                    cart.totalPrice(),
-                    createBaseViewModel(0, productsViewModel.size()),
-                    productsViewModel
-                );
-            }
-
-            default -> null;
-        };
-
-        model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
-        model.addAttribute("delete", new DeleteProductFromUserCartFrom(null, form.base()));
+        model.addAttribute("orderCreate", new PurchaseCreateForm(0));
 
         return "cart";
     }
 
-    @PostMapping("/add-product")
+    @Override
+    @GetMapping("/admin")
+    public String adminCartPage(
+        Authentication authentication,
+        Model model
+    ) {
+        var cart = cartService.findCart(authentication.getName());
+
+        var productsViewModel = cart
+            .products()
+            .stream()
+            .map(p -> new ProductInCartViewModel(
+                    p.id(),
+                    p.name(),
+                    p.category(),
+                    p.quantity(),
+                    p.totalPrice()
+                )
+            )
+            .toList();
+
+        var viewModel = new CartAdminViewModel(
+            cart.totalPrice(),
+            createBaseViewModel(0, productsViewModel.size()),
+            productsViewModel
+        );
+
+        model.addAttribute("model", viewModel);
+        model.addAttribute("orderCreate", new OrderCreateForm(null));
+
+        return "cart";
+    }
+
+    @Override
+    @PostMapping("/user/add-product")
     public String addProductToUserCart(
+        Authentication authentication,
         @Valid @ModelAttribute("add") AddProductToUserCartForm add,
         BindingResult bindingResult,
         Model model
     ) {
-        cartService.addProductToCart(add.base().id(), add.productId());
+        cartService.addProductToCart(authentication.getName(), add.productId());
 
-        return "redirect:" + UrlUtil.homeUrl(add.base());
+        return "redirect:/home/user";
     }
 
-    @GetMapping("/delete-product")
-    public String deleteProductFromUserCart(
-        @Valid @ModelAttribute("delete") DeleteProductFromUserCartFrom delete,
+    @Override
+    @PostMapping("/admin/add-product")
+    public String addProductToAdminCart(
+        Authentication authentication,
+        @Valid @ModelAttribute("add") AddProductToAdminCartForm add,
         BindingResult bindingResult,
         Model model
     ) {
-        cartService.deleteProductFromCart(delete.base().id(), delete.productId());
+        cartService.addProductToCart(authentication.getName(), add.productId());
 
-        return "redirect:" + UrlUtil.cartUrl(delete.base());
+        return "redirect:/home/admin";
     }
 
+    @Override
+    @GetMapping("/user/delete-product/{productId}")
+    public String deleteProductFromUserCart(
+        Authentication authentication,
+        @PathVariable("productId") String productId,
+        Model model
+    ) {
+        cartService.deleteProductFromCart(authentication.getName(), productId);
+
+        return "redirect:/cart/user";
+    }
+
+    @Override
+    @GetMapping("/admin/delete-product/{productId}")
+    public String deleteProductFromAdminCart(
+        Authentication authentication,
+        @PathVariable("productId") String productId,
+        Model model
+    ) {
+        cartService.deleteProductFromCart(authentication.getName(), productId);
+
+        return "redirect:/cart/admin";
+    }
+
+    @Override
     public BasePagesViewModel createBaseViewModel(int totalPages, int countItemsInCart) {
         return new BasePagesViewModel(totalPages, countItemsInCart);
     }

@@ -1,9 +1,9 @@
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Корзина</title>
-    <link rel="stylesheet" th:href="@{/css/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/cart.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <header>
@@ -12,7 +12,7 @@
 <body>
 <aside>
     <h1 class="center-div">Заказ</h1>
-    <form th:if="${form.base().role() == 'ADMIN'}"
+    <form sec:authorize="hasRole('ADMIN')"
           th:action="@{/orders/admin/create}"
           th:method="post"
           th:object="${orderCreate}">
@@ -20,15 +20,12 @@
             товара</p>
         <div class="search">
             <p>Введите id склада:</p>
-            <input th:if="${form.base().role() == 'ADMIN'}" type="text" th:field="*{warehouseId}"
+            <input sec:authorize="hasRole('ADMIN')" type="text" th:field="*{warehouseId}"
                    placeholder="Введите id склада">
-            <input type="hidden" th:field="*{base.userName}"/>
-            <input type="hidden" th:field="*{base.role}"/>
-            <input type="hidden" th:field="*{base.id}"/>
         </div>
         <button type="submit">Заказать</button>
     </form>
-    <form th:if="${form.base().role() == 'USER'}"
+    <form sec:authorize="hasRole('USER')"
           th:action="@{/orders/user/create}"
           th:method="post"
           th:object="${orderCreate}">
@@ -37,12 +34,9 @@
         <p style="text-decoration: underline;" th:text="'У вас баллов: ' + ${model.pointsCount()}">У вас баллов</p>
         <div class="search">
             <p>Введите кол-во баллов:</p>
-            <input th:if="${form.base().role() == 'USER'}" type="number" min="0" th:max="${model.totalPrice()}"
+            <input type="number" min="0" th:max="${model.totalPrice()}"
                    th:field="*{pointsSpent}"
                    placeholder="Введите количество баллов">
-            <input type="hidden" th:field="*{base.userName}"/>
-            <input type="hidden" th:field="*{base.role}"/>
-            <input type="hidden" th:field="*{base.id}"/>
         </div>
         <button type="submit">Заказать</button>
     </form>
@@ -58,12 +52,8 @@
             <h4 th:text="'Категория: ' + ${product.category()}">Категория</h4>
             <h4 th:text="'Цена: ' + ${product.totalPrice()}">Цена</h4>
             <h4 th:text="'Количество: ' + ${product.quantity()}">Количество</h4>
-            <a class="long-button" th:href="@{/cart/delete-product(
-                  base.id=${form.base.id()},
-                  base.userName=${form.base().userName()},
-                  base.role=${form.base().role()},
-                  productId=${product.id()}
-                  )}">Удалить</a>
+            <a class="long-button" sec:authorize="hasRole('USER')" th:href="@{/cart/user/delete-product/{productId}(productId=${product.id()})}">Удалить</a>
+            <a class="long-button" sec:authorize="hasRole('ADMIN')" th:href="@{/cart/admin/delete-product/{productId}(productId=${product.id()})}">Удалить</a>
         </div>
     </div>
 </main>

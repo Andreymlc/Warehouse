@@ -33,31 +33,35 @@ public class SecurityConfig {
                     authorizeHttpRequests.
                         requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                         .permitAll()
-                        .requestMatchers("/favicon.ico").permitAll()
-                        .requestMatchers("/error").permitAll()
-                        .requestMatchers("/", "/users/login", "/users/register", "/users/login-error")
-                        .permitAll().
-                        requestMatchers("/users/profile").authenticated().
-                        requestMatchers("/employees/add", "/employees/employee-delete/").hasAnyRole(Roles.ADMIN.name()).
-                        requestMatchers("/companies/company-delete/").hasRole(Roles.ADMIN.name()).
-                        anyRequest().authenticated()
+                        .requestMatchers("/favicon.ico", "/error", "/users/login", "/users/register", "/users/login-error")
+                        .permitAll()
+                        .requestMatchers("/cart", "/orders").authenticated()
+                        .requestMatchers("/catalog/**", "/warehouses/**").hasRole(Roles.ADMIN.name())
+                        .anyRequest().authenticated()
             )
             .formLogin(
                 (formLogin) ->
-                    formLogin.
-                        loginPage("/users/login").
-                        usernameParameter(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY).
-                        passwordParameter(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_PASSWORD_KEY).
-                        defaultSuccessUrl("/").
-                        failureForwardUrl("/users/login-error")
+                    formLogin
+                        .loginPage("/users/login")
+                        .usernameParameter(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY)
+                        .passwordParameter(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_PASSWORD_KEY)
+                        .defaultSuccessUrl("/")
+                        .failureForwardUrl("/users/login-error")
             )
             .logout((logout) ->
-                logout.logoutUrl("/users/logout").
-                    logoutSuccessUrl("/").
-                    invalidateHttpSession(true)
+                logout.logoutUrl("/users/logout")
+                    .logoutSuccessUrl("/")
+                    .invalidateHttpSession(true)
             ).securityContext(
-                securityContext -> securityContext.
-                    securityContextRepository(securityContextRepository)
+                securityContext -> securityContext
+                    .securityContextRepository(securityContextRepository)
+            ).rememberMe(
+                rememberMe -> rememberMe
+                    .key("encription key")
+                    .rememberMeParameter("remember")
+                    .tokenValiditySeconds(60 * 60 * 244 * 14)
+                    .userDetailsService(userDetailsService())
+                    .alwaysRemember(true)
             );
 
         return http.build();

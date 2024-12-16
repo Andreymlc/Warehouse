@@ -2,16 +2,24 @@ package com.example.Warehouse.services.impl;
 
 import com.example.Warehouse.domain.models.Category;
 import com.example.Warehouse.domain.repositories.contracts.category.CategoryRepository;
-import com.example.Warehouse.dto.CategoryAddDto;
-import com.example.Warehouse.dto.CategoryDto;
-import com.example.Warehouse.services.CategoryService;
+import com.example.Warehouse.dto.PageForRedis;
+import com.example.Warehouse.dto.category.CategoryAddDto;
+import com.example.Warehouse.dto.category.CategoryDto;
+import com.example.Warehouse.dto.category.CategorySearchDto;
+import com.example.Warehouse.dto.filters.CategoryFilter;
+import com.example.Warehouse.exceptions.InvalidDataException;
+import com.example.Warehouse.services.contracts.CategoryService;
+import com.example.Warehouse.utils.specifications.CategorySpec;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,61 +28,94 @@ public class CategoryServiceImpl implements CategoryService {
     private final ModelMapper modelMapper;
     private final CategoryRepository categoryRepo;
 
-    public CategoryServiceImpl(ModelMapper modelMapper, CategoryRepository categoryRepo) {
+    public CategoryServiceImpl(
+        ModelMapper modelMapper,
+        CategoryRepository categoryRepo
+    ) {
         this.modelMapper = modelMapper;
         this.categoryRepo = categoryRepo;
     }
 
     @Override
-    public String addCategory(CategoryAddDto categoryDto) {
+    @CacheEvict(value = "categories", allEntries = true)
+    public String create(CategoryAddDto categoryDto) {
+        var existingCategory = categoryRepo.findByName(categoryDto.name());
+
+        if (existingCategory.isPresent()) {
+            if (existingCategory.get().getIsDeleted()) {
+                existingCategory.get().setIsDeleted(false);
+                existingCategory.get().setDiscount(1f);
+                categoryRepo.save(existingCategory.get());
+
+                return "";
+            }
+
+            throw new InvalidDataException("Категория с таким имененм уже существует");
+        }
+
         return categoryRepo.save(modelMapper.map(categoryDto, Category.class)).getId();
     }
 
     @Override
-    public void deleteCategory(String id) {
+    @Transactional
+    @CacheEvict(value = {"categories", "products", "stocks"}, allEntries = true)
+    public void delete(String id) {
         var category = categoryRepo.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
 
-        category.setDeleted(true);
+        category.getProducts().forEach(p -> p.setIsDeleted(true));
+        category.setIsDeleted(true);
         categoryRepo.save(category);
     }
 
     @Override
-    public Page<CategoryDto> findCategories(String substring, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("name"));
+    @Cacheable(
+        value = "categories",
+        key = "#categoryDto.substring + '-' + #categoryDto.page + '-' + #categoryDto.size() + '-' + #categoryDto.returnDeleted"
+    )
+    public PageForRedis<CategoryDto> findCategories(CategorySearchDto categoryDto) {
+        Pageable pageable = PageRequest
+            .of(categoryDto.page() - 1, categoryDto.size(), Sort.by("name"));
 
-        Page<Category> categoryPage = substring != null
-            ? categoryRepo.findByNameContainingIgnoreCase(substring, pageable)
-            : categoryRepo.findAll(pageable);
+        Page<Category> categoryPage = categoryRepo.findAllByFilter(
+            CategorySpec.filter(
+                new CategoryFilter(
+                    categoryDto.substring(),
+                    categoryDto.returnDeleted()
+                )
+            ),
+            pageable
+        );
 
-        return categoryPage.map(c -> modelMapper.map(c, CategoryDto.class));
+        return new PageForRedis<>(categoryPage.map(c -> modelMapper.map(c, CategoryDto.class)));
     }
 
     @Override
-    public List<String> findAllNamesCategories() {
-        return categoryRepo.findAll()
-            .stream()
-            .map(Category::getName)
-            .toList();
+    @Cacheable("categories")
+    public List<String> findAllNamesCategories(boolean returnDeleted) {
+        if (returnDeleted) {
+            return categoryRepo.findAll()
+                .stream()
+                .map(Category::getName)
+                .toList();
+        } else {
+            return categoryRepo.findAll()
+                .stream()
+                .filter(c -> !c.getIsDeleted())
+                .map(Category::getName)
+                .toList();
+        }
     }
 
     @Override
-    public void editCategory(String id, String name, int discount) {
+    @CacheEvict(value = {"categories", "products", "stocks"}, allEntries = true)
+    public void edit(String id, String name, int discount) {
         var category = categoryRepo.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
 
-        var isChanged = false;
+        if (name != null) category.setName(name);
+        category.setDiscount(1 - (float) discount / 100);
 
-        if (name != null && !category.getName().equalsIgnoreCase(name)) {
-            category.setName(name);
-            isChanged = true;
-        }
-        if (category.getDiscount() != discount) {
-            category.setDiscount(1 - (float) discount / 100);
-            isChanged = true;
-        }
-        if (isChanged) {
-            categoryRepo.save(category);
-        }
+        categoryRepo.save(category);
     }
 }

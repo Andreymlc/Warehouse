@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface UserRepository extends BaseSaveRepository<User> {
     Optional<User> findById(String id);
 
-    int findPointsCount(String id);
+    int findPointsCount(String username);
 
     Optional<User> findByUsername(String name);
 }

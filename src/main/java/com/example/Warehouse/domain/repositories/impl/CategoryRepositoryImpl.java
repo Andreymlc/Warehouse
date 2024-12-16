@@ -1,7 +1,9 @@
 package com.example.Warehouse.domain.repositories.impl;
 
+import com.example.Warehouse.domain.models.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import com.example.Warehouse.domain.models.Category;
 import com.example.Warehouse.domain.repositories.contracts.category.BaseCategoryRepository;
@@ -24,27 +26,17 @@ public class CategoryRepositoryImpl extends BaseRepository<BaseCategoryRepositor
     }
 
     @Override
-    public Page<Category> findAllExisting(Pageable pageable) {
-        return repository.findByDeletedFalse(pageable);
-    }
-
-    @Override
     public Optional<Category> findById(String id) {
         return repository.findById(id);
     }
 
     @Override
-    public Page<Category> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Page<Category> findAllByFilter(Specification<Category> specification, Pageable pageable) {
+        return repository.findAll(specification, pageable);
     }
 
     @Override
     public Optional<Category> findByName(String name) {
         return repository.findByName(name);
-    }
-
-    @Override
-    public Page<Category> findByNameContainingIgnoreCase(String name, Pageable pageable) {
-        return repository.findByNameContainingIgnoreCaseAndDeletedFalse(name, pageable);
     }
 }

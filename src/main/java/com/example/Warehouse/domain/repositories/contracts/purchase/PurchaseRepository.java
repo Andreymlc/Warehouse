@@ -12,5 +12,5 @@ public interface PurchaseRepository extends BaseSaveRepository<Purchase> {
 
     Page<Purchase> findAll(Pageable pageable);
 
-    Page<Purchase> findByUserId(String userId, Pageable pageable);
+    Page<Purchase> findByUserName(String userId, Pageable pageable);
 }

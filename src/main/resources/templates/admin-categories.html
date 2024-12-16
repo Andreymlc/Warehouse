@@ -1,116 +1,99 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8">
-        <title>Админ категории</title>
-        <link rel="stylesheet" th:href="@{/css/navbar.css}">
-        <link rel="stylesheet" th:href="@{/css/home.css}">
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    </head>
-    <header>
-        <div th:replace="~{/navbar}">Navbar</div>
-    </header>
-    <body>
-        <aside>
-            <ul>
-                <li>
-                    <a th:href="@{/home/admin/warehouses(
-                             base.userName=${form.base.userName()},
-                             base.id=${form.base.id()},
-                             base.role=${form.base.role()})}">Все склады</a>
-                </li>
-                <li>
-                    <a th:href="@{/home/admin(
-                             base.userName=${form.base.userName()},
-                             priceSort=true,
-                             base.id=${form.base.id()},
-                             base.role=${form.base.role()})}">Каталог товаров</a>
-                </li>
-                <li>
-                    <a class="active-button" th:href="@{/home/admin/categories(
-                             base.userName=${form.base.userName()},
-                             base.id=${form.base.id()},
-                             base.role=${form.base.role()})}">Категории</a>
-                </li>
-            </ul>
-            <form class="standard-form" th:action="@{/catalog/categories/create}"
-                  th:method="post"
-                  th:object="${create}">
-                <h4>Создание категории</h4>
-                <input class="default-input" type="text" th:field="*{name}" placeholder="Навзание категории">
-                <input class="default-input" type="text" th:field="*{discount}" placeholder="Скидка" >
-                <input type="hidden" th:field="*{base.userName}"/>
-                <input type="hidden" th:field="*{base.role}" />
-                <input type="hidden" th:field="*{base.id}" />
-                <button type="submit">Создать</button>
-            </form>
-        </aside>
-        <main>
-            <form th:action="@{/home/admin/categories}"
-                  th:method="get"
-                  th:object="${form}">
-                <div class="search">
-                    <input type="text"
-                           th:field="*{pages.substring}"
-                           placeholder="Поиск категории по названию"/>
-                    <button type="submit">Поиск</button>
-                </div>
-                <input type="hidden" th:field="*{pages.page}" />
-                <input type="hidden" th:field="*{pages.size}" />
-                <input type="hidden" th:field="*{base.userName}" />
-                <input type="hidden" th:field="*{base.role}" />
-                <input type="hidden" th:field="*{base.id}" />
-            </form>
+<head>
+    <meta charset="UTF-8">
+    <title>Админ категории</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<header>
+    <div th:replace="~{/navbar}">Navbar</div>
+</header>
+<body>
+<aside>
+    <ul>
+        <li>
+            <a th:href="@{/home/admin/warehouses(returnDeleted=${form.returnDeleted})}">Все склады</a>
+        </li>
+        <li>
+            <a th:href="@{/home/admin(returnDeleted=${form.returnDeleted})}">Каталог товаров</a>
+        </li>
+        <li>
+            <a class="active-button" th:href="@{/home/admin/categories(returnDeleted=${form.returnDeleted})}">Категории</a>
+        </li>
+    </ul>
+    <form class="standard-form" th:action="@{/catalog/categories/create}"
+          th:method="post"
+          th:object="${create}">
+        <h4>Создание категории</h4>
+        <input class="default-input" type="text" th:field="*{name}" placeholder="Навзание категории">
+        <input class="default-input" type="text" th:field="*{discount}" placeholder="Скидка">
+        <button type="submit">Создать</button>
+    </form>
+</aside>
+<main>
+    <form th:action="@{/home/admin/categories}"
+          th:method="get"
+          th:object="${form}">
+        <div class="search">
+            <input type="text"
+                   th:field="*{pages.substring}"
+                   placeholder="Поиск категории по названию"/>
+            <div class="sorting">
+                <input th:field="*{returnDeleted}" type="checkbox">
+                Показать удаленные
+            </div>
+            <button type="submit">Поиск</button>
+        </div>
+        <input type="hidden" th:field="*{pages.page}"/>
+        <input type="hidden" th:field="*{pages.size}"/>
+    </form>
 
-            <div class="pages" th:if="${model.base().totalPages() > 1}">
-                <ul class="pages-ul">
-                    <li
-                            th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
-                            th:classappend="${pageNumber == form.pages.page()} ? 'active'">
-                        <a class="page-picker"
-                           th:href="@{/home/admin/categories(
-                             base.userName=${form.base.userName()},
-                             base.id=${form.base.id()},
-                             base.role=${form.base.role()},
+    <div class="pages" th:if="${model.base().totalPages() > 1}">
+        <ul class="pages-ul">
+            <li
+                    th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
+                    th:classappend="${pageNumber == form.pages.page()} ? 'active'">
+                <a class="page-picker"
+                   th:href="@{/home/admin/categories(
+                             returnDeleted=${form.returnDeleted},
                              pages.page=${pageNumber},
                              pages.size=${form.pages.size()},
                              pages.substring=${form.pages.substring()}
                          )}"
-                           th:text="${pageNumber}">1</a>
-                    </li>
-                </ul>
-            </div>
+                   th:text="${pageNumber}">1</a>
+            </li>
+        </ul>
+    </div>
 
-            <div class="cards" th:if="${#lists.isEmpty(model.categories())}">
-                Категории не найдены
-            </div>
+    <div class="cards" th:if="${#lists.isEmpty(model.categories())}">
+        Категории не найдены
+    </div>
 
-            <div class="cards" th:if="${not #lists.isEmpty(model.categories())}">
-                <div class="card" th:each="category : ${model.categories()}">
-                    <h2 th:text="'Название: ' + ${category.name()}">Название Категории</h2>
-                    <h4 th:text="'Скидка по категории: ' + ${category.discount()} + '%'">Скидка по категории</h4>
-                    <form  class="search" th:action="@{/catalog/categories/{categoryId}/edit(categoryId=${category.id()})}"
-                          th:method="post"
-                          th:object="${edit}">
-                        <input class="small-input" type="number" min="0" max="100" th:field="*{discount}" placeholder="Скидка">
-                        <input type="hidden" th:field="*{base.userName}" />
-                        <input type="hidden" th:field="*{base.role}" />
-                        <input type="hidden" th:field="*{base.id}" />
-                        <button type="submit">Применить</button>
-                    </form>
-                    <div class="margin-top">
-                        <a th:href="@{/catalog/categories/{id}/edit(
+    <div class="cards" th:if="${not #lists.isEmpty(model.categories())}">
+        <div class="card" th:each="category : ${model.categories()}">
+            <div style="display: flex">
+                <h2 th:text="'Название: ' + ${category.name()}">Название Категории</h2>
+                <img th:if="${category.isDeleted()}" src="/css/icon/trash-can_115312.png" alt="Удалена"/>
+            </div>
+            <h4 th:text="'Скидка по категории: ' + ${category.discount()} + '%'">Скидка по категории</h4>
+            <form class="search" th:action="@{/catalog/categories/{categoryId}/edit(categoryId=${category.id()})}"
+                  th:method="post"
+                  th:object="${edit}">
+                <input class="small-input" type="number" min="0" max="100" th:field="*{discount}" placeholder="Скидка">
+                <button type="submit">Применить</button>
+            </form>
+            <div class="categories-buttons">
+                <a th:href="@{/catalog/categories/{id}/edit(
                         id=${category.id()},
                         name=${category.name()},
-                        discount=${category.discount()},
-                        base.userName=${form.base.userName()},
-                        base.id=${form.base.id()},
-                        base.role=${form.base.role()}
-                        )}">Редактировать</a>
-                        <a onclick="return confirm('Вы уверены, что хотите удалить категорию?');">Удалить</a>
-                    </div>
-                </div>
+                        discount=${category.discount()})}">Редактировать</a>
+                <a th:href="@{/catalog/categories/{categoryId}/delete(categoryId=${category.id()})}"
+                   onclick="return confirm('Вы уверены, что хотите удалить категорию?');">Удалить</a>
             </div>
-        </main>
-    </body>
+        </div>
+    </div>
+</main>
+</body>
 </html>

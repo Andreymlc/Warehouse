@@ -1,21 +1,22 @@
 package com.example.Warehouse.controllers;
 
-import com.example.Warehouse.dto.WarehouseAddDto;
-import com.example.Warehouse.services.CategoryService;
-import com.example.Warehouse.services.ProductService;
-import com.example.Warehouse.services.StockService;
-import com.example.Warehouse.services.WarehouseService;
-import com.example.Warehouse.utils.UrlUtil;
+import com.example.Warehouse.dto.product.ProductSearchByWarehouseDto;
+import com.example.Warehouse.dto.warehouse.WarehouseAddDto;
+import com.example.Warehouse.services.contracts.CategoryService;
+import com.example.Warehouse.services.contracts.ProductService;
+import com.example.Warehouse.services.contracts.StockService;
+import com.example.Warehouse.services.contracts.WarehouseService;
 import com.example.WarehouseContracts.controllers.WarehouseController;
-import com.example.WarehouseContracts.dto.forms.base.BaseForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductMoveForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductSetMinMaxForm;
 import com.example.WarehouseContracts.dto.forms.product.ProductWarehouseSearchForm;
 import com.example.WarehouseContracts.dto.forms.warehouse.WarehouseCreateForm;
 import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
-import com.example.WarehouseContracts.dto.viewmodels.product.AdminProductsViewModel;
-import com.example.WarehouseContracts.dto.viewmodels.product.ProductViewModel;
+import com.example.WarehouseContracts.dto.viewmodels.product.ProductStockViewModel;
+import com.example.WarehouseContracts.dto.viewmodels.product.ProductsStockViewModel;
+import com.example.WarehouseContracts.dto.viewmodels.product.ProductsViewModel;
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,23 +25,27 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/warehouses")
 public class WarehouseControllerImpl implements WarehouseController {
+    private final ModelMapper modelMapper;
     private final StockService stockService;
     private final ProductService productService;
     private final CategoryService categoryService;
     private final WarehouseService warehouseService;
 
     public WarehouseControllerImpl(
+        ModelMapper modelMapper,
         StockService stockService,
         ProductService productService,
         CategoryService categoryService,
         WarehouseService warehouseService
     ) {
+        this.modelMapper = modelMapper;
         this.stockService = stockService;
         this.productService = productService;
         this.categoryService = categoryService;
         this.warehouseService = warehouseService;
     }
 
+    @Override
     @PostMapping("/create")
     public String create(
         @Valid @ModelAttribute("create") WarehouseCreateForm create,
@@ -49,19 +54,15 @@ public class WarehouseControllerImpl implements WarehouseController {
     ) {
         warehouseService.add(new WarehouseAddDto(create.name(), create.location()));
 
-        return "redirect:" + UrlUtil.warehousesUrl(create.base());
+        return "redirect:/home/admin/warehouses?returnDeleted=false";
     }
 
     @Override
     @GetMapping("/{warehouseId}/delete")
-    public String delete(
-        @PathVariable("warehouseId") String warehouseId,
-        @Valid @ModelAttribute("form") BaseForm form,
-        BindingResult bindingResult
-    ) {
+    public String delete(@PathVariable("warehouseId") String warehouseId) {
         warehouseService.delete(warehouseId);
 
-        return "redirect:" + UrlUtil.warehousesUrl(form);
+        return "redirect:/home/admin/warehouses?returnDeleted=false";
     }
 
     @Override
@@ -71,30 +72,26 @@ public class WarehouseControllerImpl implements WarehouseController {
         @ModelAttribute("form") ProductWarehouseSearchForm form,
         Model model
     ) {
-        var productsPage = productService.findProductsByWarehouse(
-            form.pages().page(),
-            form.pages().size(),
-            form.category(),
-            form.pages().substring(),
-            warehouseId
-        );
+        var productsPage = productService
+            .findProductsByWarehouse(modelMapper.map(form, ProductSearchByWarehouseDto.class)).toPage();
 
-        var categories = categoryService.findAllNamesCategories();
+        var categories = categoryService.findAllNamesCategories(form.returnDeleted());
 
         var productViewModels = productsPage
             .stream()
-            .map(p -> new ProductViewModel(
+            .map(p -> new ProductStockViewModel(
                     p.id(),
                     p.name(),
-                    p.price(),
-                    p.oldPrice(),
+                    p.quantity(),
+                    p.minStock(),
+                    p.maxStock(),
                     p.category(),
-                    p.quantity()
+                    p.isDeleted()
                 )
             )
             .toList();
 
-        var viewModel = new AdminProductsViewModel(
+        var viewModel = new ProductsStockViewModel(
             createBaseViewModel(productsPage.getTotalPages(), 0),
             categories,
             productViewModels
@@ -102,9 +99,9 @@ public class WarehouseControllerImpl implements WarehouseController {
 
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
-        model.addAttribute("minimum", new ProductSetMinMaxForm(null, null, "", "", form.base()));
-        model.addAttribute("maximum", new ProductSetMinMaxForm(null, null, "", "", form.base()));
-        model.addAttribute("moveForm", new ProductMoveForm(null, null, null, form.base(), null, null));
+        model.addAttribute("minimum", new ProductSetMinMaxForm(null, null, "", ""));
+        model.addAttribute("maximum", new ProductSetMinMaxForm(null, null, "", ""));
+        model.addAttribute("moveForm", new ProductMoveForm(null, null, null, null, null));
 
         return "warehouse";
     }
@@ -119,7 +116,7 @@ public class WarehouseControllerImpl implements WarehouseController {
     ) {
         stockService.moveProduct(moveForm.productId(), warehouseId, moveForm.newWarehouseId(), moveForm.countItems());
 
-        return "redirect:" + UrlUtil.warehouseManageUrl(moveForm.base(), warehouseId);
+        return "redirect:/warehouses/" + warehouseId + "/manage?returnDeleted=false";
     }
 
     @Override
@@ -132,7 +129,7 @@ public class WarehouseControllerImpl implements WarehouseController {
     ) {
         stockService.setMinimum(editForm.value(), editForm.productId(), warehouseId);
 
-        return "redirect:" + UrlUtil.warehouseManageUrl(editForm.base(), warehouseId);
+        return "redirect:/warehouses/" + warehouseId + "/manage?returnDeleted=false";
     }
 
     @Override
@@ -145,7 +142,7 @@ public class WarehouseControllerImpl implements WarehouseController {
     ) {
         stockService.setMaximum(editForm.value(), editForm.productId(), warehouseId);
 
-        return "redirect:" + UrlUtil.warehouseManageUrl(editForm.base(), warehouseId);
+        return "redirect:/warehouses/" + warehouseId + "/manage?returnDeleted=false";
     }
 
     @Override

@@ -1,50 +1,44 @@
-<nav xmlns:th="http://www.thymeleaf.org">
+<nav xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
     <ul>
         <li>
             <h2>Warehouse</h2>
         </li>
-        <li th:if="${form.base.role()} == 'ADMIN'">
-            <a th:href="@{/home/admin(
-                     priceSort=true,
-                     base.id=${form.base.id()},
-                     base.role=${form.base.role()},
-                     base.userName=${form.base.userName()})}">Главная</a>
+        <li sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/home/admin(returnDeleted=false)}">Главная</a>
         </li>
-        <li th:if="${form.base.role()} == 'USER'">
-            <a th:href="@{/home/user(
-                    base.userName=${form.base.userName()},
-                    base.role=${form.base.role()},
-                    base.id=${form.base.id()},
-                    priceSort=true)}">Каталог</a>
+        <li sec:authorize="hasRole('USER')">
+            <a th:href="@{/home/user(returnDeleted=false)}">Каталог</a>
         </li>
-        <li th:if="${form.base.role()} == 'ADMIN'">
-            <a th:href="@{/orders/admin(
-                        base.id=${form.base.id()},
-                        base.role=${form.base.role()},
-                        base.userName=${form.base.userName()}
-            )}">Мои заказы</a>
+        <li sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/orders/admin}">Мои заказы</a>
         </li>
-        <li th:if="${form.base.role()} == 'USER'">
-            <a th:href="@{/orders/user(
-                        base.id=${form.base.id()},
-                        base.role=${form.base.role()},
-                        base.userName=${form.base.userName()}
-            )}">Мои заказы</a>
+        <li sec:authorize="hasRole('USER')">
+            <a th:href="@{/orders/user}">Мои заказы</a>
         </li>
-        <li th:if="${form.base.role()} == 'ADMIN'">
-            <a th:href="@{/orders/manage-purchase(
-                        base.id=${form.base.id()},
-                        base.role=${form.base.role()},
-                        base.userName=${form.base.userName()}
-            )}">Заказы пользователей</a>
+        <li sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/orders/manage-purchase}">Заказы пользователей</a>
+        </li>
+        <li sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/cart/admin}">Корзина <span th:text="4"></span></a>
+        </li>
+        <li sec:authorize="hasRole('USER')">
+            <a th:href="@{/cart/user}">Корзина <span th:text="4"></span></a>
         </li>
         <li>
-            <a th:href="@{/cart(
-                        base.id=${form.base.id()},
-                        base.role=${form.base.role()},
-                        base.userName=${form.base.userName()}
-            )}">Корзина <span th:text="4"></span></a>
+            <th:block sec:authentication="name"></th:block>
         </li>
-        <li th:text="${form.base.userName()}">UserName</li>
+        <li sec:authorize="isAuthenticated()">
+            <form
+                    th:method="post"
+                    th:action="@{/users/logout}">
+                <button type="submit" value="Logout">Logout</button>
+            </form>
+        </li>
+        <li sec:authorize="!isAuthenticated()">
+            <a th:href="@{/users/register}">Register</a>
+        </li>
+        <li sec:authorize="!isAuthenticated()">
+            <a th:href="@{/users/login}">Login</a>
+        </li>
     </ul>
 </nav>

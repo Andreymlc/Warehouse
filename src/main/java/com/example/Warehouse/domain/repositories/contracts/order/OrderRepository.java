@@ -13,5 +13,5 @@ public interface OrderRepository {
 
     Page<Order> findAll(Pageable pageable);
 
-    Page<Order> findByUserId(String userId, Pageable pageable);
+    Page<Order> findByUsername(String username, Pageable pageable);
 }

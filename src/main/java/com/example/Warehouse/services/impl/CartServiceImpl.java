@@ -1,14 +1,15 @@
 package com.example.Warehouse.services.impl;
 
 import com.example.Warehouse.domain.models.CartItem;
-import com.example.Warehouse.domain.repositories.contracts.cart.CartRepository;
 import com.example.Warehouse.domain.repositories.contracts.product.ProductRepository;
 import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
-import com.example.Warehouse.dto.CartDto;
-import com.example.Warehouse.dto.ProductCartDto;
+import com.example.Warehouse.dto.cart.CartDto;
+import com.example.Warehouse.dto.product.ProductCartDto;
 import com.example.Warehouse.exceptions.InvalidDataException;
-import com.example.Warehouse.services.CartService;
+import com.example.Warehouse.services.contracts.CartService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,28 +18,23 @@ import java.util.List;
 @Service
 public class CartServiceImpl implements CartService {
     private final UserRepository userRepo;
-    private final CartRepository cartRepo;
     private final ProductRepository productRepo;
 
     public CartServiceImpl(
         UserRepository userRepo,
-        CartRepository cartRepo,
         ProductRepository productRepo
     ) {
         this.userRepo = userRepo;
-        this.cartRepo = cartRepo;
         this.productRepo = productRepo;
     }
 
     @Override
-    public int getItemsQuantity(String userId) {
-        return cartRepo.findItemsQuantityByUserId(userId);
-    }
+    @Cacheable("cart")
+    public CartDto findCart(String username) {
+        var user = userRepo.findByUsername(username)
+            .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 
-    @Override
-    public CartDto findCart(String userId) {
-        var cart = cartRepo.findAllByUserId(userId)
-            .orElseThrow(() -> new EntityNotFoundException("Корзина не найдена"));
+        var cart = user.getCart();
 
         List<ProductCartDto> productCartDto = new ArrayList<>();
 
@@ -65,8 +61,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void addProductToCart(String userId, String productId) {
-        var existingUser = userRepo.findById(userId)
+    @CacheEvict(value = "cart", allEntries = true)
+    public void addProductToCart(String username, String productId) {
+        var existingUser = userRepo.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 
         var existingProduct = productRepo.findById(productId)
@@ -90,8 +87,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void deleteProductFromCart(String userId, String productId) {
-        var existingUser = userRepo.findById(userId)
+    @CacheEvict(value = "cart", allEntries = true)
+    public void deleteProductFromCart(String username, String productId) {
+        var existingUser = userRepo.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 
         var existingCart = existingUser.getCart();

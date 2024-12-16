@@ -1,61 +1,58 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8">
-        <title>Мои заказы</title>
-        <link rel="stylesheet" th:href="@{/css/navbar.css}">
-        <link rel="stylesheet" th:href="@{/css/orders.css}">
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    </head>
-    <header>
-        <div th:replace="~{/navbar}">Navbar</div>
-    </header>
-    <body>
-        <main>
-            <div class="pages" th:if="${model.base().totalPages() > 1}">
-                <ul class="pages-ul">
-                    <li
-                        th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
-                        th:classappend="${pageNumber == form.pages.page()} ? 'active'">
-                        <a class="page-picker"
-                           th:href="@{/orders(
-                         base.userName=${form.base.userName()},
-                         base.role=${form.base.role()},
-                         base.id=${form.base.id()},
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои заказы</title>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/orders.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<header>
+    <div th:replace="~{/navbar}">Navbar</div>
+</header>
+<body>
+<main>
+    <div class="pages" th:if="${model.base().totalPages() > 1}">
+        <ul class="pages-ul">
+            <li
+                    th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
+                    th:classappend="${pageNumber == form.pages.page()} ? 'active'">
+                <a class="page-picker"
+                   th:href="@{/orders(
                          pages.page=${pageNumber},
                          pages.size=${form.pages.size()},
                          pages.substring=${form.pages.substring()}
                      )}"
-                           th:text="${pageNumber}">1</a>
-                    </li>
-                </ul>
-            </div>
+                   th:text="${pageNumber}">1</a>
+            </li>
+        </ul>
+    </div>
 
-            <div class="products" th:if="${form.base().role() == 'ADMIN' && #lists.isEmpty(model.orders())}">
-                Пока что вы не сделали ни одного заказа ☹
-            </div>
+    <div class="products" sec:authorize="hasRole('ADMIN')" th:if="${#lists.isEmpty(model.orders())}">
+        Пока что вы не сделали ни одного заказа ☹
+    </div>
 
-            <div class="cards" th:if="${form.base().role() == 'ADMIN' && not #lists.isEmpty(model.orders())}">
-                <div class="card" th:each="order : ${model.orders()}">
-                    <h2 th:text="'Номер заказа: ' + ${order.number()}">Номер заказа</h2>
-                    <h4 th:text="'Итоговая цена: ' + ${order.totalPrice()}">Итоговая цена</h4>
-                    <h4 th:text="'Дата заказа: ' + ${#temporals.format(order.date(), 'HH:mm dd-MM')}">Дата заказа</h4>
-                </div>
-            </div>
+    <div class="cards" sec:authorize="hasRole('ADMIN')" th:if="${not #lists.isEmpty(model.orders())}">
+        <div class="card" th:each="order : ${model.orders()}">
+            <h2 th:text="'Номер заказа: ' + ${order.number()}">Номер заказа</h2>
+            <h4 th:text="'Итоговая цена: ' + ${order.totalPrice()}">Итоговая цена</h4>
+            <h4 th:text="'Дата заказа: ' + ${#temporals.format(order.date(), 'HH:mm dd-MM')}">Дата заказа</h4>
+        </div>
+    </div>
 
-            <div class="products" th:if="${form.base().role() == 'USER' && #lists.isEmpty(model.purchases())}">
-                Пока что вы не сделали ни одного заказа ☹
-            </div>
+    <div class="products" sec:authorize="hasRole('USER')" th:if="${#lists.isEmpty(model.purchases())}">
+        Пока что вы не сделали ни одного заказа ☹
+    </div>
 
-            <div class="cards" th:if="${form.base().role() == 'USER' && not #lists.isEmpty(model.purchases())}">
-                <div class="card" th:each="purchase : ${model.purchases()}">
-                    <h2 th:text="'Статус: ' + ${purchase.status()}">Статус</h2>
-                    <h2 th:text="'Номер заказа: ' + ${purchase.number()}">Номер заказа</h2>
-                    <h4 th:text="'Итоговая цена: ' + ${purchase.totalPrice()}">Итоговая цена</h4>
-                    <h4 th:text="'Полученно баллов: ' + ${purchase.cashback()}">Получено баллов</h4>
-                    <h4 th:text="'Дата заказа: ' + ${#temporals.format(purchase.date(), 'HH:mm dd-MM')}">Дата заказа</h4>
-                </div>
-            </div>
-        </main>
-    </body>
+    <div class="cards" sec:authorize="hasRole('USER')" th:if="${not #lists.isEmpty(model.purchases())}">
+        <div class="card" th:each="purchase : ${model.purchases()}">
+            <h2 th:text="'Статус: ' + ${purchase.status()}">Статус</h2>
+            <h2 th:text="'Номер заказа: ' + ${purchase.number()}">Номер заказа</h2>
+            <h4 th:text="'Итоговая цена: ' + ${purchase.totalPrice()}">Итоговая цена</h4>
+            <h4 th:text="'Полученно баллов: ' + ${purchase.cashback()}">Получено баллов</h4>
+            <h4 th:text="'Дата заказа: ' + ${#temporals.format(purchase.date(), 'HH:mm dd-MM')}">Дата заказа</h4>
+        </div>
+    </div>
+</main>
+</body>
 </html>

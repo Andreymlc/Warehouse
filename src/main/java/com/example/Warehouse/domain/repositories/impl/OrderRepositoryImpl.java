@@ -27,7 +27,7 @@ public class OrderRepositoryImpl extends BaseRepository<BaseOrderRepository> imp
     }
 
     @Override
-    public Page<Order> findByUserId(String userId, Pageable pageable) {
-        return repository.findByUserId(userId, pageable);
+    public Page<Order> findByUsername(String username, Pageable pageable) {
+        return repository.findByUserUsername(username, pageable);
     }
 }

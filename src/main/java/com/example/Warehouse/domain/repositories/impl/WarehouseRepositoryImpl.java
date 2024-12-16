@@ -2,6 +2,7 @@ package com.example.Warehouse.domain.repositories.impl;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import com.example.Warehouse.domain.models.Warehouse;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.BaseWarehouseRepository;
@@ -23,8 +24,8 @@ public class WarehouseRepositoryImpl extends BaseRepository<BaseWarehouseReposit
     }
 
     @Override
-    public Page<Warehouse> findAll(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Page<Warehouse> findAllByFilter(Specification<Warehouse> specification, Pageable pageable) {
+        return repository.findAll(specification, pageable);
     }
 
     @Override

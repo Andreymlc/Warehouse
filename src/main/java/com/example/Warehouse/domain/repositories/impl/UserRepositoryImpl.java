@@ -15,13 +15,13 @@ public class UserRepositoryImpl extends BaseRepository<BaseUserRepository> imple
     }
 
     @Override
-    public int findPointsCount(String id) {
-        return repository.findPointsCount(id);
+    public int findPointsCount(String username) {
+        return repository.findPointsCount(username);
     }
 
     @Override
     public Optional<User> findByUsername(String name) {
-        return repository.findByUserName(name);
+        return repository.findByUsername(name);
     }
 
     @Override

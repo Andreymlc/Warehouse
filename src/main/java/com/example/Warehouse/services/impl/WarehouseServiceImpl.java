@@ -3,14 +3,20 @@ package com.example.Warehouse.services.impl;
 import com.example.Warehouse.domain.models.Stock;
 import com.example.Warehouse.domain.models.Warehouse;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
-import com.example.Warehouse.dto.AddStockDto;
-import com.example.Warehouse.dto.OrderItemDto;
-import com.example.Warehouse.dto.WarehouseAddDto;
-import com.example.Warehouse.dto.WarehouseDto;
-import com.example.Warehouse.services.StockService;
-import com.example.Warehouse.services.WarehouseService;
+import com.example.Warehouse.dto.PageForRedis;
+import com.example.Warehouse.dto.filters.WarehouseFilter;
+import com.example.Warehouse.dto.order.OrderItemDto;
+import com.example.Warehouse.dto.warehouse.AddStockDto;
+import com.example.Warehouse.dto.warehouse.WarehouseAddDto;
+import com.example.Warehouse.dto.warehouse.WarehouseDto;
+import com.example.Warehouse.dto.warehouse.WarehouseSearchDto;
+import com.example.Warehouse.services.contracts.StockService;
+import com.example.Warehouse.services.contracts.WarehouseService;
+import com.example.Warehouse.utils.specifications.WarehouseSpec;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,23 +44,36 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public Page<WarehouseDto> findWarehouses(String substring, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("name"));
+    @Cacheable(
+        value = "warehouses",
+        key = "#warehouseDto.substring + '-' + #warehouseDto.size + '-' + #warehouseDto.page + '-' + #warehouseDto.returnDeleted"
+    )
+    public PageForRedis<WarehouseDto> findWarehouses(WarehouseSearchDto warehouseDto) {
+        Pageable pageable = PageRequest
+            .of(warehouseDto.page() - 1, warehouseDto.size(), Sort.by("name"));
 
-        Page<Warehouse> warehouses = substring != null
-            ? warehouseRepo.findByNameContainingIgnoreCase(substring, pageable)
-            : warehouseRepo.findAll(pageable);
+        Page<Warehouse> warehouses = warehouseRepo.findAllByFilter(
+            WarehouseSpec.filter(
+                new WarehouseFilter(
+                    warehouseDto.substring(),
+                    warehouseDto.returnDeleted()
+                )
+            ),
+            pageable
+        );
 
-        return warehouses.map(w ->
+        return new PageForRedis<>(warehouses.map(w ->
             new WarehouseDto(
                 w.getId(),
                 w.getName(),
-                w.getLocation()
+                w.getLocation(),
+                w.getIsDeleted()
             )
-        );
+        ));
     }
 
     @Override
+    @CacheEvict(value = "warehouses", allEntries = true)
     public String add(WarehouseAddDto warehouseDto) {
         return warehouseRepo.save(modelMapper.map(warehouseDto, Warehouse.class)).getId();
     }
@@ -90,11 +109,12 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @CacheEvict(value = "warehouses", allEntries = true)
     public void delete(String warehouseId) {
         var warehouse = warehouseRepo.findById(warehouseId)
             .orElseThrow(() -> new EntityNotFoundException("Склад не найден"));
 
-        warehouse.setDeleted(true);
+        warehouse.setIsDeleted(true);
         warehouseRepo.save(warehouse);
     }
 }

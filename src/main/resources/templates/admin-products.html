@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Админ продукты</title>
-    <link rel="stylesheet" th:href="@{/css/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <header>
@@ -14,23 +14,13 @@
 <aside>
     <ul>
         <li>
-            <a th:href="@{/home/admin/warehouses(
-                       base.userName=${form.base.userName()},
-                         base.id=${form.base.id()},
-                       base.role=${form.base.role()})}">Все склады</a>
+            <a th:href="@{/home/admin/warehouses(returnDeleted=${form.returnDeleted})}">Все склады</a>
         </li>
         <li>
-            <a class="active-button" th:href="@{/home/admin(
-                       base.id=${form.base.id()},
-                       base.userName=${form.base.userName()},
-                       priceSort=true,
-                       base.role=${form.base.role()})}">Каталог товаров</a>
+            <a class="active-button" th:href="@{/home/admin(returnDeleted=${form.returnDeleted})}">Каталог товаров</a>
         </li>
         <li>
-            <a th:href="@{/home/admin/categories(
-                       base.id=${form.base.id()},
-                       base.userName=${form.base.userName()},
-                       base.role=${form.base.role()})}">Категории</a>
+            <a th:href="@{/home/admin/categories(returnDeleted=${form.returnDeleted})}">Категории</a>
         </li>
     </ul>
     <form class="standard-form" th:action="@{/catalog/products/create}"
@@ -40,9 +30,6 @@
         <input class="default-input" type="text" th:field="*{name}" placeholder="Название товара">
         <input class="default-input" type="text" th:field="*{category}" placeholder="Категория">
         <input class="default-input" type="number" step="any" min="0" th:field="*{price}" placeholder="Цена">
-        <input type="hidden" th:field="*{base.userName}"/>
-        <input type="hidden" th:field="*{base.role}"/>
-        <input type="hidden" th:field="*{base.id}"/>
         <button type="submit">Создать</button>
     </form>
 </aside>
@@ -65,35 +52,34 @@
                 </select>
                 <div class="sorting">
                     <lable>
-                        <input th:field="*{priceSort}" type="radio" value="true">
+                        <input th:field="*{priceSort}" type="radio" value="asc">
                         Сначала дешевле
                     </lable>
                     <lable>
-                        <input th:field="*{priceSort}" type="radio" value="false">
+                        <input th:field="*{priceSort}" type="radio" value="desc">
                         Сначала дороже
                     </lable>
+                </div>
+                <div class="sorting">
+                    <input th:field="*{returnDeleted}" type="checkbox">
+                    Показать удаленные
                 </div>
             </div>
             <button type="submit">Поиск</button>
         </div>
         <input type="hidden" th:field="*{pages.page}"/>
         <input type="hidden" th:field="*{pages.size}"/>
-        <input type="hidden" th:field="*{base.userName}"/>
-        <input type="hidden" th:field="*{base.role}"/>
-        <input type="hidden" th:field="*{base.id}"/>
     </form>
 
     <div class="pages" th:if="${model.base().totalPages() > 1}">
         <ul class="pages-ul">
             <li
-                th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
-                th:classappend="${pageNumber == form.pages.page()} ? 'active'">
+                    th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
+                    th:classappend="${pageNumber == form.pages.page()} ? 'active'">
                 <a class="page-picker"
                    th:href="@{/home/admin(
-                         base.userName=${form.base.userName()},
-                         base.role=${form.base.role()},
-                         base.id=${form.base.id()},
                          category=${form.category()},
+                         returnDeleted=${form.returnDeleted},
                          priceSort=${form.priceSort()},
                          pages.page=${pageNumber},
                          pages.size=${form.pages.size()},
@@ -110,7 +96,10 @@
 
     <div class="cards" th:if="${not #lists.isEmpty(model.products())}">
         <div class="card" th:each="product : ${model.products()}">
-            <h2 th:text="'Название: ' + ${product.name()}">Название Товара</h2>
+            <div style="display: flex">
+                <h2 th:text="'Название: ' + ${product.name()}">Название Товара</h2>
+                <img th:if="${product.isDeleted()}" src="/css/icon/trash-can_115312.png" alt="Удален"/>
+            </div>
             <h4 th:text="'Категория: ' + ${product.category()}">Категория</h4>
             <h4 class="decorated-text" th:if="${product.price() != product.oldPrice()}"
                 th:text="'Актуальная цена: ' + ${product.price()}">Актуальная цена</h4>
@@ -125,26 +114,14 @@
                             id=${product.id()},
                             name=${product.name()},
                             category=${product.category},
-                            price=${product.price},
-                            base.userName=${form.base.userName()},
-                            base.id=${form.base.id()},
-                            base.role=${form.base.role()}
+                            price=${product.price}
                             )}">Редактировать</a>
-                    <a class="delete-button" th:href="@{/catalog/products/{id}/delete(
-                    id=${product.id()},
-                    base.id=${form.base.id()},
-                    userName=${form.base().userName()},
-                    role=${form.base().role()}
-                )}" onclick="return confirm('Вы уверены, что хотите удалить продукт?');">Удалить</a>
+                    <a class="delete-button" th:href="@{/catalog/products/{id}/delete(id=${product.id()})}"
+                       onclick="return confirm('Вы уверены, что хотите удалить продукт?');">Удалить</a>
                 </div>
                 <div class="right-items">
                     <form
-                            th:action="@{/cart/add-product(
-                                  base.id=${form.base().id()},
-                                  base.role=${form.base().role()},
-                                  base.userName=${form.base().userName()},
-                                  productId=${product.id()}
-                                  )}"
+                            th:action="@{/cart/admin/add-product(productId=${product.id()})}"
                             th:method="post"
                             th:object="${add}">
                         <button type="submit" class="order">+</button>

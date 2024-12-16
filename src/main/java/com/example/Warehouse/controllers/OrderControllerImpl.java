@@ -1,13 +1,12 @@
 package com.example.Warehouse.controllers;
 
-import com.example.Warehouse.dto.PurchaseDto;
-import com.example.Warehouse.services.OrderService;
-import com.example.Warehouse.services.PurchaseService;
-import com.example.Warehouse.utils.UrlUtil;
+import com.example.Warehouse.dto.purchase.PurchaseDto;
+import com.example.Warehouse.services.contracts.OrderService;
+import com.example.Warehouse.services.contracts.PurchaseService;
 import com.example.WarehouseContracts.controllers.OrderController;
-import com.example.WarehouseContracts.dto.forms.purchase.PurchaseChangeStatusForm;
 import com.example.WarehouseContracts.dto.forms.order.OrderCreateForm;
 import com.example.WarehouseContracts.dto.forms.order.OrdersSearchForm;
+import com.example.WarehouseContracts.dto.forms.purchase.PurchaseChangeStatusForm;
 import com.example.WarehouseContracts.dto.forms.purchase.PurchaseCreateForm;
 import com.example.WarehouseContracts.dto.forms.purchase.PurchasesSearchForm;
 import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
@@ -17,6 +16,7 @@ import com.example.WarehouseContracts.dto.viewmodels.purchase.PurchasePageViewMo
 import com.example.WarehouseContracts.dto.viewmodels.purchase.PurchaseViewModel;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,6 +42,7 @@ public class OrderControllerImpl implements OrderController {
     @Override
     @GetMapping("/admin")
     public String getOrders(
+        Authentication authentication,
         @Valid @ModelAttribute("form") OrdersSearchForm form,
         BindingResult bindingResult,
         Model model
@@ -52,7 +53,7 @@ public class OrderControllerImpl implements OrderController {
         }
 
         var ordersPage = orderService.findOrders(
-            form.base().id(),
+            authentication.getName(),
             form.pages().page(),
             form.pages().size()
         );
@@ -77,8 +78,10 @@ public class OrderControllerImpl implements OrderController {
         return "orders";
     }
 
+    @Override
     @GetMapping("/user")
     public String getPurchases(
+        Authentication authentication,
         @Valid @ModelAttribute("form") PurchasesSearchForm form,
         BindingResult bindingResult,
         Model model
@@ -88,11 +91,11 @@ public class OrderControllerImpl implements OrderController {
             return "orders";
         }
 
-        Page<PurchaseDto> purchasesPage = purchaseService.findPurchases(
-            form.base().id(),
+        var purchasesPage = purchaseService.findPurchases(
+            authentication.getName(),
             form.pages().page(),
             form.pages().size()
-        );
+        ).toPage();
 
         var purchasesViewModel = purchasesPage
             .stream()
@@ -116,6 +119,7 @@ public class OrderControllerImpl implements OrderController {
         return "orders";
     }
 
+    @Override
     @GetMapping("/manage-purchase")
     public String managePurchasePage(
         @Valid @ModelAttribute("form") PurchasesSearchForm form,
@@ -127,10 +131,10 @@ public class OrderControllerImpl implements OrderController {
             return "orders";
         }
 
-        Page<PurchaseDto> purchasesPage = purchaseService.findAllPurchases(
+        var purchasesPage = purchaseService.findAllPurchases(
             form.pages().page(),
             form.pages().size()
-        );
+        ).toPage();
 
         var purchasesViewModel = purchasesPage
             .stream()
@@ -170,9 +174,10 @@ public class OrderControllerImpl implements OrderController {
 
         model.addAttribute("form", form);
 
-        return "redirect:" + UrlUtil.managePurchaseUrl(form.base());
+        return "redirect:/orders/manage-purchase";
     }
 
+    @Override
     @GetMapping("/canceled")
     public String setCanceledStatus(
         @Valid @ModelAttribute("form") PurchaseChangeStatusForm form,
@@ -188,32 +193,33 @@ public class OrderControllerImpl implements OrderController {
 
         model.addAttribute("form", form);
 
-        return "redirect:" + UrlUtil.managePurchaseUrl(form.base());
+        return "redirect:/orders/manage-purchase";
     }
 
     @Override
-    @PostMapping("/admin/create")
+    @PostMapping("/admin/create/{warehouseId}")
     public String createAdminOrder(
+        Authentication authentication,
         @Valid @ModelAttribute("form") OrderCreateForm form,
         BindingResult bindingResult,
         Model model
     ) {
+        orderService.addOrder(authentication.getName(), form.warehouseId());
 
-        orderService.addOrder(form.base().id(), form.warehouseId());
-
-        return "redirect:" + UrlUtil.orderUrl(form.base());
+        return "redirect:/orders/admin";
     }
 
     @Override
     @PostMapping("/user/create")
     public String createUserPurchase(
+        Authentication authentication,
         @Valid @ModelAttribute("form") PurchaseCreateForm form,
         BindingResult bindingResult,
         Model model
     ) {
-        purchaseService.addPurchase(form.base().id(), form.pointsSpent());
+        purchaseService.addPurchase(authentication.getName(), form.pointsSpent());
 
-        return "redirect:" + UrlUtil.purchaseUrl(form.base());
+        return "redirect:/orders/user";
     }
 
     @Override

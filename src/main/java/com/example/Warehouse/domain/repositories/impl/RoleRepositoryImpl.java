@@ -15,4 +15,8 @@ public class RoleRepositoryImpl extends BaseRepository<BaseRoleRepository> imple
     public Optional<Role> findRoleByName(Roles role) {
         return repository.findRoleByName(role);
     }
+
+    public Role save(Role role) {
+        return repository.save(role);
+    }
 }

@@ -63,3 +63,7 @@ a:hover {
     height: 15px;
     width: 15px;
 }
+
+.text-danger {
+    color: #d9534f;
+}

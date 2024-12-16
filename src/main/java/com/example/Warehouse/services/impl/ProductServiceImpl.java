@@ -5,18 +5,19 @@ import com.example.Warehouse.domain.models.Stock;
 import com.example.Warehouse.domain.repositories.contracts.category.CategoryRepository;
 import com.example.Warehouse.domain.repositories.contracts.product.ProductRepository;
 import com.example.Warehouse.domain.repositories.contracts.stock.StockRepository;
-import com.example.Warehouse.dto.ProductAddDto;
-import com.example.Warehouse.dto.ProductDto;
+import com.example.Warehouse.dto.PageForRedis;
+import com.example.Warehouse.dto.product.*;
 import com.example.Warehouse.dto.filters.ProductFilter;
 import com.example.Warehouse.dto.filters.StockFilter;
-import com.example.Warehouse.services.ProductService;
-import com.example.Warehouse.services.StockService;
+import com.example.Warehouse.services.contracts.ProductService;
+import com.example.Warehouse.services.contracts.StockService;
 import com.example.Warehouse.utils.specifications.ProductSpec;
 import com.example.Warehouse.utils.specifications.StockSpec;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -40,66 +41,90 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductDto> findProducts(
-        int page,
-        int size,
-        String category,
-        String substring,
-        boolean priceSort
-    ) {
-        Sort sort = priceSort
+    @Cacheable(
+        value = "products",
+        key = "#productDto.page + '-' + " +
+            "#productDto.size + '-' + " +
+            "#productDto.category + '-' + " +
+            "#productDto.substring + '-' + " +
+            "#productDto.priceSort + '-' +" +
+            "#productDto.deleted"
+    )
+    public PageForRedis<ProductDto> findProducts(ProductSearchDto productDto) {
+        var sort = productDto.priceSort().equals("asc")
             ? Sort.by("price").ascending()
             : Sort.by("price").descending();
 
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        var pageable = PageRequest.of(productDto.page() - 1, productDto.size(), sort);
 
         Page<Product> productsPage = productRepo.findAllByFilter(
-            ProductSpec.filter(new ProductFilter(category, substring)),
+            ProductSpec.filter(
+                new ProductFilter(
+                    productDto.category(),
+                    productDto.isDeleted(),
+                    productDto.substring()
+                )
+            ),
             pageable
         );
 
-        return productsPage.map(p ->
+        return new PageForRedis<>(productsPage.map(p ->
             new ProductDto(
                 p.getId(),
                 p.getName(),
-                p.getCategory().getName(),
                 (float) Math.round(p.getPrice() * p.getCategory().getDiscount() * 100) / 100,
+                p.getPrice(),
+                p.getCategory().getName(),
                 stockService.findProductQuantityByProductId(p.getId()),
-                p.getPrice()
+                p.getIsDeleted()
             )
-        );
+        ));
     }
 
     @Override
-    public Page<ProductDto> findProductsByWarehouse(
-        int page,
-        int size,
-        String category,
-        String substring,
-        String warehouseId
-    ) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("quantity"));
+    @Cacheable(
+        value = "stocks",
+        key = "#productDto.page + '-' + " +
+            "#productDto.size + '-' + " +
+            "#productDto.category + '-' + " +
+            "#productDto.substring + '-' + " +
+            "#productDto.warehouseId + '-' +" +
+            "#productDto.returnDeletedProduct"
+    )
+    public PageForRedis<ProductStockDto> findProductsByWarehouse(ProductSearchByWarehouseDto productDto) {
+        var pageable = PageRequest.of(productDto.page() - 1, productDto.size(), Sort.by("quantity"));
 
-        Page<Stock> productsPage = stockRepo.findAllByFilter(
-            StockSpec.filter(new StockFilter(category, substring, warehouseId)),
+        Page<Stock> stoksPage = stockRepo.findAllByFilter(
+            StockSpec.filter(
+                new StockFilter(
+                    productDto.category(),
+                    productDto.substring(),
+                    productDto.warehouseId(),
+                    productDto.returnDeletedProduct()
+                )
+            ),
             pageable
         );
 
-        return productsPage.map(s -> {
-            var product = s.getProduct();
+        return new PageForRedis<>(
+            stoksPage.map(s -> {
+                var product = s.getProduct();
 
-            return new ProductDto(
-                product.getId(),
-                product.getName(),
-                product.getCategory().getName(),
-                (float) Math.round(product.getPrice() * product.getCategory().getDiscount() * 100) / 100,
-                s.getQuantity(),
-                product.getPrice()
-            );
-        });
+                return new ProductStockDto(
+                    product.getId(),
+                    product.getName(),
+                    s.getQuantity(),
+                    s.getMinStock(),
+                    s.getMaxStock(),
+                    product.getCategory().getName(),
+                    product.getIsDeleted()
+                );
+            })
+        );
     }
 
     @Override
+    @CacheEvict(value = "products", allEntries = true)
     public String addProduct(ProductAddDto productAddDto) {
         var existingCategory = categoryRepo.findByName(productAddDto.category())
             .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
@@ -115,14 +140,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(value = {"products", "stocks"}, allEntries = true)
     public void deleteProduct(String productId) {
         var product = productRepo.findById(productId)
             .orElseThrow(() -> new EntityNotFoundException("Продукт не найден"));
 
-        product.setDeleted(true);
+        product.setIsDeleted(true);
         productRepo.save(product);
     }
 
+    @Override
+    @CacheEvict(value = {"products", "stocks"}, allEntries = true)
     public void editProduct(String id, String name, String categoryName, float price) {
         var product = productRepo.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Продукт не найден"));

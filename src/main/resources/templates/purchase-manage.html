@@ -19,9 +19,6 @@
                     th:classappend="${pageNumber == form.pages.page()} ? 'active'">
                 <a class="page-picker"
                    th:href="@{/orders(
-                         base.userName=${form.base.userName()},
-                         base.role=${form.base.role()},
-                         base.id=${form.base.id()},
                          pages.page=${pageNumber},
                          pages.size=${form.pages.size()},
                          pages.substring=${form.pages.substring()}
@@ -42,18 +39,10 @@
             <h4 th:text="'Итоговая цена: ' + ${purchase.totalPrice()}">Итоговая цена</h4>
             <h4 th:text="'Полученно баллов: ' + ${purchase.cashback()}">Получено баллов</h4>
             <h4 th:text="'Дата заказа: ' + ${#temporals.format(purchase.date(), 'HH:mm dd-MM')}">Дата заказа</h4>
-            <a th:if="${purchase.status() != 'DELIVERED' && purchase.status() != 'CANCELED'}" th:href="@{/orders/check(
-                            purchaseNumber=${purchase.number()},
-                            base.userName=${form.base().userName()},
-                            base.id=${form.base.id()},
-                            base.role=${form.base().role()}
-                            )}">Отметить</a>
-            <a class="delete-button" th:if="${purchase.status() != 'CANCELED'}" th:href="@{/orders/canceled(
-                            purchaseNumber=${purchase.number()},
-                            base.userName=${form.base().userName()},
-                            base.id=${form.base.id()},
-                            base.role=${form.base().role()}
-                            )}">Отменить заказ</a>
+            <a th:if="${purchase.status() != 'DELIVERED' && purchase.status() != 'CANCELED'}"
+               th:href="@{/orders/check(purchaseNumber=${purchase.number()})}">Отметить</a>
+            <a class="delete-button" th:if="${purchase.status() != 'CANCELED'}"
+               th:href="@{/orders/canceled(purchaseNumber=${purchase.number()})}">Отменить заказ</a>
         </div>
     </div>
 </main>

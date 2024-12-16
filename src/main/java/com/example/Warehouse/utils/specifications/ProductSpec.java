@@ -12,15 +12,15 @@ import java.util.Optional;
 public class ProductSpec {
 
     public static Specification<Product> filter(ProductFilter filter) {
-        return (root, query, builder) -> {
+        return (root, query, criteriaBuilder) -> {
             List<Predicate> orPredicates = new ArrayList<>();
             List<Predicate> andPredicates = new ArrayList<>();
 
             Optional.ofNullable(filter.substring())
                 .filter(n -> !n.isEmpty())
                 .ifPresent(n -> orPredicates.add(
-                    builder.like(
-                        builder.lower(root.get("name")),
+                    criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("name")),
                         "%" + n.toLowerCase() + "%"
                     )
                 ));
@@ -29,8 +29,8 @@ public class ProductSpec {
                 Optional.ofNullable(filter.substring())
                     .filter(n -> !n.isEmpty())
                     .ifPresent(n -> orPredicates.add(
-                        builder.like(
-                            builder.lower(root.get("category").get("name")),
+                        criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("category").get("name")),
                             "%" + n.toLowerCase() + "%"
                         )
                     ));
@@ -39,18 +39,21 @@ public class ProductSpec {
             Optional.ofNullable(filter.category())
                 .filter(c -> !c.isEmpty())
                 .ifPresent(c -> andPredicates.add(
-                    builder.like(
-                        builder.lower(root.get("category").get("name")),
+                    criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("category").get("name")),
                         "%" + c.toLowerCase() + "%"
                     )
                 ));
 
+            if (!filter.deleted())
+                andPredicates.add(criteriaBuilder.isFalse(root.get("isDeleted")));
+
             if (!orPredicates.isEmpty()) {
-                var orPredicate = builder.or(orPredicates.toArray(new Predicate[0]));
+                var orPredicate = criteriaBuilder.or(orPredicates.toArray(new Predicate[0]));
                 andPredicates.add(orPredicate);
             }
 
-            return builder.and(andPredicates.toArray(new Predicate[0]));
+            return criteriaBuilder.and(andPredicates.toArray(new Predicate[0]));
         };
     }
 }

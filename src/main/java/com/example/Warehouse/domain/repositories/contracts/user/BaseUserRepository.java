@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface BaseUserRepository extends JpaRepository<User, String> {
-    Optional<User> findByUserName(String name);
+    Optional<User> findByUsername(String name);
 
-    @Query("SELECT u.points FROM User u WHERE u.id = :id")
-    int findPointsCount(@Param("id") String userId);
+    @Query("SELECT u.points FROM User u WHERE u.username = :username")
+    int findPointsCount(@Param("username") String username);
 }

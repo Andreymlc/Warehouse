@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface BasePurchaseRepository extends JpaRepository<Purchase, String> {
     Optional<Purchase> findByNumber(String number);
 
-    Page<Purchase> findByUserId(String number, Pageable pageable);
+    Page<Purchase> findByUserUsername(String number, Pageable pageable);
 }

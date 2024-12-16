@@ -17,8 +17,8 @@ public class PurchaseRepositoryImpl extends BaseRepository<BasePurchaseRepositor
     }
 
     @Override
-    public Page<Purchase> findByUserId(String userId, Pageable pageable) {
-        return repository.findByUserId(userId, pageable);
+    public Page<Purchase> findByUserName(String userId, Pageable pageable) {
+        return repository.findByUserUsername(userId, pageable);
     }
 
     @Override

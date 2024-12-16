@@ -43,7 +43,7 @@ public class Category extends BaseEntity {
         this.discount = discount;
     }
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     public Set<Product> getProducts() {
         return products;
     }
@@ -53,11 +53,11 @@ public class Category extends BaseEntity {
     }
 
     @Column(name = "is_deleted", nullable = false)
-    public boolean isDeleted() {
+    public boolean getIsDeleted() {
         return isDeleted;
     }
 
-    public void setDeleted(boolean deleted) {
+    public void setIsDeleted(boolean deleted) {
         isDeleted = deleted;
     }
 }
