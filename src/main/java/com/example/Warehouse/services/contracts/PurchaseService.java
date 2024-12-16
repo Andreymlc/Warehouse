@@ -1,8 +1,7 @@
 package com.example.Warehouse.services.contracts;
 
-import com.example.Warehouse.dto.PageForRedis;
-import com.example.Warehouse.dto.purchase.PurchaseDto;
-import org.springframework.data.domain.Page;
+import com.example.Warehouse.models.dto.PageForRedis;
+import com.example.Warehouse.models.dto.purchase.PurchaseDto;
 
 public interface PurchaseService {
     void check(String purchaseNumber);

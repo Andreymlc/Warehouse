@@ -1,10 +1,10 @@
 package com.example.Warehouse.services.impl;
 
-import com.example.Warehouse.domain.models.Stock;
+import com.example.Warehouse.domain.entities.Stock;
 import com.example.Warehouse.domain.repositories.contracts.product.ProductRepository;
 import com.example.Warehouse.domain.repositories.contracts.stock.StockRepository;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
-import com.example.Warehouse.dto.warehouse.AddStockDto;
+import com.example.Warehouse.models.dto.warehouse.AddStockDto;
 import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.services.contracts.StockService;
 import jakarta.persistence.EntityNotFoundException;
@@ -59,18 +59,31 @@ public class StockServiceImpl implements StockService {
         var sourceStock = stockRepo.findForUpdateByProductIdAndWarehouseId(productId, warehouseId)
             .orElseThrow(() -> new EntityNotFoundException("Склад - источник с таким продуктом не найден"));
 
-        var targetStock = stockRepo.findForUpdateByProductIdAndWarehouseId(productId, newWarehouseId)
-            .orElseThrow(() -> new EntityNotFoundException("Склад - конечный пункт, с таким продуктом не найден"));
+        var arrivalWarehouse = warehouseRepo.findById(newWarehouseId)
+            .orElseThrow(() -> new InvalidDataException("Склад - получатель не найден"));
 
         if (sourceStock.getQuantity() < quantity) {
             throw new InvalidDataException("На складе нет такого количества продукта");
         }
 
         sourceStock.setQuantity(sourceStock.getQuantity() - quantity);
-        targetStock.setQuantity(targetStock.getQuantity() + quantity);
+
+        var stockWithProduct = arrivalWarehouse
+            .getStocks()
+            .stream()
+            .filter(s -> s.getProduct().getId().equals(productId))
+            .toList();
+
+        if (stockWithProduct.isEmpty())
+            addStock(new AddStockDto(quantity, productId, newWarehouseId, 1, quantity));
+        else {
+            var stock = stockWithProduct.getFirst();
+            stockWithProduct.getFirst().setQuantity(quantity);
+            stockRepo.save(stock);
+        }
 
         stockRepo.save(sourceStock);
-        stockRepo.save(targetStock);
+
     }
 
     @Override

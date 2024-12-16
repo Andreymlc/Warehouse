@@ -1,6 +1,6 @@
 package com.example.Warehouse.domain.repositories.contracts.product;
 
-import com.example.Warehouse.domain.models.Product;
+import com.example.Warehouse.domain.entities.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

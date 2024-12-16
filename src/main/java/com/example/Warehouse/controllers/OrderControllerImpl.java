@@ -1,21 +1,19 @@
 package com.example.Warehouse.controllers;
 
-import com.example.Warehouse.dto.purchase.PurchaseDto;
+import com.example.Warehouse.controllers.contracts.OrderController;
+import com.example.Warehouse.models.forms.order.OrderCreateForm;
+import com.example.Warehouse.models.forms.order.OrdersSearchForm;
+import com.example.Warehouse.models.forms.purchase.PurchaseChangeStatusForm;
+import com.example.Warehouse.models.forms.purchase.PurchaseCreateForm;
+import com.example.Warehouse.models.forms.purchase.PurchasesSearchForm;
+import com.example.Warehouse.models.viewmodels.base.BasePagesViewModel;
+import com.example.Warehouse.models.viewmodels.order.OrderViewModel;
+import com.example.Warehouse.models.viewmodels.order.OrdersPageViewModel;
+import com.example.Warehouse.models.viewmodels.purchase.PurchasePageViewModel;
+import com.example.Warehouse.models.viewmodels.purchase.PurchaseViewModel;
 import com.example.Warehouse.services.contracts.OrderService;
 import com.example.Warehouse.services.contracts.PurchaseService;
-import com.example.WarehouseContracts.controllers.OrderController;
-import com.example.WarehouseContracts.dto.forms.order.OrderCreateForm;
-import com.example.WarehouseContracts.dto.forms.order.OrdersSearchForm;
-import com.example.WarehouseContracts.dto.forms.purchase.PurchaseChangeStatusForm;
-import com.example.WarehouseContracts.dto.forms.purchase.PurchaseCreateForm;
-import com.example.WarehouseContracts.dto.forms.purchase.PurchasesSearchForm;
-import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
-import com.example.WarehouseContracts.dto.viewmodels.order.OrderViewModel;
-import com.example.WarehouseContracts.dto.viewmodels.order.OrdersPageViewModel;
-import com.example.WarehouseContracts.dto.viewmodels.purchase.PurchasePageViewModel;
-import com.example.WarehouseContracts.dto.viewmodels.purchase.PurchaseViewModel;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -56,7 +54,7 @@ public class OrderControllerImpl implements OrderController {
             authentication.getName(),
             form.pages().page(),
             form.pages().size()
-        );
+        ).toPage();
 
         var ordersViewModel = ordersPage
             .stream()
@@ -197,7 +195,7 @@ public class OrderControllerImpl implements OrderController {
     }
 
     @Override
-    @PostMapping("/admin/create/{warehouseId}")
+    @PostMapping("/admin/create")
     public String createAdminOrder(
         Authentication authentication,
         @Valid @ModelAttribute("form") OrderCreateForm form,

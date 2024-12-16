@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Админ редактирование категории</title>
-    <link rel="stylesheet" th:href="@{/css/home.css}">
     <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/home.css}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <header>
@@ -18,7 +18,7 @@
         <h2>Редактирование категории</h2>
         <input class="default-input" type="text" th:field="*{name}" placeholder="Название">
         <input class="default-input" type="number" min="0" max="100" th:field="*{discount}" placeholder="Скидка">
-        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{id}" />
         <button type="submit">Применить</button>
     </form>
 </main>

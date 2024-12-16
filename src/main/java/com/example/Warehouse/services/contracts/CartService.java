@@ -1,6 +1,6 @@
 package com.example.Warehouse.services.contracts;
 
-import com.example.Warehouse.dto.cart.CartDto;
+import com.example.Warehouse.models.dto.cart.CartDto;
 
 public interface CartService {
     CartDto findCart(String username);

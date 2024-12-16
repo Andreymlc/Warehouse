@@ -1,10 +1,10 @@
 package com.example.Warehouse.services.impl;
 
 import com.example.Warehouse.domain.enums.Roles;
-import com.example.Warehouse.domain.models.User;
+import com.example.Warehouse.domain.entities.User;
 import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
 import com.example.Warehouse.domain.repositories.contracts.user.roles.RoleRepository;
-import com.example.Warehouse.dto.auth.RegisterUserDto;
+import com.example.Warehouse.models.dto.auth.RegisterUserDto;
 import com.example.Warehouse.exceptions.UserAlreadyExistsException;
 import com.example.Warehouse.services.contracts.UserService;
 import jakarta.persistence.EntityNotFoundException;

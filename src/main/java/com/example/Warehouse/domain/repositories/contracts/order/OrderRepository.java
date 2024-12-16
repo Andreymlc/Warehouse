@@ -1,6 +1,6 @@
 package com.example.Warehouse.domain.repositories.contracts.order;
 
-import com.example.Warehouse.domain.models.Order;
+import com.example.Warehouse.domain.entities.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

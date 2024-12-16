@@ -1,6 +1,6 @@
 package com.example.Warehouse.domain.repositories.contracts.user;
 
-import com.example.Warehouse.domain.models.User;
+import com.example.Warehouse.domain.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

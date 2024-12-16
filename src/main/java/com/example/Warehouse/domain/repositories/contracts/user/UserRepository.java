@@ -1,6 +1,6 @@
 package com.example.Warehouse.domain.repositories.contracts.user;
 
-import com.example.Warehouse.domain.models.User;
+import com.example.Warehouse.domain.entities.User;
 import com.example.Warehouse.domain.repositories.contracts.BaseSaveRepository;
 
 import java.util.Optional;

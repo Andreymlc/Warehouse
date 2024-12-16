@@ -1,6 +1,6 @@
 package com.example.Warehouse.domain.repositories.contracts.category;
 
-import com.example.Warehouse.domain.models.Category;
+import com.example.Warehouse.domain.entities.Category;
 import com.example.Warehouse.domain.repositories.contracts.BaseSaveRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,12 +1,12 @@
 package com.example.Warehouse.services.impl;
 
-import com.example.Warehouse.domain.models.Category;
+import com.example.Warehouse.domain.entities.Category;
 import com.example.Warehouse.domain.repositories.contracts.category.CategoryRepository;
-import com.example.Warehouse.dto.PageForRedis;
-import com.example.Warehouse.dto.category.CategoryAddDto;
-import com.example.Warehouse.dto.category.CategoryDto;
-import com.example.Warehouse.dto.category.CategorySearchDto;
-import com.example.Warehouse.dto.filters.CategoryFilter;
+import com.example.Warehouse.models.dto.PageForRedis;
+import com.example.Warehouse.models.dto.category.CategoryAddDto;
+import com.example.Warehouse.models.dto.category.CategoryDto;
+import com.example.Warehouse.models.dto.category.CategorySearchDto;
+import com.example.Warehouse.models.filters.CategoryFilter;
 import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.services.contracts.CategoryService;
 import com.example.Warehouse.utils.specifications.CategorySpec;
@@ -53,7 +53,9 @@ public class CategoryServiceImpl implements CategoryService {
             throw new InvalidDataException("Категория с таким имененм уже существует");
         }
 
-        return categoryRepo.save(modelMapper.map(categoryDto, Category.class)).getId();
+        //var cat = modelMapper.map(categoryDto, Category.class);
+
+        return categoryRepo.save(new Category(categoryDto.name(), 1 - (float) categoryDto.discount() / 100, false)).getId();
     }
 
     @Override

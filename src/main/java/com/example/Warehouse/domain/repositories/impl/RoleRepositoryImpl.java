@@ -1,7 +1,7 @@
 package com.example.Warehouse.domain.repositories.impl;
 
 import com.example.Warehouse.domain.enums.Roles;
-import com.example.Warehouse.domain.models.Role;
+import com.example.Warehouse.domain.entities.Role;
 import com.example.Warehouse.domain.repositories.contracts.user.roles.RoleRepository;
 import com.example.Warehouse.domain.repositories.contracts.user.roles.BaseRoleRepository;
 import org.springframework.stereotype.Repository;

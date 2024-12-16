@@ -1,11 +1,12 @@
 package com.example.Warehouse.domain.repositories.contracts.stock;
 
-import com.example.Warehouse.domain.models.Stock;
+import com.example.Warehouse.domain.entities.Stock;
 import com.example.Warehouse.domain.repositories.contracts.BaseSaveRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface StockRepository extends BaseSaveRepository<Stock> {
@@ -17,7 +18,7 @@ public interface StockRepository extends BaseSaveRepository<Stock> {
 
     Optional<Stock> findByProductIdAndWarehouseId(String productId, String warehouseId);
 
-    Optional<Integer> findProductQuantityByWarehouseId(String productId, String warehouseId);
+    List<Stock> findByWarehouseId(String warehouseId);
 
     Optional<Stock> findForUpdateByProductIdAndWarehouseId(String productId, String warehouseId);
 }

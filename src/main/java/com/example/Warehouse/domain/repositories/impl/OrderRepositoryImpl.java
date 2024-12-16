@@ -1,6 +1,6 @@
 package com.example.Warehouse.domain.repositories.impl;
 
-import com.example.Warehouse.domain.models.Order;
+import com.example.Warehouse.domain.entities.Order;
 import com.example.Warehouse.domain.repositories.contracts.order.BaseOrderRepository;
 import com.example.Warehouse.domain.repositories.contracts.order.OrderRepository;
 import org.springframework.data.domain.Page;

@@ -1,11 +1,10 @@
 package com.example.Warehouse.domain.repositories.impl;
 
-import com.example.Warehouse.domain.models.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
-import com.example.Warehouse.domain.models.Category;
+import com.example.Warehouse.domain.entities.Category;
 import com.example.Warehouse.domain.repositories.contracts.category.BaseCategoryRepository;
 import com.example.Warehouse.domain.repositories.contracts.category.CategoryRepository;
 

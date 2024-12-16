@@ -1,22 +1,21 @@
 package com.example.Warehouse.controllers;
 
-import com.example.Warehouse.dto.category.CategoryAddDto;
-import com.example.Warehouse.dto.product.ProductAddDto;
+import com.example.Warehouse.controllers.contracts.CatalogController;
+import com.example.Warehouse.models.dto.category.CategoryAddDto;
+import com.example.Warehouse.models.dto.product.ProductAddDto;
+import com.example.Warehouse.models.forms.category.CategoryCreateForm;
+import com.example.Warehouse.models.forms.category.CategoryEditForm;
+import com.example.Warehouse.models.forms.product.ProductCreateForm;
+import com.example.Warehouse.models.forms.product.ProductEditForm;
+import com.example.Warehouse.models.viewmodels.base.BasePagesViewModel;
 import com.example.Warehouse.services.contracts.CategoryService;
 import com.example.Warehouse.services.contracts.ProductService;
-import com.example.WarehouseContracts.controllers.CatalogController;
-import com.example.WarehouseContracts.dto.forms.category.CategoryCreateForm;
-import com.example.WarehouseContracts.dto.forms.category.CategoryEditForm;
-import com.example.WarehouseContracts.dto.forms.product.ProductCreateForm;
-import com.example.WarehouseContracts.dto.forms.product.ProductEditForm;
-import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
-import com.example.WarehouseContracts.utils.validation.category.ExistingCategory;
-import com.example.WarehouseContracts.utils.validation.product.ExistProduct;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/catalog")
@@ -32,15 +31,20 @@ public class CatalogControllerImpl implements CatalogController {
     @Override
     @PostMapping("/products/create")
     public String createProduct(
-        @Valid @ModelAttribute("createProduct") ProductCreateForm create,
+        @Valid @ModelAttribute("createProduct") ProductCreateForm createProduct,
         BindingResult bindingResult,
+        RedirectAttributes redirectAttributes,
         Model model
     ) {
+        if (bindingResult.hasErrors()) {
+            return "redirect:/home/admin?returnDeleted=false";
+        }
+
         productService.addProduct(
             new ProductAddDto(
-                create.name(),
-                create.category(),
-                create.price()
+                createProduct.name(),
+                createProduct.category(),
+                createProduct.price()
             )
         );
 
@@ -49,10 +53,7 @@ public class CatalogControllerImpl implements CatalogController {
 
     @Override
     @GetMapping("/products/{productId}/delete")
-    public String deleteProduct(
-        @Valid @ExistProduct @PathVariable("productId") String productId,
-        BindingResult bindingResult
-    ) {
+    public String deleteProduct(@PathVariable("productId") String productId) {
         productService.deleteProduct(productId);
 
         return "redirect:/home/admin?returnDeleted=false";
@@ -61,12 +62,12 @@ public class CatalogControllerImpl implements CatalogController {
     @Override
     @GetMapping("/products/{productId}/edit")
     public String showEditProduct(
-        @Valid @ExistingCategory @PathVariable("productId") String categoryId,
-        @Valid @ModelAttribute("edit") ProductEditForm form,
-        BindingResult bindingResult
+        @PathVariable("productId") String productId,
+        @Valid @ModelAttribute("edit") ProductEditForm edit,
         Model model
     ) {
-        model.addAttribute("form", form);
+
+        model.addAttribute("form", edit);
 
         return "product-edit";
     }
@@ -75,11 +76,11 @@ public class CatalogControllerImpl implements CatalogController {
     @PostMapping("/products/{productId}/edit")
     public String editProduct(
         @PathVariable("productId") String productId,
-        @Valid @ModelAttribute("edit") ProductEditForm form,
-        BindingResult bindingResult
+        @Valid @ModelAttribute("edit") ProductEditForm edit,
+        Model model
     ) {
 
-        productService.editProduct(productId, form.name(), form.category(), form.price());
+        productService.editProduct(productId, edit.name(), edit.category(), edit.price());
 
         return "redirect:/home/admin?returnDeleted=false";
     }
@@ -91,6 +92,11 @@ public class CatalogControllerImpl implements CatalogController {
         BindingResult bindingResult,
         Model model
     ) {
+
+        if (bindingResult.hasErrors()) {
+            return "redirect:/home/admin/categories?returnDeleted=false";
+        }
+
         categoryService.create(new CategoryAddDto(create.name(), create.discount()));
 
         return "redirect:/home/admin/categories?returnDeleted=false";
@@ -111,7 +117,7 @@ public class CatalogControllerImpl implements CatalogController {
         @Valid @ModelAttribute("edit") CategoryEditForm edit,
         Model model
     ) {
-        model.addAttribute("edit", edit);
+        model.addAttribute("form", edit);
 
         return "category-edit";
     }
@@ -121,8 +127,9 @@ public class CatalogControllerImpl implements CatalogController {
     public String editCategory(
         @PathVariable("categoryId") String categoryId,
         @Valid @ModelAttribute("edit") CategoryEditForm edit,
-        BindingResult bindingResult
+        Model model
     ) {
+
         categoryService.edit(categoryId, edit.name(), edit.discount());
 
         return "redirect:/home/admin/categories?returnDeleted=false";

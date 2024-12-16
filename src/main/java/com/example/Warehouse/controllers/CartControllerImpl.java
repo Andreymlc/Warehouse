@@ -2,15 +2,15 @@ package com.example.Warehouse.controllers;
 
 import com.example.Warehouse.services.contracts.CartService;
 import com.example.Warehouse.services.contracts.UserService;
-import com.example.WarehouseContracts.controllers.CartController;
-import com.example.WarehouseContracts.dto.forms.cart.AddProductToAdminCartForm;
-import com.example.WarehouseContracts.dto.forms.cart.AddProductToUserCartForm;
-import com.example.WarehouseContracts.dto.forms.order.OrderCreateForm;
-import com.example.WarehouseContracts.dto.forms.purchase.PurchaseCreateForm;
-import com.example.WarehouseContracts.dto.viewmodels.base.BasePagesViewModel;
-import com.example.WarehouseContracts.dto.viewmodels.cart.CartAdminViewModel;
-import com.example.WarehouseContracts.dto.viewmodels.cart.CartUserViewModel;
-import com.example.WarehouseContracts.dto.viewmodels.product.ProductInCartViewModel;
+import com.example.Warehouse.controllers.contracts.CartController;
+import com.example.Warehouse.models.forms.cart.AddProductToAdminCartForm;
+import com.example.Warehouse.models.forms.cart.AddProductToUserCartForm;
+import com.example.Warehouse.models.forms.order.OrderCreateForm;
+import com.example.Warehouse.models.forms.purchase.PurchaseCreateForm;
+import com.example.Warehouse.models.viewmodels.base.BasePagesViewModel;
+import com.example.Warehouse.models.viewmodels.cart.CartAdminViewModel;
+import com.example.Warehouse.models.viewmodels.cart.CartUserViewModel;
+import com.example.Warehouse.models.viewmodels.product.ProductInCartViewModel;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -111,7 +111,7 @@ public class CartControllerImpl implements CartController {
     ) {
         cartService.addProductToCart(authentication.getName(), add.productId());
 
-        return "redirect:/home/user";
+        return "redirect:/home/user?returnDeleted=false";
     }
 
     @Override
@@ -124,7 +124,7 @@ public class CartControllerImpl implements CartController {
     ) {
         cartService.addProductToCart(authentication.getName(), add.productId());
 
-        return "redirect:/home/admin";
+        return "redirect:/home/admin?returnDeleted=false";
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.example.Warehouse.domain.repositories.impl;
 
-import com.example.Warehouse.domain.models.User;
+import com.example.Warehouse.domain.entities.User;
 import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
 import com.example.Warehouse.domain.repositories.contracts.user.BaseUserRepository;
 import org.springframework.stereotype.Repository;

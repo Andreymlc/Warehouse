@@ -82,6 +82,7 @@
                   th:method="post"
                   th:object="${edit}">
                 <input class="small-input" type="number" min="0" max="100" th:field="*{discount}" placeholder="Скидка">
+                <input type="hidden" th:field="*{id}" />
                 <button type="submit">Применить</button>
             </form>
             <div class="categories-buttons">

@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
-import com.example.Warehouse.domain.models.Warehouse;
+import com.example.Warehouse.domain.entities.Warehouse;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.BaseWarehouseRepository;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
 

@@ -1,7 +1,7 @@
 package com.example.Warehouse.utils.specifications;
 
-import com.example.Warehouse.domain.models.Stock;
-import com.example.Warehouse.dto.filters.StockFilter;
+import com.example.Warehouse.domain.entities.Stock;
+import com.example.Warehouse.models.filters.StockFilter;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 

@@ -1,9 +1,9 @@
 package com.example.Warehouse.controllers;
 
-import com.example.Warehouse.dto.auth.RegisterUserDto;
+import com.example.Warehouse.models.dto.auth.RegisterUserDto;
 import com.example.Warehouse.services.contracts.UserService;
-import com.example.WarehouseContracts.controllers.UserController;
-import com.example.WarehouseContracts.dto.forms.auth.RegisterForm;
+import com.example.Warehouse.controllers.contracts.UserController;
+import com.example.Warehouse.models.forms.auth.RegisterForm;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;

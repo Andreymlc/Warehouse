@@ -31,6 +31,12 @@
         <input class="default-input" type="text" th:field="*{category}" placeholder="Категория">
         <input class="default-input" type="number" step="any" min="0" th:field="*{price}" placeholder="Цена">
         <button type="submit">Создать</button>
+        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger">Error
+            message</p>
+        <p th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="text-danger">Error
+            message</p>
+        <p th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-danger">Error
+            message</p>
     </form>
 </aside>
 <main>
@@ -124,6 +130,7 @@
                             th:action="@{/cart/admin/add-product(productId=${product.id()})}"
                             th:method="post"
                             th:object="${add}">
+
                         <button type="submit" class="order">+</button>
                     </form>
                 </div>

@@ -1,15 +1,15 @@
 package com.example.Warehouse.services.impl;
 
-import com.example.Warehouse.domain.models.Stock;
-import com.example.Warehouse.domain.models.Warehouse;
+import com.example.Warehouse.domain.entities.Stock;
+import com.example.Warehouse.domain.entities.Warehouse;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
-import com.example.Warehouse.dto.PageForRedis;
-import com.example.Warehouse.dto.filters.WarehouseFilter;
-import com.example.Warehouse.dto.order.OrderItemDto;
-import com.example.Warehouse.dto.warehouse.AddStockDto;
-import com.example.Warehouse.dto.warehouse.WarehouseAddDto;
-import com.example.Warehouse.dto.warehouse.WarehouseDto;
-import com.example.Warehouse.dto.warehouse.WarehouseSearchDto;
+import com.example.Warehouse.models.dto.PageForRedis;
+import com.example.Warehouse.models.filters.WarehouseFilter;
+import com.example.Warehouse.models.dto.order.OrderItemDto;
+import com.example.Warehouse.models.dto.warehouse.AddStockDto;
+import com.example.Warehouse.models.dto.warehouse.WarehouseAddDto;
+import com.example.Warehouse.models.dto.warehouse.WarehouseDto;
+import com.example.Warehouse.models.dto.warehouse.WarehouseSearchDto;
 import com.example.Warehouse.services.contracts.StockService;
 import com.example.Warehouse.services.contracts.WarehouseService;
 import com.example.Warehouse.utils.specifications.WarehouseSpec;

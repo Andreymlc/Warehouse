@@ -4,10 +4,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
-import com.example.Warehouse.domain.models.Stock;
+import com.example.Warehouse.domain.entities.Stock;
 import com.example.Warehouse.domain.repositories.contracts.stock.StockRepository;
 import com.example.Warehouse.domain.repositories.contracts.stock.BaseStockRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -33,8 +34,8 @@ public class StockRepositoryImpl extends BaseRepository<BaseStockRepository> imp
     }
 
     @Override
-    public Optional<Integer> findProductQuantityByWarehouseId(String productId, String warehouseId) {
-        return repository.findProductQuantityByWarehouseId(productId, warehouseId);
+    public List<Stock> findByWarehouseId(String warehouseId) {
+        return repository.findByWarehouseId(warehouseId);
     }
 
     @Override

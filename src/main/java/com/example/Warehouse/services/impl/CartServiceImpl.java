@@ -1,10 +1,10 @@
 package com.example.Warehouse.services.impl;
 
-import com.example.Warehouse.domain.models.CartItem;
+import com.example.Warehouse.domain.entities.CartItem;
 import com.example.Warehouse.domain.repositories.contracts.product.ProductRepository;
 import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
-import com.example.Warehouse.dto.cart.CartDto;
-import com.example.Warehouse.dto.product.ProductCartDto;
+import com.example.Warehouse.models.dto.cart.CartDto;
+import com.example.Warehouse.models.dto.product.ProductCartDto;
 import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.services.contracts.CartService;
 import jakarta.persistence.EntityNotFoundException;

@@ -1,11 +1,10 @@
 package com.example.Warehouse.services.contracts;
 
-import com.example.Warehouse.dto.PageForRedis;
-import com.example.Warehouse.dto.order.OrderItemDto;
-import com.example.Warehouse.dto.warehouse.WarehouseDto;
-import com.example.Warehouse.dto.warehouse.WarehouseAddDto;
-import com.example.Warehouse.dto.warehouse.WarehouseSearchDto;
-import org.springframework.data.domain.Page;
+import com.example.Warehouse.models.dto.PageForRedis;
+import com.example.Warehouse.models.dto.order.OrderItemDto;
+import com.example.Warehouse.models.dto.warehouse.WarehouseDto;
+import com.example.Warehouse.models.dto.warehouse.WarehouseAddDto;
+import com.example.Warehouse.models.dto.warehouse.WarehouseSearchDto;
 
 import java.util.List;
 

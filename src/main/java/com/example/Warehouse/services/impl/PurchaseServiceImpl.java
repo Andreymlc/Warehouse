@@ -1,15 +1,15 @@
 package com.example.Warehouse.services.impl;
 
 import com.example.Warehouse.domain.enums.Status;
-import com.example.Warehouse.domain.models.Purchase;
-import com.example.Warehouse.domain.models.PurchaseItem;
-import com.example.Warehouse.domain.models.Stock;
+import com.example.Warehouse.domain.entities.Purchase;
+import com.example.Warehouse.domain.entities.PurchaseItem;
+import com.example.Warehouse.domain.entities.Stock;
 import com.example.Warehouse.domain.repositories.contracts.purchase.PurchaseRepository;
 import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
-import com.example.Warehouse.dto.PageForRedis;
-import com.example.Warehouse.dto.purchase.PurchaseDto;
-import com.example.Warehouse.dto.purchase.PurchaseItemDto;
+import com.example.Warehouse.models.dto.PageForRedis;
+import com.example.Warehouse.models.dto.purchase.PurchaseDto;
+import com.example.Warehouse.models.dto.purchase.PurchaseItemDto;
 import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.services.contracts.PurchaseService;
 import com.example.Warehouse.services.contracts.StockService;
@@ -17,7 +17,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -54,7 +53,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional
-
+    @CacheEvict(value = "purchases", allEntries = true)
     public void addPurchase(String username, int pointsSpent) {
         var user = userRepo.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));

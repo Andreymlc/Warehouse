@@ -1,6 +1,6 @@
 package com.example.Warehouse.domain.repositories.contracts.purchase;
 
-import com.example.Warehouse.domain.models.Purchase;
+import com.example.Warehouse.domain.entities.Purchase;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

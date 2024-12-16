@@ -1,6 +1,6 @@
 package com.example.Warehouse.services.contracts;
 
-import com.example.Warehouse.dto.auth.RegisterUserDto;
+import com.example.Warehouse.models.dto.auth.RegisterUserDto;
 
 
 public interface UserService {

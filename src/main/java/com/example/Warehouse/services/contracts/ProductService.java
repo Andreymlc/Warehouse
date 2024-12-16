@@ -1,7 +1,7 @@
 package com.example.Warehouse.services.contracts;
 
-import com.example.Warehouse.dto.PageForRedis;
-import com.example.Warehouse.dto.product.*;
+import com.example.Warehouse.models.dto.PageForRedis;
+import com.example.Warehouse.models.dto.product.*;
 
 public interface ProductService {
     void deleteProduct(String productId);

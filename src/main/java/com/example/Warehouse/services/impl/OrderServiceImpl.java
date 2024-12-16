@@ -1,18 +1,19 @@
 package com.example.Warehouse.services.impl;
 
-import com.example.Warehouse.domain.models.Order;
-import com.example.Warehouse.domain.models.OrderItem;
+import com.example.Warehouse.domain.entities.Order;
+import com.example.Warehouse.domain.entities.OrderItem;
 import com.example.Warehouse.domain.repositories.contracts.order.OrderRepository;
 import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
-import com.example.Warehouse.dto.order.OrderDto;
-import com.example.Warehouse.dto.order.OrderItemDto;
+import com.example.Warehouse.models.dto.PageForRedis;
+import com.example.Warehouse.models.dto.order.OrderDto;
+import com.example.Warehouse.models.dto.order.OrderItemDto;
 import com.example.Warehouse.services.contracts.OrderService;
 import com.example.Warehouse.services.contracts.WarehouseService;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,23 +47,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto findOrderByNumber(String number) {
-        var order = orderRepo.findById(number).orElseThrow();
-        return modelMapper.map(order, OrderDto.class);
-    }
-
-    @Override
-    public Page<OrderDto> findOrders(String username, int page, int size) {
+    @Cacheable(value = "orders", key = "#username + '-' + #page + '-' + #size")
+    public PageForRedis<OrderDto> findOrders(String username, int page, int size) {
         var sort = Sort.by("date").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         var orderPage = orderRepo.findByUsername(username, pageable);
 
-        return orderPage.map(o -> modelMapper.map(o, OrderDto.class));
+        return new PageForRedis<>(orderPage.map(o -> modelMapper.map(o, OrderDto.class)));
     }
 
     @Override
     @Transactional
+    @CacheEvict(value = "orders", allEntries = true)
     public void addOrder(String username, String warehouseId) {
         var existingUser = userRepo.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));

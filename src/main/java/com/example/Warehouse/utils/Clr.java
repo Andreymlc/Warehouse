@@ -1,13 +1,13 @@
 package com.example.Warehouse.utils;
 
 import com.example.Warehouse.domain.enums.Roles;
-import com.example.Warehouse.domain.models.Role;
+import com.example.Warehouse.domain.entities.Role;
 import com.example.Warehouse.domain.repositories.contracts.user.roles.RoleRepository;
-import com.example.Warehouse.dto.category.CategoryAddDto;
-import com.example.Warehouse.dto.product.ProductAddDto;
-import com.example.Warehouse.dto.warehouse.AddStockDto;
-import com.example.Warehouse.dto.warehouse.WarehouseAddDto;
-import com.example.Warehouse.dto.warehouse.WarehouseSearchDto;
+import com.example.Warehouse.models.dto.category.CategoryAddDto;
+import com.example.Warehouse.models.dto.product.ProductAddDto;
+import com.example.Warehouse.models.dto.warehouse.AddStockDto;
+import com.example.Warehouse.models.dto.warehouse.WarehouseAddDto;
+import com.example.Warehouse.models.dto.warehouse.WarehouseSearchDto;
 import com.example.Warehouse.services.contracts.CategoryService;
 import com.example.Warehouse.services.contracts.ProductService;
 import com.example.Warehouse.services.contracts.StockService;

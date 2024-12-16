@@ -1,28 +1,28 @@
 package com.example.Warehouse.config;
 
-import com.example.Warehouse.domain.models.OrderItem;
-import com.example.Warehouse.domain.models.Purchase;
-import com.example.Warehouse.dto.auth.RegisterUserDto;
-import com.example.Warehouse.dto.category.CategoryAddDto;
-import com.example.Warehouse.dto.category.CategoryDto;
-import com.example.Warehouse.dto.category.CategorySearchDto;
-import com.example.Warehouse.dto.order.OrderDto;
-import com.example.Warehouse.dto.order.OrderItemDto;
-import com.example.Warehouse.dto.product.ProductSearchByWarehouseDto;
-import com.example.Warehouse.dto.product.ProductSearchDto;
-import com.example.Warehouse.dto.purchase.PurchaseDto;
-import com.example.Warehouse.dto.warehouse.WarehouseSearchDto;
-import com.example.WarehouseContracts.dto.forms.category.CategorySearchForm;
-import com.example.WarehouseContracts.dto.forms.product.ProductSearchForm;
-import com.example.WarehouseContracts.dto.forms.product.ProductWarehouseSearchForm;
-import com.example.WarehouseContracts.dto.forms.warehouse.WarehousesSearchForm;
+import com.example.Warehouse.domain.entities.OrderItem;
+import com.example.Warehouse.domain.entities.Purchase;
+import com.example.Warehouse.models.dto.auth.RegisterUserDto;
+import com.example.Warehouse.models.dto.category.CategoryAddDto;
+import com.example.Warehouse.models.dto.category.CategoryDto;
+import com.example.Warehouse.models.dto.category.CategorySearchDto;
+import com.example.Warehouse.models.dto.order.OrderDto;
+import com.example.Warehouse.models.dto.order.OrderItemDto;
+import com.example.Warehouse.models.dto.product.ProductSearchByWarehouseDto;
+import com.example.Warehouse.models.dto.product.ProductSearchDto;
+import com.example.Warehouse.models.dto.purchase.PurchaseDto;
+import com.example.Warehouse.models.dto.warehouse.WarehouseSearchDto;
+import com.example.Warehouse.models.forms.category.CategorySearchForm;
+import com.example.Warehouse.models.forms.product.ProductSearchForm;
+import com.example.Warehouse.models.forms.product.ProductWarehouseSearchForm;
+import com.example.Warehouse.models.forms.warehouse.WarehousesSearchForm;
 import org.modelmapper.ModelMapper;
-import com.example.Warehouse.domain.models.Order;
+import com.example.Warehouse.domain.entities.Order;
 import org.modelmapper.record.RecordModule;
 import org.springframework.context.annotation.Bean;
-import com.example.Warehouse.domain.models.Category;
+import com.example.Warehouse.domain.entities.Category;
 import org.springframework.context.annotation.Configuration;
-import com.example.WarehouseContracts.dto.forms.auth.RegisterForm;
+import com.example.Warehouse.models.forms.auth.RegisterForm;
 
 @Configuration
 public class MapperConfig {

@@ -1,14 +1,14 @@
 package com.example.Warehouse.services.impl;
 
-import com.example.Warehouse.domain.models.Product;
-import com.example.Warehouse.domain.models.Stock;
+import com.example.Warehouse.domain.entities.Product;
+import com.example.Warehouse.domain.entities.Stock;
 import com.example.Warehouse.domain.repositories.contracts.category.CategoryRepository;
 import com.example.Warehouse.domain.repositories.contracts.product.ProductRepository;
 import com.example.Warehouse.domain.repositories.contracts.stock.StockRepository;
-import com.example.Warehouse.dto.PageForRedis;
-import com.example.Warehouse.dto.product.*;
-import com.example.Warehouse.dto.filters.ProductFilter;
-import com.example.Warehouse.dto.filters.StockFilter;
+import com.example.Warehouse.models.dto.PageForRedis;
+import com.example.Warehouse.models.dto.product.*;
+import com.example.Warehouse.models.filters.ProductFilter;
+import com.example.Warehouse.models.filters.StockFilter;
 import com.example.Warehouse.services.contracts.ProductService;
 import com.example.Warehouse.services.contracts.StockService;
 import com.example.Warehouse.utils.specifications.ProductSpec;
