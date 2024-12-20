@@ -1,12 +1,8 @@
-package com.example.Warehouse.controllers;
+package com.example.Warehouse.controllers.impl;
 
+import com.example.Warehouse.controllers.contracts.WarehouseController;
 import com.example.Warehouse.models.dto.product.ProductSearchByWarehouseDto;
 import com.example.Warehouse.models.dto.warehouse.WarehouseAddDto;
-import com.example.Warehouse.services.contracts.CategoryService;
-import com.example.Warehouse.services.contracts.ProductService;
-import com.example.Warehouse.services.contracts.StockService;
-import com.example.Warehouse.services.contracts.WarehouseService;
-import com.example.Warehouse.controllers.contracts.WarehouseController;
 import com.example.Warehouse.models.forms.product.ProductMoveForm;
 import com.example.Warehouse.models.forms.product.ProductSetMinMaxForm;
 import com.example.Warehouse.models.forms.product.ProductWarehouseSearchForm;
@@ -14,6 +10,10 @@ import com.example.Warehouse.models.forms.warehouse.WarehouseCreateForm;
 import com.example.Warehouse.models.viewmodels.base.BasePagesViewModel;
 import com.example.Warehouse.models.viewmodels.product.ProductStockViewModel;
 import com.example.Warehouse.models.viewmodels.product.ProductsStockViewModel;
+import com.example.Warehouse.services.contracts.CategoryService;
+import com.example.Warehouse.services.contracts.ProductService;
+import com.example.Warehouse.services.contracts.StockService;
+import com.example.Warehouse.services.contracts.WarehouseService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
@@ -72,22 +72,13 @@ public class WarehouseControllerImpl implements WarehouseController {
         Model model
     ) {
         var productsPage = productService
-            .findProductsByWarehouse(modelMapper.map(form, ProductSearchByWarehouseDto.class)).toPage();
+            .findProductsByWarehouse(modelMapper.map(form, ProductSearchByWarehouseDto.class));
 
         var categories = categoryService.findAllNamesCategories(form.returnDeleted());
 
         var productViewModels = productsPage
             .stream()
-            .map(p -> new ProductStockViewModel(
-                    p.id(),
-                    p.name(),
-                    p.quantity(),
-                    p.minStock(),
-                    p.maxStock(),
-                    p.category(),
-                    p.isDeleted()
-                )
-            )
+            .map(productStockDto -> modelMapper.map(productStockDto, ProductStockViewModel.class))
             .toList();
 
         var viewModel = new ProductsStockViewModel(
@@ -113,7 +104,8 @@ public class WarehouseControllerImpl implements WarehouseController {
         BindingResult bindingResult,
         Model model
     ) {
-        stockService.moveProduct(moveForm.productId(), warehouseId, moveForm.newWarehouseId(), moveForm.countItems());
+        stockService
+            .moveProduct(moveForm.productId(), warehouseId, moveForm.newWarehouseId(), moveForm.countItems());
 
         return "redirect:/warehouses/" + warehouseId + "/manage?returnDeleted=false";
     }

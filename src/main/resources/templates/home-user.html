@@ -30,11 +30,11 @@
                 </select>
                 <div class="sorting">
                     <lable>
-                        <input th:field="*{priceSort}" type="radio" value="true">
+                        <input th:field="*{priceSort}" type="radio" value="asc">
                         Сначала дешевле
                     </lable>
                     <lable>
-                        <input th:field="*{priceSort}" type="radio" value="false">
+                        <input th:field="*{priceSort}" type="radio" value="desc">
                         Сначала дороже
                     </lable>
                 </div>
@@ -43,6 +43,7 @@
         </div>
         <input type="hidden" th:field="*{pages.page}"/>
         <input type="hidden" th:field="*{pages.size}"/>
+        <input type="hidden" th:field="*{returnDeleted}"/>
     </form>
 
     <div class="pages" th:if="${model.base().totalPages() > 1}">

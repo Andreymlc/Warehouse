@@ -1,4 +1,4 @@
-package com.example.Warehouse.controllers;
+package com.example.Warehouse.controllers.impl;
 
 import com.example.Warehouse.controllers.contracts.CatalogController;
 import com.example.Warehouse.models.dto.category.CategoryAddDto;
@@ -11,6 +11,7 @@ import com.example.Warehouse.models.viewmodels.base.BasePagesViewModel;
 import com.example.Warehouse.services.contracts.CategoryService;
 import com.example.Warehouse.services.contracts.ProductService;
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,10 +21,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/catalog")
 public class CatalogControllerImpl implements CatalogController {
+    private final ModelMapper modelMapper;
     private final ProductService productService;
     private final CategoryService categoryService;
 
-    public CatalogControllerImpl(ProductService productService, CategoryService categoryService) {
+    public CatalogControllerImpl(
+        ModelMapper modelMapper,
+        ProductService productService,
+        CategoryService categoryService
+    ) {
+        this.modelMapper = modelMapper;
         this.productService = productService;
         this.categoryService = categoryService;
     }
@@ -40,13 +47,7 @@ public class CatalogControllerImpl implements CatalogController {
             return "redirect:/home/admin?returnDeleted=false";
         }
 
-        productService.addProduct(
-            new ProductAddDto(
-                createProduct.name(),
-                createProduct.category(),
-                createProduct.price()
-            )
-        );
+        productService.addProduct(modelMapper.map(createProduct, ProductAddDto.class));
 
         return "redirect:/home/admin?returnDeleted=false";
     }

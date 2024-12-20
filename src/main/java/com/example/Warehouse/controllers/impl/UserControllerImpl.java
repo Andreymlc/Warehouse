@@ -1,4 +1,4 @@
-package com.example.Warehouse.controllers;
+package com.example.Warehouse.controllers.impl;
 
 import com.example.Warehouse.models.dto.auth.RegisterUserDto;
 import com.example.Warehouse.services.contracts.UserService;

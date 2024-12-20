@@ -1,9 +1,9 @@
 package com.example.Warehouse.services.contracts;
 
-import com.example.Warehouse.models.dto.PageForRedis;
-import com.example.Warehouse.models.dto.category.CategoryDto;
 import com.example.Warehouse.models.dto.category.CategoryAddDto;
+import com.example.Warehouse.models.dto.category.CategoryDto;
 import com.example.Warehouse.models.dto.category.CategorySearchDto;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -16,5 +16,5 @@ public interface CategoryService {
 
     List<String> findAllNamesCategories(boolean returnDeleted);
 
-    PageForRedis<CategoryDto> findCategories(CategorySearchDto categoryDto);
+    Page<CategoryDto> findCategories(CategorySearchDto categoryDto);
 }

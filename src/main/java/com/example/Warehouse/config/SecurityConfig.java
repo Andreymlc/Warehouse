@@ -33,10 +33,10 @@ public class SecurityConfig {
                     authorizeHttpRequests.
                         requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                         .permitAll()
-                        .requestMatchers("/favicon.ico", "/error", "/users/login", "/users/register", "/users/login-error")
+                        .requestMatchers("/","/favicon.ico", "/error", "/users/login", "/users/register", "/users/login-error")
                         .permitAll()
-                        .requestMatchers("/cart", "/orders").authenticated()
-                        .requestMatchers("/catalog/**", "/warehouses/**").hasRole(Roles.ADMIN.name())
+                        .requestMatchers("/cart/**", "/orders/**", "/home/admin/**").authenticated()
+                        .requestMatchers("/catalog/**", "/warehouses/**", "/home/admin/**", "/orders/admin/**").hasRole(Roles.ADMIN.name())
                         .anyRequest().authenticated()
             )
             .formLogin(
@@ -47,7 +47,7 @@ public class SecurityConfig {
                         .passwordParameter(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_PASSWORD_KEY)
                         .defaultSuccessUrl("/")
                         .failureForwardUrl("/users/login-error")
-            )
+            ).userDetailsService(userDetailsService())
             .logout((logout) ->
                 logout.logoutUrl("/users/logout")
                     .logoutSuccessUrl("/")

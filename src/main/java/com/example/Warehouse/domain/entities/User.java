@@ -42,7 +42,6 @@ public class User extends BaseEntity {
         this.username = userName;
     }
 
-
     @Column(name = "email", nullable = false)
     public String getEmail() {
         return email;

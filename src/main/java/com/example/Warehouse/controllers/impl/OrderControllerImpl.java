@@ -1,4 +1,4 @@
-package com.example.Warehouse.controllers;
+package com.example.Warehouse.controllers.impl;
 
 import com.example.Warehouse.controllers.contracts.OrderController;
 import com.example.Warehouse.models.forms.order.OrderCreateForm;
@@ -14,6 +14,7 @@ import com.example.Warehouse.models.viewmodels.purchase.PurchaseViewModel;
 import com.example.Warehouse.services.contracts.OrderService;
 import com.example.Warehouse.services.contracts.PurchaseService;
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,13 +27,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/orders")
 public class OrderControllerImpl implements OrderController {
+    private final ModelMapper modelMapper;
     private final OrderService orderService;
     private final PurchaseService purchaseService;
 
     public OrderControllerImpl(
+        ModelMapper modelMapper,
         OrderService orderService,
         PurchaseService purchaseService
     ) {
+        this.modelMapper = modelMapper;
         this.orderService = orderService;
         this.purchaseService = purchaseService;
     }
@@ -54,16 +58,12 @@ public class OrderControllerImpl implements OrderController {
             authentication.getName(),
             form.pages().page(),
             form.pages().size()
-        ).toPage();
+        );
 
         var ordersViewModel = ordersPage
             .stream()
-            .map(op -> new OrderViewModel(
-                    op.number(),
-                    op.totalPrice(),
-                    op.date()
-                )
-            ).toList();
+            .map(orderDto -> modelMapper.map(orderDto, OrderViewModel.class))
+            .toList();
 
         var viewModel = new OrdersPageViewModel(
             createBaseViewModel(ordersPage.getTotalPages(), 0),
@@ -93,18 +93,12 @@ public class OrderControllerImpl implements OrderController {
             authentication.getName(),
             form.pages().page(),
             form.pages().size()
-        ).toPage();
+        );
 
         var purchasesViewModel = purchasesPage
             .stream()
-            .map(op -> new PurchaseViewModel(
-                    op.number(),
-                    op.status(),
-                    op.cashback(),
-                    op.totalPrice(),
-                    op.date()
-                )
-            ).toList();
+            .map(purchaseDto -> modelMapper.map(purchaseDto, PurchaseViewModel.class))
+            .toList();
 
         var viewModel = new PurchasePageViewModel(
             createBaseViewModel(purchasesPage.getTotalPages(), 0),
@@ -118,7 +112,7 @@ public class OrderControllerImpl implements OrderController {
     }
 
     @Override
-    @GetMapping("/manage-purchase")
+    @GetMapping("/admin/manage-purchase")
     public String managePurchasePage(
         @Valid @ModelAttribute("form") PurchasesSearchForm form,
         BindingResult bindingResult,
@@ -132,18 +126,12 @@ public class OrderControllerImpl implements OrderController {
         var purchasesPage = purchaseService.findAllPurchases(
             form.pages().page(),
             form.pages().size()
-        ).toPage();
+        );
 
         var purchasesViewModel = purchasesPage
             .stream()
-            .map(op -> new PurchaseViewModel(
-                    op.number(),
-                    op.status(),
-                    op.cashback(),
-                    op.totalPrice(),
-                    op.date()
-                )
-            ).toList();
+            .map(purchaseDto -> modelMapper.map(purchaseDto, PurchaseViewModel.class))
+            .toList();
 
         var viewModel = new PurchasePageViewModel(
             createBaseViewModel(purchasesPage.getTotalPages(), 0),
@@ -157,7 +145,7 @@ public class OrderControllerImpl implements OrderController {
     }
 
     @Override
-    @GetMapping("/check")
+    @GetMapping("/admin/check")
     public String changeStatus(
         @Valid @ModelAttribute("form") PurchaseChangeStatusForm form,
         BindingResult bindingResult,
@@ -176,7 +164,7 @@ public class OrderControllerImpl implements OrderController {
     }
 
     @Override
-    @GetMapping("/canceled")
+    @GetMapping("/admin/canceled")
     public String setCanceledStatus(
         @Valid @ModelAttribute("form") PurchaseChangeStatusForm form,
         BindingResult bindingResult,

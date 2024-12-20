@@ -3,13 +3,12 @@ package com.example.Warehouse.services.impl;
 import com.example.Warehouse.domain.entities.Stock;
 import com.example.Warehouse.domain.entities.Warehouse;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
-import com.example.Warehouse.models.dto.PageForRedis;
-import com.example.Warehouse.models.filters.WarehouseFilter;
 import com.example.Warehouse.models.dto.order.OrderItemDto;
 import com.example.Warehouse.models.dto.warehouse.AddStockDto;
 import com.example.Warehouse.models.dto.warehouse.WarehouseAddDto;
 import com.example.Warehouse.models.dto.warehouse.WarehouseDto;
 import com.example.Warehouse.models.dto.warehouse.WarehouseSearchDto;
+import com.example.Warehouse.models.filters.WarehouseFilter;
 import com.example.Warehouse.services.contracts.StockService;
 import com.example.Warehouse.services.contracts.WarehouseService;
 import com.example.Warehouse.utils.specifications.WarehouseSpec;
@@ -48,7 +47,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         value = "warehouses",
         key = "#warehouseDto.substring + '-' + #warehouseDto.size + '-' + #warehouseDto.page + '-' + #warehouseDto.returnDeleted"
     )
-    public PageForRedis<WarehouseDto> findWarehouses(WarehouseSearchDto warehouseDto) {
+    public Page<WarehouseDto> findWarehouses(WarehouseSearchDto warehouseDto) {
         Pageable pageable = PageRequest
             .of(warehouseDto.page() - 1, warehouseDto.size(), Sort.by("name"));
 
@@ -62,14 +61,14 @@ public class WarehouseServiceImpl implements WarehouseService {
             pageable
         );
 
-        return new PageForRedis<>(warehouses.map(w ->
+        return warehouses.map(w ->
             new WarehouseDto(
                 w.getId(),
                 w.getName(),
                 w.getLocation(),
                 w.getIsDeleted()
             )
-        ));
+        );
     }
 
     @Override

@@ -11,40 +11,42 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.security.Principal;
+
 public interface CartController extends BaseController {
     @GetMapping("/user")
     String userCartPage(
-        Authentication authentication,
+        Principal principal,
         Model model);
 
     @GetMapping("/admin")
     String adminCartPage(
-        Authentication authentication,
+        Principal principal,
         Model model);
 
     @PostMapping("/user/add-product")
     String addProductToUserCart(
-        Authentication authentication,
+        Principal principal,
         @Valid @ModelAttribute("add") AddProductToUserCartForm add,
         BindingResult bindingResult,
         Model model);
 
     @PostMapping("/admin/add-product")
     String addProductToAdminCart(
-        Authentication authentication,
+        Principal principal,
         @Valid @ModelAttribute("add") AddProductToAdminCartForm add,
         BindingResult bindingResult,
         Model model);
 
     @GetMapping("/user/delete-product/{productId}")
     String deleteProductFromUserCart(
-        Authentication authentication,
+        Principal principal,
         @PathVariable("productId") String productId,
         Model model);
 
     @GetMapping("/admin/delete-product/{productId}")
     String deleteProductFromAdminCart(
-        Authentication authentication,
+        Principal principal,
         @PathVariable("productId") String productId,
         Model model);
 }

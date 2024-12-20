@@ -179,6 +179,7 @@ button .active-button {
 }
 
 .card h4, h5 {
+    color: #444444;
     margin: 10px 0 0 0;
 }
 
@@ -294,7 +295,7 @@ img {
 
 .decorated-text {
     text-decoration: underline;
-    color: crimson;
+    text-decoration-color: crimson;
 }
 
 .order {

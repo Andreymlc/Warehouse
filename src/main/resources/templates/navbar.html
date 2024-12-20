@@ -16,7 +16,7 @@
             <a th:href="@{/orders/user}">Мои заказы</a>
         </li>
         <li sec:authorize="hasRole('ADMIN')">
-            <a th:href="@{/orders/manage-purchase}">Заказы пользователей</a>
+            <a th:href="@{/orders/admin/manage-purchase}">Заказы пользователей</a>
         </li>
         <li sec:authorize="hasRole('ADMIN')">
             <a th:href="@{/cart/admin}">Корзина <span th:text="4"></span></a>

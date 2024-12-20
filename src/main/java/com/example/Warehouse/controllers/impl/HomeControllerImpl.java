@@ -1,4 +1,4 @@
-package com.example.Warehouse.controllers;
+package com.example.Warehouse.controllers.impl;
 
 import com.example.Warehouse.models.dto.category.CategorySearchDto;
 import com.example.Warehouse.models.dto.product.ProductSearchDto;
@@ -24,6 +24,9 @@ import com.example.Warehouse.models.viewmodels.category.CategoriesViewModel;
 import com.example.Warehouse.models.viewmodels.product.ProductViewModel;
 import com.example.Warehouse.models.viewmodels.product.ProductsViewModel;
 import jakarta.validation.Valid;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,6 +42,8 @@ public class HomeControllerImpl implements HomeController {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final WarehouseService warehouseService;
+
+    private static final Logger LOG = LogManager.getLogger(Controller.class);
 
     public HomeControllerImpl(
         ModelMapper modelMapper,
@@ -62,17 +67,11 @@ public class HomeControllerImpl implements HomeController {
         if (bindingResult.hasErrors()) return "admin-warehouses";
 
         var warehousesPage = warehouseService
-            .findWarehouses(modelMapper.map(form, WarehouseSearchDto.class)).toPage();
+            .findWarehouses(modelMapper.map(form, WarehouseSearchDto.class));
 
         var warehouseViewModels = warehousesPage
             .stream()
-            .map(w -> new WarehouseViewModel(
-                    w.id(),
-                    w.name(),
-                    w.location(),
-                    w.isDeleted()
-                )
-            )
+            .map(warehouseDto -> modelMapper.map(warehouseDto, WarehouseViewModel.class))
             .toList();
 
         var viewModel = new WarehousesViewModel(
@@ -96,23 +95,20 @@ public class HomeControllerImpl implements HomeController {
 
         if (bindingResult.hasErrors()) return "admin-products";
 
+        LOG.info("Fetching products with search parameters: {}", form);
+
         var productsPage = productService
-            .findProducts(modelMapper.map(form, ProductSearchDto.class)).toPage();
+            .findProducts(modelMapper.map(form, ProductSearchDto.class));
+
+        LOG.info("Found {} products", productsPage.getTotalElements());
 
         var categories = categoryService.findAllNamesCategories(form.returnDeleted());
 
+        LOG.info("Fetched {} categories", categories.size());
+
         var productViewModels = productsPage
             .stream()
-            .map(p -> new ProductViewModel(
-                    p.id(),
-                    p.name(),
-                    p.price(),
-                    p.oldPrice(),
-                    p.category(),
-                    p.quantity(),
-                    p.isDeleted()
-                )
-            )
+            .map(productDto -> modelMapper.map(productDto, ProductViewModel.class))
             .toList();
 
         var viewModel = new ProductsViewModel(
@@ -125,6 +121,8 @@ public class HomeControllerImpl implements HomeController {
         model.addAttribute("model", viewModel);
         model.addAttribute("add", new AddProductToAdminCartForm(null));
         model.addAttribute("createProduct", new ProductCreateForm(null, 0f, null));
+
+        LOG.info("Returning 'admin-products' view with product data and categories.");
 
         return "admin-products";
     }
@@ -142,16 +140,11 @@ public class HomeControllerImpl implements HomeController {
         }
 
         var categoriesPage = categoryService
-            .findCategories(modelMapper.map(form, CategorySearchDto.class)).toPage();
+            .findCategories(modelMapper.map(form, CategorySearchDto.class));
 
         var categoriesViewModels = categoriesPage
             .stream()
-            .map(c -> new CategoryViewModel(
-                c.id(),
-                c.name(),
-                c.discount(),
-                c.isDeleted()
-            ))
+            .map(categoryDto -> modelMapper.map(categoryDto, CategoryViewModel.class))
             .toList();
 
         var viewModel = new CategoriesViewModel(
@@ -177,22 +170,13 @@ public class HomeControllerImpl implements HomeController {
         if (bindingResult.hasErrors()) return "home-user";
 
         var productsPage = productService
-            .findProducts(modelMapper.map(form, ProductSearchDto.class)).toPage();
+            .findProducts(modelMapper.map(form, ProductSearchDto.class));
 
         var categories = categoryService.findAllNamesCategories(false);
 
         var productViewModels = productsPage
             .stream()
-            .map(p -> new ProductViewModel(
-                    p.id(),
-                    p.name(),
-                    p.price(),
-                    p.oldPrice(),
-                    p.category(),
-                    p.quantity(),
-                    false
-                )
-            )
+            .map(productDto -> modelMapper.map(productDto, ProductViewModel.class))
             .toList();
 
         var viewModel = new ProductsViewModel(

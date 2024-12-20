@@ -5,7 +5,6 @@ import com.example.Warehouse.domain.entities.OrderItem;
 import com.example.Warehouse.domain.repositories.contracts.order.OrderRepository;
 import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
-import com.example.Warehouse.models.dto.PageForRedis;
 import com.example.Warehouse.models.dto.order.OrderDto;
 import com.example.Warehouse.models.dto.order.OrderItemDto;
 import com.example.Warehouse.services.contracts.OrderService;
@@ -48,13 +47,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Cacheable(value = "orders", key = "#username + '-' + #page + '-' + #size")
-    public PageForRedis<OrderDto> findOrders(String username, int page, int size) {
+    public Page<OrderDto> findOrders(String username, int page, int size) {
         var sort = Sort.by("date").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         var orderPage = orderRepo.findByUsername(username, pageable);
 
-        return new PageForRedis<>(orderPage.map(o -> modelMapper.map(o, OrderDto.class)));
+        return orderPage.map(o -> modelMapper.map(o, OrderDto.class));
     }
 
     @Override

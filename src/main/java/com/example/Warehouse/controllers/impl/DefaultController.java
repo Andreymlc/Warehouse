@@ -1,4 +1,4 @@
-package com.example.Warehouse.controllers;
+package com.example.Warehouse.controllers.impl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;

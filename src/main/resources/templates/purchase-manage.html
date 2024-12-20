@@ -40,9 +40,9 @@
             <h4 th:text="'Полученно баллов: ' + ${purchase.cashback()}">Получено баллов</h4>
             <h4 th:text="'Дата заказа: ' + ${#temporals.format(purchase.date(), 'HH:mm dd-MM')}">Дата заказа</h4>
             <a th:if="${purchase.status() != 'DELIVERED' && purchase.status() != 'CANCELED'}"
-               th:href="@{/orders/check(purchaseNumber=${purchase.number()})}">Отметить</a>
+               th:href="@{/orders/admin/check(purchaseNumber=${purchase.number()})}">Отметить</a>
             <a class="delete-button" th:if="${purchase.status() != 'CANCELED'}"
-               th:href="@{/orders/canceled(purchaseNumber=${purchase.number()})}">Отменить заказ</a>
+               th:href="@{/orders/admin/canceled(purchaseNumber=${purchase.number()})}">Отменить заказ</a>
         </div>
     </div>
 </main>

@@ -51,7 +51,7 @@ public class Purchase extends BaseEntity {
         this.date = purchaseDate;
     }
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "status", nullable = false)
     public Status getStatus() {
         return status;

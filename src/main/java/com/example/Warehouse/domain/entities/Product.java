@@ -103,16 +103,4 @@ public class Product extends BaseEntity {
     public void setIsDeleted(boolean deleted) {
         isDeleted = deleted;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Product product)) return false;
-        return name.equalsIgnoreCase(product.name) && price.equals(product.price);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, price);
-    }
 }

@@ -1,5 +1,7 @@
 package com.example.Warehouse.models.dto.product;
 
+import java.io.Serializable;
+
 public record ProductStockDto(
     String id,
     String name,
@@ -8,5 +10,5 @@ public record ProductStockDto(
     int maxStock,
     String category,
     boolean isDeleted
-) {
+) implements Serializable {
 }

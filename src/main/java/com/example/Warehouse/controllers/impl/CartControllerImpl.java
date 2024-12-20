@@ -1,4 +1,4 @@
-package com.example.Warehouse.controllers;
+package com.example.Warehouse.controllers.impl;
 
 import com.example.Warehouse.services.contracts.CartService;
 import com.example.Warehouse.services.contracts.UserService;
@@ -12,22 +12,28 @@ import com.example.Warehouse.models.viewmodels.cart.CartAdminViewModel;
 import com.example.Warehouse.models.viewmodels.cart.CartUserViewModel;
 import com.example.Warehouse.models.viewmodels.product.ProductInCartViewModel;
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/cart")
 public class CartControllerImpl implements CartController {
+    private final ModelMapper modelMapper;
     private final CartService cartService;
     private final UserService userService;
 
     public CartControllerImpl(
+        ModelMapper modelMapper,
         CartService cartService,
         UserService userService
     ) {
+        this.modelMapper = modelMapper;
         this.cartService = cartService;
         this.userService = userService;
     }
@@ -35,25 +41,18 @@ public class CartControllerImpl implements CartController {
     @Override
     @GetMapping("/user")
     public String userCartPage(
-        Authentication authentication,
+        Principal principal,
         Model model
     ) {
-        var cart = cartService.findCart(authentication.getName());
+        var cart = cartService.findCart(principal.getName());
 
         var productsViewModel = cart
             .products()
             .stream()
-            .map(p -> new ProductInCartViewModel(
-                    p.id(),
-                    p.name(),
-                    p.category(),
-                    p.quantity(),
-                    p.totalPrice()
-                )
-            )
+            .map(productCartDto -> modelMapper.map(productCartDto, ProductInCartViewModel.class))
             .toList();
 
-        var pointsCount = userService.getPointsCount(authentication.getName());
+        var pointsCount = userService.getPointsCount(principal.getName());
 
         var viewModel = new CartUserViewModel(
             cart.totalPrice(),
@@ -71,22 +70,15 @@ public class CartControllerImpl implements CartController {
     @Override
     @GetMapping("/admin")
     public String adminCartPage(
-        Authentication authentication,
+        Principal principal,
         Model model
     ) {
-        var cart = cartService.findCart(authentication.getName());
+        var cart = cartService.findCart(principal.getName());
 
         var productsViewModel = cart
             .products()
             .stream()
-            .map(p -> new ProductInCartViewModel(
-                    p.id(),
-                    p.name(),
-                    p.category(),
-                    p.quantity(),
-                    p.totalPrice()
-                )
-            )
+            .map(productCartDto -> modelMapper.map(productCartDto, ProductInCartViewModel.class))
             .toList();
 
         var viewModel = new CartAdminViewModel(
@@ -104,12 +96,12 @@ public class CartControllerImpl implements CartController {
     @Override
     @PostMapping("/user/add-product")
     public String addProductToUserCart(
-        Authentication authentication,
+        Principal principal,
         @Valid @ModelAttribute("add") AddProductToUserCartForm add,
         BindingResult bindingResult,
         Model model
     ) {
-        cartService.addProductToCart(authentication.getName(), add.productId());
+        cartService.addProductToCart(principal.getName(), add.productId());
 
         return "redirect:/home/user?returnDeleted=false";
     }
@@ -117,12 +109,12 @@ public class CartControllerImpl implements CartController {
     @Override
     @PostMapping("/admin/add-product")
     public String addProductToAdminCart(
-        Authentication authentication,
+        Principal principal,
         @Valid @ModelAttribute("add") AddProductToAdminCartForm add,
         BindingResult bindingResult,
         Model model
     ) {
-        cartService.addProductToCart(authentication.getName(), add.productId());
+        cartService.addProductToCart(principal.getName(), add.productId());
 
         return "redirect:/home/admin?returnDeleted=false";
     }
@@ -130,11 +122,11 @@ public class CartControllerImpl implements CartController {
     @Override
     @GetMapping("/user/delete-product/{productId}")
     public String deleteProductFromUserCart(
-        Authentication authentication,
+        Principal principal,
         @PathVariable("productId") String productId,
         Model model
     ) {
-        cartService.deleteProductFromCart(authentication.getName(), productId);
+        cartService.deleteProductFromCart(principal.getName(), productId);
 
         return "redirect:/cart/user";
     }
@@ -142,11 +134,11 @@ public class CartControllerImpl implements CartController {
     @Override
     @GetMapping("/admin/delete-product/{productId}")
     public String deleteProductFromAdminCart(
-        Authentication authentication,
+        Principal principal,
         @PathVariable("productId") String productId,
         Model model
     ) {
-        cartService.deleteProductFromCart(authentication.getName(), productId);
+        cartService.deleteProductFromCart(principal.getName(), productId);
 
         return "redirect:/cart/admin";
     }

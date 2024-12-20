@@ -2,12 +2,11 @@ package com.example.Warehouse.services.impl;
 
 import com.example.Warehouse.domain.entities.Category;
 import com.example.Warehouse.domain.repositories.contracts.category.CategoryRepository;
-import com.example.Warehouse.models.dto.PageForRedis;
+import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.models.dto.category.CategoryAddDto;
 import com.example.Warehouse.models.dto.category.CategoryDto;
 import com.example.Warehouse.models.dto.category.CategorySearchDto;
 import com.example.Warehouse.models.filters.CategoryFilter;
-import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.services.contracts.CategoryService;
 import com.example.Warehouse.utils.specifications.CategorySpec;
 import jakarta.persistence.EntityNotFoundException;
@@ -75,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
         value = "categories",
         key = "#categoryDto.substring + '-' + #categoryDto.page + '-' + #categoryDto.size() + '-' + #categoryDto.returnDeleted"
     )
-    public PageForRedis<CategoryDto> findCategories(CategorySearchDto categoryDto) {
+    public Page<CategoryDto> findCategories(CategorySearchDto categoryDto) {
         Pageable pageable = PageRequest
             .of(categoryDto.page() - 1, categoryDto.size(), Sort.by("name"));
 
@@ -89,7 +88,7 @@ public class CategoryServiceImpl implements CategoryService {
             pageable
         );
 
-        return new PageForRedis<>(categoryPage.map(c -> modelMapper.map(c, CategoryDto.class)));
+        return categoryPage.map(c -> modelMapper.map(c, CategoryDto.class));
     }
 
     @Override

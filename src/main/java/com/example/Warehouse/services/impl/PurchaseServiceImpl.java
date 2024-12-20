@@ -1,22 +1,22 @@
 package com.example.Warehouse.services.impl;
 
-import com.example.Warehouse.domain.enums.Status;
 import com.example.Warehouse.domain.entities.Purchase;
 import com.example.Warehouse.domain.entities.PurchaseItem;
 import com.example.Warehouse.domain.entities.Stock;
+import com.example.Warehouse.domain.enums.Status;
 import com.example.Warehouse.domain.repositories.contracts.purchase.PurchaseRepository;
 import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
-import com.example.Warehouse.models.dto.PageForRedis;
+import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.models.dto.purchase.PurchaseDto;
 import com.example.Warehouse.models.dto.purchase.PurchaseItemDto;
-import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.services.contracts.PurchaseService;
 import com.example.Warehouse.services.contracts.StockService;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -88,6 +88,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             pointsSpent,
             purchaseItems
         );
+        purchaseItems.forEach(item -> item.setPurchase(purchase));
 
         findSuitableWarehouse(
             purchaseItems
@@ -98,7 +99,6 @@ public class PurchaseServiceImpl implements PurchaseService {
                 ).toList()
         );
 
-        purchaseItems.forEach(item -> item.setPurchase(purchase));
         user.getPurchases().add(purchase);
 
         user.setPoints(user.getPoints() - pointsSpent + cashback);
@@ -118,28 +118,25 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Cacheable(value = "purchases", key = "#username + '-' + #page + '-' + #size")
-    public PageForRedis<PurchaseDto> findPurchases(String username, int page, int size) {
-        var sortByStatus = Sort.by("status").descending();
+    public Page<PurchaseDto> findPurchases(String username, int page, int size) {
+        var sortByStatus = Sort.by("status").ascending();
         var sortByDate = Sort.by("date").descending();
 
         Pageable pageable = PageRequest.of(page - 1, size, sortByStatus.and(sortByDate));
 
-        return new PageForRedis<>(purchaseRepo
+        return purchaseRepo
             .findByUserName(username, pageable)
-            .map(o -> modelMapper.map(o, PurchaseDto.class))
-        );
+            .map(o -> modelMapper.map(o, PurchaseDto.class));
     }
 
     @Override
     @Cacheable(value = "purchases", key = "#page + '-' + #size")
-    public PageForRedis<PurchaseDto> findAllPurchases(int page, int size) {
-        var sortByStatus = Sort.by("status").descending();
+    public Page<PurchaseDto> findAllPurchases(int page, int size) {
+        var sortByStatus = Sort.by("status").ascending();
         var sortByDate = Sort.by("date").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sortByStatus.and(sortByDate));
 
-        return new PageForRedis<>(purchaseRepo
-            .findAll(pageable).map(p -> modelMapper.map(p, PurchaseDto.class))
-        );
+        return purchaseRepo.findAll(pageable).map(p -> modelMapper.map(p, PurchaseDto.class));
     }
 
     @Override

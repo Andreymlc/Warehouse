@@ -1,6 +1,6 @@
 package com.example.Warehouse.models.viewmodels.product;
 
-public record ProductViewModel (
+public record ProductViewModel(
     String id,
     String name,
     Float price,
@@ -8,4 +8,5 @@ public record ProductViewModel (
     String category,
     Integer quantity,
     boolean isDeleted
-) {}
+) {
+}

@@ -31,19 +31,19 @@ public interface OrderController extends BaseController {
         BindingResult bindingResult,
         Model model);
 
-    @GetMapping("/manage-purchase")
+    @GetMapping("/admin/manage-purchase")
     String managePurchasePage(
         @Valid @ModelAttribute("form") PurchasesSearchForm form,
         BindingResult bindingResult,
         Model model);
 
-    @GetMapping("/check")
+    @GetMapping("/admin/check")
     String changeStatus(
         @Valid @ModelAttribute("form") PurchaseChangeStatusForm form,
         BindingResult bindingResult,
         Model model);
 
-    @GetMapping("/canceled")
+    @GetMapping("/admin/canceled")
     String setCanceledStatus(
         @Valid @ModelAttribute("form") PurchaseChangeStatusForm form,
         BindingResult bindingResult,

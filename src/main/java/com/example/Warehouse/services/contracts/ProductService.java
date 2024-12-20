@@ -1,7 +1,7 @@
 package com.example.Warehouse.services.contracts;
 
-import com.example.Warehouse.models.dto.PageForRedis;
 import com.example.Warehouse.models.dto.product.*;
+import org.springframework.data.domain.Page;
 
 public interface ProductService {
     void deleteProduct(String productId);
@@ -10,7 +10,7 @@ public interface ProductService {
 
     void editProduct(String id, String name, String categoryName, float price);
 
-    PageForRedis<ProductDto> findProducts(ProductSearchDto productSearchDto);
+    Page<ProductDto> findProducts(ProductSearchDto productSearchDto);
 
-    PageForRedis<ProductStockDto> findProductsByWarehouse(ProductSearchByWarehouseDto productDto);
+    Page<ProductStockDto> findProductsByWarehouse(ProductSearchByWarehouseDto productDto);
 }

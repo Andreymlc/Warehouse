@@ -5,7 +5,6 @@ import com.example.Warehouse.domain.entities.Stock;
 import com.example.Warehouse.domain.repositories.contracts.category.CategoryRepository;
 import com.example.Warehouse.domain.repositories.contracts.product.ProductRepository;
 import com.example.Warehouse.domain.repositories.contracts.stock.StockRepository;
-import com.example.Warehouse.models.dto.PageForRedis;
 import com.example.Warehouse.models.dto.product.*;
 import com.example.Warehouse.models.filters.ProductFilter;
 import com.example.Warehouse.models.filters.StockFilter;
@@ -41,16 +40,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(
-        value = "products",
-        key = "#productDto.page + '-' + " +
-            "#productDto.size + '-' + " +
-            "#productDto.category + '-' + " +
-            "#productDto.substring + '-' + " +
-            "#productDto.priceSort + '-' +" +
-            "#productDto.deleted"
-    )
-    public PageForRedis<ProductDto> findProducts(ProductSearchDto productDto) {
+    @Cacheable(value = "products")
+    public Page<ProductDto> findProducts(ProductSearchDto productDto) {
         var sort = productDto.priceSort().equals("asc")
             ? Sort.by("price").ascending()
             : Sort.by("price").descending();
@@ -68,7 +59,7 @@ public class ProductServiceImpl implements ProductService {
             pageable
         );
 
-        return new PageForRedis<>(productsPage.map(p ->
+        return productsPage.map(p ->
             new ProductDto(
                 p.getId(),
                 p.getName(),
@@ -78,20 +69,12 @@ public class ProductServiceImpl implements ProductService {
                 stockService.findProductQuantityByProductId(p.getId()),
                 p.getIsDeleted()
             )
-        ));
+        );
     }
 
     @Override
-    @Cacheable(
-        value = "stocks",
-        key = "#productDto.page + '-' + " +
-            "#productDto.size + '-' + " +
-            "#productDto.category + '-' + " +
-            "#productDto.substring + '-' + " +
-            "#productDto.warehouseId + '-' +" +
-            "#productDto.returnDeletedProduct"
-    )
-    public PageForRedis<ProductStockDto> findProductsByWarehouse(ProductSearchByWarehouseDto productDto) {
+    @Cacheable(value = "stocks")
+    public Page<ProductStockDto> findProductsByWarehouse(ProductSearchByWarehouseDto productDto) {
         var pageable = PageRequest.of(productDto.page() - 1, productDto.size(), Sort.by("quantity"));
 
         Page<Stock> stoksPage = stockRepo.findAllByFilter(
@@ -106,21 +89,21 @@ public class ProductServiceImpl implements ProductService {
             pageable
         );
 
-        return new PageForRedis<>(
+        return
             stoksPage.map(s -> {
-                var product = s.getProduct();
+                    var product = s.getProduct();
 
-                return new ProductStockDto(
-                    product.getId(),
-                    product.getName(),
-                    s.getQuantity(),
-                    s.getMinStock(),
-                    s.getMaxStock(),
-                    product.getCategory().getName(),
-                    product.getIsDeleted()
-                );
-            })
-        );
+                    return new ProductStockDto(
+                        product.getId(),
+                        product.getName(),
+                        s.getQuantity(),
+                        s.getMinStock(),
+                        s.getMaxStock(),
+                        product.getCategory().getName(),
+                        product.getIsDeleted()
+                    );
+                }
+            );
     }
 
     @Override

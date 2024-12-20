@@ -48,7 +48,7 @@ public class Clr implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         Random random = new Random();
-        var existingWarehouse = warehouseService.findWarehouses(new WarehouseSearchDto(1, 12, "", true)).toPage();
+        var existingWarehouse = warehouseService.findWarehouses(new WarehouseSearchDto(1, 12, "", true));
 
         if (existingWarehouse.isEmpty()) {
             System.out.println("База дынных пуста. Заполняем..");
