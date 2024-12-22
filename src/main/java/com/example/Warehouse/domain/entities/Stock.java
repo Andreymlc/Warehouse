@@ -12,14 +12,21 @@ public class Stock extends BaseEntity {
     private Product product;
     private Warehouse warehouse;
 
-    protected Stock() {}
+    protected Stock() {
+    }
 
-    public Stock(Integer quantity, Integer minStock, Integer maxStock, Product product, Warehouse warehouse) {
-        this.maxStock = maxStock;
+    public Stock(
+        Integer quantity,
+        Integer minStock,
+        Integer maxStock,
+        Product product,
+        Warehouse warehouse
+    ) {
         this.product = product;
         this.quantity = quantity;
-        this.warehouse = warehouse;
         this.minStock = minStock;
+        this.maxStock = maxStock;
+        this.warehouse = warehouse;
     }
 
     @Column(name = "quantity", nullable = false)

@@ -33,7 +33,7 @@ public class Clr implements CommandLineRunner {
     private final CategoryService categoryService;
     private final WarehouseService warehouseService;
 
-    private static final Logger LOG = LogManager.getLogger(Clr.class);
+    private static final Logger LOG = LogManager.getLogger(Component.class);
 
     @Autowired
     public Clr(

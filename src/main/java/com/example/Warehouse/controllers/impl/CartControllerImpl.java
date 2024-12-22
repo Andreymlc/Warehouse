@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 
@@ -29,7 +30,7 @@ public class CartControllerImpl implements CartController {
     private final CartService cartService;
     private final UserService userService;
 
-    private static final Logger LOG = LogManager.getLogger(CartControllerImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Controller.class);
 
     public CartControllerImpl(
         ModelMapper modelMapper,
@@ -108,8 +109,20 @@ public class CartControllerImpl implements CartController {
         Principal principal,
         @Valid @ModelAttribute("add") AddProductToUserCartForm add,
         BindingResult bindingResult,
+        RedirectAttributes redirectAttributes,
         Model model
     ) {
+        if (bindingResult.hasErrors()) {
+            LOG.error(bindingResult.getAllErrors());
+            redirectAttributes.addFlashAttribute("add", add);
+            redirectAttributes.addFlashAttribute(
+                "org.springframework.validation.BindingResult.add",
+                bindingResult
+            );
+
+            return "redirect:/home/user?returnDeleted=false";
+        }
+
         LOG.info("Add product '{}' to User cart", add.productId());
         cartService.addProductToCart(principal.getName(), add.productId());
 
@@ -124,8 +137,20 @@ public class CartControllerImpl implements CartController {
         Principal principal,
         @Valid @ModelAttribute("add") AddProductToAdminCartForm add,
         BindingResult bindingResult,
+        RedirectAttributes redirectAttributes,
         Model model
     ) {
+        if (bindingResult.hasErrors()) {
+            LOG.error(bindingResult.getAllErrors());
+            redirectAttributes.addFlashAttribute("add", add);
+            redirectAttributes.addFlashAttribute(
+                "org.springframework.validation.BindingResult.add",
+                bindingResult
+            );
+
+            return "redirect:/home/user?returnDeleted=false";
+        }
+
         LOG.info("Add product '{}' to Admin cart", add.productId());
         cartService.addProductToCart(principal.getName(), add.productId());
 

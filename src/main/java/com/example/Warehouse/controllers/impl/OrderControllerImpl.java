@@ -33,7 +33,7 @@ public class OrderControllerImpl implements OrderController {
     private final OrderService orderService;
     private final PurchaseService purchaseService;
 
-    private static final Logger LOG = LogManager.getLogger(OrderControllerImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Controller.class);
 
     public OrderControllerImpl(
         ModelMapper modelMapper,

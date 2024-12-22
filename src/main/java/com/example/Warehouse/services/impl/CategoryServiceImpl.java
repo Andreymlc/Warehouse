@@ -30,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final ModelMapper modelMapper;
     private final CategoryRepository categoryRepo;
 
-    private static final Logger LOG = LogManager.getLogger(CategoryServiceImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Service.class);
 
     public CategoryServiceImpl(
         ModelMapper modelMapper,

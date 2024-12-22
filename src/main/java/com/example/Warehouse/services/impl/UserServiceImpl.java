@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepo;
     private final PasswordEncoder passwordEncoder;
 
-    private static final Logger LOG = LogManager.getLogger(UserServiceImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Service.class);
 
     public UserServiceImpl(
         UserRepository userRepo,

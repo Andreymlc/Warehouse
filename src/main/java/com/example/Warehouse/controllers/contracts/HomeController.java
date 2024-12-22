@@ -21,7 +21,6 @@ public interface HomeController extends BaseController {
         @ModelAttribute("form") WarehousesSearchForm form,
         Model model);
 
-
     /**
      * Returns: {@code admin-products.html}
      */
@@ -45,5 +44,8 @@ public interface HomeController extends BaseController {
     String homeUserPage(
         @ModelAttribute("form") ProductSearchForm form,
         Model model);
+
+    @GetMapping("/most-popular-products")
+    String getFiveMostPopularProducts(Model model);
 
 }

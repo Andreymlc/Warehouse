@@ -18,13 +18,14 @@ public class Product extends BaseEntity {
     private Set<OrderItem> orderItems;
     private Set<PurchaseItem> purchaseItems;
 
-    protected Product() {}
+    protected Product() {
+    }
 
     public Product(
-            String name,
-            Float price,
-            Category category,
-            boolean isDeleted
+        String name,
+        Float price,
+        Category category,
+        boolean isDeleted
     ) {
         this.name = name;
         this.price = price;

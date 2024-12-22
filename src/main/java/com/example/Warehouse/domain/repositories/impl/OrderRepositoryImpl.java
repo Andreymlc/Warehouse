@@ -30,4 +30,9 @@ public class OrderRepositoryImpl extends BaseRepository<BaseOrderRepository> imp
     public Page<Order> findByUsername(String username, Pageable pageable) {
         return repository.findByUserUsername(username, pageable);
     }
+
+    @Override
+    public Order save(Order order) {
+        return repository.save(order);
+    }
 }

@@ -22,7 +22,7 @@ public class CartServiceImpl implements CartService {
     private final UserRepository userRepo;
     private final ProductRepository productRepo;
 
-    private static final Logger LOG = LogManager.getLogger(CartServiceImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Service.class);
 
     public CartServiceImpl(
         UserRepository userRepo,
@@ -30,6 +30,14 @@ public class CartServiceImpl implements CartService {
     ) {
         this.userRepo = userRepo;
         this.productRepo = productRepo;
+    }
+
+    @Cacheable("cart-items-count")
+    public int findCountItemsInCart(String username) {
+        var user = userRepo.findByUsername(username)
+            .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+
+        return user.getCart().size();
     }
 
     @Override

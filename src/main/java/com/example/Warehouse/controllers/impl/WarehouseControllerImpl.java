@@ -4,7 +4,6 @@ import com.example.Warehouse.controllers.contracts.WarehouseController;
 import com.example.Warehouse.models.dto.product.ProductMoveDto;
 import com.example.Warehouse.models.dto.product.ProductSearchByWarehouseDto;
 import com.example.Warehouse.models.dto.warehouse.WarehouseAddDto;
-import com.example.Warehouse.models.forms.category.CategoryEditForm;
 import com.example.Warehouse.models.forms.product.ProductMoveForm;
 import com.example.Warehouse.models.forms.product.ProductSetMinMaxForm;
 import com.example.Warehouse.models.forms.product.ProductWarehouseSearchForm;
@@ -36,7 +35,7 @@ public class WarehouseControllerImpl implements WarehouseController {
     private final CategoryService categoryService;
     private final WarehouseService warehouseService;
 
-    private static final Logger LOG = LogManager.getLogger(WarehouseControllerImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Controller.class);
 
     public WarehouseControllerImpl(
         ModelMapper modelMapper,
@@ -104,9 +103,12 @@ public class WarehouseControllerImpl implements WarehouseController {
 
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
-        if (!model.containsAttribute("minimum")) model.addAttribute("minimum", new ProductSetMinMaxForm(null, null, "", warehouseId));
-        if (!model.containsAttribute("maximum")) model.addAttribute("maximum", new ProductSetMinMaxForm(null, null, "", warehouseId));
-        if (!model.containsAttribute("moveForm")) model.addAttribute("moveForm", new ProductMoveForm(null, null, null, warehouseId, null));
+        if (!model.containsAttribute("minimum"))
+            model.addAttribute("minimum", new ProductSetMinMaxForm(null, null, "", warehouseId));
+        if (!model.containsAttribute("maximum"))
+            model.addAttribute("maximum", new ProductSetMinMaxForm(null, null, "", warehouseId));
+        if (!model.containsAttribute("moveForm"))
+            model.addAttribute("moveForm", new ProductMoveForm(null, null, null, warehouseId, null));
 
         LOG.info("Returning 'warehouse' view with product data");
 

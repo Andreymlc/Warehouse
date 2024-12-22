@@ -28,7 +28,7 @@ public class CatalogControllerImpl implements CatalogController {
     private final ProductService productService;
     private final CategoryService categoryService;
 
-    private static final Logger LOG = LogManager.getLogger(CatalogControllerImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Controller.class);
 
     public CatalogControllerImpl(
         ModelMapper modelMapper,
@@ -49,6 +49,7 @@ public class CatalogControllerImpl implements CatalogController {
         Model model
     ) {
         if (bindingResult.hasErrors()) {
+            LOG.error(bindingResult.getAllErrors());
             redirectAttributes.addFlashAttribute("createProduct", createProduct);
             redirectAttributes.addFlashAttribute(
                 "org.springframework.validation.BindingResult.createProduct",
@@ -97,7 +98,9 @@ public class CatalogControllerImpl implements CatalogController {
         Model model
     ) {
         if (bindingResult.hasErrors()) {
+            LOG.error(bindingResult.getAllErrors());
             model.addAttribute("edit", edit);
+
             return "product-edit";
         }
 
@@ -118,6 +121,8 @@ public class CatalogControllerImpl implements CatalogController {
         Model model
     ) {
         if (bindingResult.hasErrors()) {
+            LOG.error(bindingResult.getAllErrors());
+
             redirectAttributes.addFlashAttribute("create", create);
             redirectAttributes.addFlashAttribute(
                 "org.springframework.validation.BindingResult.create",
@@ -166,6 +171,7 @@ public class CatalogControllerImpl implements CatalogController {
         Model model
     ) {
         if (bindingResult.hasErrors()) {
+            LOG.error(bindingResult.getAllErrors());
             model.addAttribute("edit", edit);
 
             return "category-edit";

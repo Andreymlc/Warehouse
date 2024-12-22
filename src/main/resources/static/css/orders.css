@@ -66,17 +66,3 @@ main {
     padding: 5px;
     transition: background-color 0.3s;
 }
-
-.delete-button{
-    color: #fff;
-    padding: 5px;
-    border-radius: 0.5em;
-    background-color: #d9534f;
-    transition: background-color 0.3s;
-}
-
-.delete-button:hover {
-    background-color: #c9302c;
-    border: none;
-    box-shadow: 0 4px 10px rgba(217, 83, 79, 0.5);
-}

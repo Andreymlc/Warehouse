@@ -32,7 +32,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepo;
     private final CategoryRepository categoryRepo;
 
-    private static final Logger LOG = LogManager.getLogger(ProductServiceImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Service.class);
 
     public ProductServiceImpl(
         StockService stockService,

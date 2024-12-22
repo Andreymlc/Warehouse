@@ -35,7 +35,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final StockService stockService;
     private final WarehouseRepository warehouseRepo;
 
-    private static final Logger LOG = LogManager.getLogger(WarehouseServiceImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Service.class);
 
     public WarehouseServiceImpl(
         ModelMapper modelMapper,
@@ -83,6 +83,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         return warehouseRepo.save(modelMapper.map(warehouseDto, Warehouse.class)).getId();
     }
 
+    @Override
     public void fill(String warehouseId, List<OrderItemDto> items) {
         LOG.info("fillWarehouse called, params: warehouseId - {}, items - {}", warehouseId, items);
 

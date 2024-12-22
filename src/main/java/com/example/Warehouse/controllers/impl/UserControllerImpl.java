@@ -24,7 +24,7 @@ public class UserControllerImpl implements UserController {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
-    private static final Logger LOG = LogManager.getLogger(UserControllerImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Controller.class);
 
     public UserControllerImpl(
         UserService userService,

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepo;
-    private static final Logger LOG = LogManager.getLogger(UserDetailsServiceImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Service.class);
 
     public UserDetailsServiceImpl(UserRepository userRepo) {
         this.userRepo = userRepo;

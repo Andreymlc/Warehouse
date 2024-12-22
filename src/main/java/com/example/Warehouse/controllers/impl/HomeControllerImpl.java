@@ -44,7 +44,7 @@ public class HomeControllerImpl implements HomeController {
     private final CategoryService categoryService;
     private final WarehouseService warehouseService;
 
-    private static final Logger LOG = LogManager.getLogger(HomeControllerImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Controller.class);
 
     public HomeControllerImpl(
         ModelMapper modelMapper,
@@ -183,6 +183,7 @@ public class HomeControllerImpl implements HomeController {
         return "home-user";
     }
 
+    @Override
     @GetMapping("/most-popular-products")
     public String getFiveMostPopularProducts(Model model) {
         LOG.info("User requests the five most popular products");

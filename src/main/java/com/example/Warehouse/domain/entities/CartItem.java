@@ -51,18 +51,6 @@ public class CartItem extends BaseEntity {
         this.user = user;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CartItem cartItem)) return false;
-        return product.equals(cartItem.product);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(product);
-    }
-
     public void incrQuantity() {
         this.quantity++;
     }

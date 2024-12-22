@@ -40,7 +40,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final PurchaseRepository purchaseRepo;
     private final WarehouseRepository warehouseRepo;
 
-    private static final Logger LOG = LogManager.getLogger(PurchaseServiceImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Service.class);
 
     public PurchaseServiceImpl(
         ModelMapper modelMapper,
@@ -88,16 +88,13 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         float totalPrice = 0;
         for (var item : purchaseItems) {
-            var product = item.getProduct();
-            var category = product.getCategory();
-
-            totalPrice += (float) Math.round(product.getPrice() * category.getDiscount() * 100) / 100 * item.getQuantity();
+            totalPrice += item.getTotalPrice();
         }
 
-        if (user.getPoints() < pointsSpent || totalPrice < pointsSpent)
+        if (user.getPoints() < pointsSpent)
             throw new InvalidDataException("Некорректное значение баллов");
 
-        totalPrice -= pointsSpent;
+        totalPrice -= pointsSpent > totalPrice ? totalPrice : pointsSpent;
         var cashback = (int) totalPrice / 10;
 
         var purchase = new Purchase(
@@ -281,6 +278,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
             if (totalSuited == items.size()) {
                 suitableWarehouses.add(warehouse.getId());
+                if (suitableWarehouses.size() == 3) break;
             }
         }
         return suitableWarehouses;

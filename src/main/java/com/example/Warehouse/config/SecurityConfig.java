@@ -30,10 +30,10 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(
                 authorizeHttpRequests ->
-                    authorizeHttpRequests.
-                        requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                    authorizeHttpRequests
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                         .permitAll()
-                        .requestMatchers("/","/favicon.ico", "/error", "/users/login", "/users/register", "/users/login-error")
+                        .requestMatchers("/","/favicon.ico", "/error", "/users/login", "/users/register", "/users/login-error", "/home/user")
                         .permitAll()
                         .requestMatchers("/catalog/**", "/warehouses/**", "/home/admin/**", "/orders/admin/**").hasRole(Roles.ADMIN.name())
                         .requestMatchers("/cart/**", "/orders/**").authenticated()

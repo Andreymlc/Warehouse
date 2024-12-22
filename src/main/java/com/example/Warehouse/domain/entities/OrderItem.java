@@ -9,11 +9,12 @@ public class OrderItem extends BaseEntity {
     private Product product;
     private Integer quantity;
 
-    protected OrderItem() {}
+    protected OrderItem() {
+    }
 
     public OrderItem(
-            Product product,
-            Integer quantity
+        Product product,
+        Integer quantity
     ) {
         this.product = product;
         this.quantity = quantity;

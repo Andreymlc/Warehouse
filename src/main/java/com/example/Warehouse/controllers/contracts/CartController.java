@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 
@@ -29,6 +30,7 @@ public interface CartController extends BaseController {
         Principal principal,
         @Valid @ModelAttribute("add") AddProductToUserCartForm add,
         BindingResult bindingResult,
+        RedirectAttributes redirectAttributes,
         Model model);
 
     @PostMapping("/admin/add-product")
@@ -36,6 +38,7 @@ public interface CartController extends BaseController {
         Principal principal,
         @Valid @ModelAttribute("add") AddProductToAdminCartForm add,
         BindingResult bindingResult,
+        RedirectAttributes redirectAttributes,
         Model model);
 
     @GetMapping("/user/delete-product/{productId}")

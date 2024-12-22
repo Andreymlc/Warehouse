@@ -21,7 +21,7 @@ public class StockServiceImpl implements StockService {
     private final ProductRepository productRepo;
     private final WarehouseRepository warehouseRepo;
 
-    private static final Logger LOG = LogManager.getLogger(StockServiceImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Service.class);
 
     public StockServiceImpl(
         StockRepository stockRepo,
@@ -89,7 +89,7 @@ public class StockServiceImpl implements StockService {
                 productDto.productId(),
                 productDto.newWarehouseI(),
                 1,
-                productDto.quantity()
+                productDto.quantity() + 5
             ));
         else {
             var stock = stockWithProduct.getFirst();

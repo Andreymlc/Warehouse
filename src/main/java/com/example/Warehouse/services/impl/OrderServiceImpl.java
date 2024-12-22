@@ -34,7 +34,7 @@ public class OrderServiceImpl implements OrderService {
     private final WarehouseRepository warehouseRepo;
     private final WarehouseService warehouseService;
 
-    private static final Logger LOG = LogManager.getLogger(OrderServiceImpl.class);
+    private static final Logger LOG = LogManager.getLogger(Service.class);
 
     public OrderServiceImpl(
         ModelMapper modelMapper,
@@ -108,7 +108,7 @@ public class OrderServiceImpl implements OrderService {
         );
 
         orderItems.forEach(item -> item.setOrder(order));
-        existingUser.getOrders().add(order);
+        orderRepo.save(order);
 
         warehouseService.fill(
             warehouseId,
