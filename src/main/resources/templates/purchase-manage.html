@@ -29,7 +29,7 @@
     </div>
 
     <div class="products" th:if="${#lists.isEmpty(model.purchases())}">
-        Пользователи пока что не сделали ни одного заказа ☹
+        Пользователи пока что не сделали ни одного заказа 🙁
     </div>
 
     <div class="cards" th:if="${not #lists.isEmpty(model.purchases())}">
@@ -42,7 +42,8 @@
             <a th:if="${purchase.status() != 'DELIVERED' && purchase.status() != 'CANCELED'}"
                th:href="@{/orders/admin/check(purchaseNumber=${purchase.number()})}">Отметить</a>
             <a class="delete-button" th:if="${purchase.status() != 'CANCELED'}"
-               th:href="@{/orders/admin/canceled(purchaseNumber=${purchase.number()})}">Отменить заказ</a>
+               onclick="return confirm('Вы уверены, что хотите отменить покупку?');"
+               th:href="@{/orders/admin/cancel-purchase(purchaseNumber=${purchase.number()})}">Отменить покупку</a>
         </div>
     </div>
 </main>

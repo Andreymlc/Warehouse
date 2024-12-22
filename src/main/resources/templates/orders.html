@@ -29,7 +29,7 @@
     </div>
 
     <div class="products" sec:authorize="hasRole('ADMIN')" th:if="${#lists.isEmpty(model.orders())}">
-        Пока что вы не сделали ни одного заказа ☹
+        Пока что вы не сделали ни одного заказа 🙁
     </div>
 
     <div class="cards" sec:authorize="hasRole('ADMIN')" th:if="${not #lists.isEmpty(model.orders())}">
@@ -41,7 +41,7 @@
     </div>
 
     <div class="products" sec:authorize="hasRole('USER')" th:if="${#lists.isEmpty(model.purchases())}">
-        Пока что вы не сделали ни одного заказа ☹
+        Пока что вы не сделали ни одного заказа 🙁
     </div>
 
     <div class="cards" sec:authorize="hasRole('USER')" th:if="${not #lists.isEmpty(model.purchases())}">
@@ -51,6 +51,7 @@
             <h4 th:text="'Итоговая цена: ' + ${purchase.totalPrice()}">Итоговая цена</h4>
             <h4 th:text="'Полученно баллов: ' + ${purchase.cashback()}">Получено баллов</h4>
             <h4 th:text="'Дата заказа: ' + ${#temporals.format(purchase.date(), 'HH:mm dd-MM')}">Дата заказа</h4>
+            <a th:href="@{/orders/{number}/purchase-details(number=${purchase.number})}">Детали покупки</a>
         </div>
     </div>
 </main>

@@ -32,12 +32,13 @@ public class RedisConfig {
 
         return RedisCacheManager.builder(connectionFactory())
             .cacheDefaults(cacheConfig)
-            .withCacheConfiguration("products", myDefaultCacheConfig(Duration.ofHours(1)))
-            .withCacheConfiguration("categories", myDefaultCacheConfig(Duration.ofHours(1)))
-            .withCacheConfiguration("warehouses", myDefaultCacheConfig(Duration.ofHours(1)))
-            .withCacheConfiguration("purchases", myDefaultCacheConfig(Duration.ofHours(1)))
-            .withCacheConfiguration("orders", myDefaultCacheConfig(Duration.ofHours(1)))
             .withCacheConfiguration("cart", myDefaultCacheConfig(Duration.ofDays(60)))
+            .withCacheConfiguration("orders", myDefaultCacheConfig(Duration.ofHours(1)))
+            .withCacheConfiguration("products", myDefaultCacheConfig(Duration.ofHours(1)))
+            .withCacheConfiguration("purchases", myDefaultCacheConfig(Duration.ofHours(1)))
+            .withCacheConfiguration("warehouses", myDefaultCacheConfig(Duration.ofHours(1)))
+            .withCacheConfiguration("categories", myDefaultCacheConfig(Duration.ofHours(1)))
+            .withCacheConfiguration("most-popular", myDefaultCacheConfig(Duration.ofHours(1)))
             .build();
     }
 

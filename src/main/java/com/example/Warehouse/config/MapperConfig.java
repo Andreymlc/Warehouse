@@ -16,9 +16,7 @@ import com.example.Warehouse.models.dto.warehouse.WarehouseDto;
 import com.example.Warehouse.models.dto.warehouse.WarehouseSearchDto;
 import com.example.Warehouse.models.forms.auth.RegisterForm;
 import com.example.Warehouse.models.forms.category.CategorySearchForm;
-import com.example.Warehouse.models.forms.product.ProductCreateForm;
-import com.example.Warehouse.models.forms.product.ProductSearchForm;
-import com.example.Warehouse.models.forms.product.ProductWarehouseSearchForm;
+import com.example.Warehouse.models.forms.product.*;
 import com.example.Warehouse.models.forms.warehouse.WarehousesSearchForm;
 import com.example.Warehouse.models.viewmodels.category.CategoryViewModel;
 import com.example.Warehouse.models.viewmodels.order.OrderViewModel;
@@ -54,14 +52,6 @@ public class MapperConfig {
         //endregion
 
         //region Category
-        modelMapper.typeMap(CategoryAddDto.class, Category.class).setProvider(ctx -> {
-            CategoryAddDto source = (CategoryAddDto) ctx.getSource();
-            return new Category(
-                source.name(),
-                1 - (float) source.discount() / 100,
-                false
-            );
-        });
 
         modelMapper.typeMap(Category.class, CategoryDto.class).setProvider(ctx -> {
             Category source = (Category) ctx.getSource();
@@ -202,6 +192,26 @@ public class MapperConfig {
                 source.name(),
                 source.category(),
                 source.price()
+            );
+        });
+
+        modelMapper.typeMap(ProductEditForm.class, ProductEditDto.class).setProvider(ctx -> {
+            ProductEditForm source = (ProductEditForm) ctx.getSource();
+            return new ProductEditDto(
+                source.productId(),
+                source.price(),
+                source.name(),
+                source.category()
+            );
+        });
+
+        modelMapper.typeMap(ProductMoveForm.class, ProductMoveDto.class).setProvider(ctx -> {
+            ProductMoveForm source = (ProductMoveForm) ctx.getSource();
+            return new ProductMoveDto(
+                source.quantityItems(),
+                source.productId(),
+                source.warehouseId(),
+                source.newWarehouseId()
             );
         });
 

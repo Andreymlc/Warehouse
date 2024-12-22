@@ -11,7 +11,10 @@ import java.util.Optional;
 
 public interface WarehouseRepository extends BaseSaveRepository<Warehouse> {
     List<Warehouse> findAll();
+
     Optional<Warehouse> findById(String id);
+
+    Optional<Warehouse> findByName(String name);
+
     Page<Warehouse> findAllByFilter(Specification<Warehouse> specification, Pageable pageable);
-    Page<Warehouse> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }

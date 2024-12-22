@@ -12,13 +12,15 @@
 </header>
 <body>
 <main class="center-main">
-    <form class="standard-form" th:action="@{/catalog/categories/{id}/edit(id=${categoryId})}"
+    <form class="standard-form" th:action="@{/catalog/categories/edit}"
           th:method="post"
           th:object="${edit}">
         <h2>Редактирование категории</h2>
+        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger">Error message</p>
         <input class="default-input" type="text" th:field="*{name}" placeholder="Название">
+        <p th:if="${#fields.hasErrors('discount')}" th:errors="*{discount}" class="text-danger">Error message</p>
         <input class="default-input" type="number" min="0" max="100" th:field="*{discount}" placeholder="Скидка">
-        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{categoryId}" />
         <button type="submit">Применить</button>
     </form>
 </main>

@@ -1,5 +1,6 @@
 package com.example.Warehouse.domain.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -7,8 +8,9 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "purchase_items")
 public class PurchaseItem extends BaseEntity {
-    private Integer quantity;
     private Product product;
+    private Integer quantity;
+    private Float totalPrice;
     private Purchase purchase;
 
     protected PurchaseItem() {
@@ -16,12 +18,15 @@ public class PurchaseItem extends BaseEntity {
 
     public PurchaseItem(
         Product product,
-        Integer quantity
+        Integer quantity,
+        Float totalPrice
     ) {
         this.product = product;
         this.quantity = quantity;
+        this.totalPrice = totalPrice;
     }
 
+    @Column(name = "quantity")
     public Integer getQuantity() {
         return quantity;
     }
@@ -46,5 +51,14 @@ public class PurchaseItem extends BaseEntity {
 
     public void setPurchase(Purchase purchase) {
         this.purchase = purchase;
+    }
+
+    @Column(name = "total_price", nullable = false)
+    public Float getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Float totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }

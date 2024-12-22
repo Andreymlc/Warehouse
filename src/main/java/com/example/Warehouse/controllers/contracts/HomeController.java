@@ -3,7 +3,6 @@ package com.example.Warehouse.controllers.contracts;
 import com.example.Warehouse.models.forms.category.CategorySearchForm;
 import com.example.Warehouse.models.forms.product.ProductSearchForm;
 import com.example.Warehouse.models.forms.warehouse.WarehousesSearchForm;
-import jakarta.validation.Valid;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,20 +16,18 @@ public interface HomeController extends BaseController {
     /**
      * Returns: {@code admin-warehouses.html}
      */
-    @GetMapping("/admin")
-    String homeAdminPage(
+    @GetMapping("/admin/warehouses")
+    String homeAdminWarehousesPage(
         @ModelAttribute("form") WarehousesSearchForm form,
-        BindingResult bindingResult,
         Model model);
 
 
     /**
      * Returns: {@code admin-products.html}
      */
-    @PostMapping("/admin/products")
-    String homeAdminProductsPage(
-        @Valid @ModelAttribute("form") ProductSearchForm form,
-        BindingResult bindingResult,
+    @PostMapping("/admin")
+    String homeAdminPage(
+        @ModelAttribute("form") ProductSearchForm form,
         Model model);
 
     /**
@@ -38,8 +35,7 @@ public interface HomeController extends BaseController {
      */
     @PostMapping("/admin/categories")
     String homeAdminCategoriesPage(
-        @Valid @ModelAttribute("form") CategorySearchForm form,
-        BindingResult bindingResult,
+        @ModelAttribute("form") CategorySearchForm form,
         Model model);
 
     /**
@@ -48,7 +44,6 @@ public interface HomeController extends BaseController {
     @GetMapping("/user")
     String homeUserPage(
         @ModelAttribute("form") ProductSearchForm form,
-        BindingResult bindingResult,
         Model model);
 
 }

@@ -5,6 +5,8 @@ import com.example.Warehouse.services.contracts.UserService;
 import com.example.Warehouse.controllers.contracts.UserController;
 import com.example.Warehouse.models.forms.auth.RegisterForm;
 import jakarta.validation.Valid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Controller;
@@ -22,6 +24,8 @@ public class UserControllerImpl implements UserController {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
+    private static final Logger LOG = LogManager.getLogger(UserControllerImpl.class);
+
     public UserControllerImpl(
         UserService userService,
         ModelMapper modelMapper
@@ -38,6 +42,8 @@ public class UserControllerImpl implements UserController {
     @Override
     @GetMapping("/register")
     public String registerForm() {
+        LOG.info("Show register form");
+
         return "register";
     }
 
@@ -55,7 +61,10 @@ public class UserControllerImpl implements UserController {
             return "redirect:/users/register";
         }
 
+        LOG.info("Register new user {}", form.getUserName());
         userService.register(modelMapper.map(form, RegisterUserDto.class));
+
+        LOG.info("Successful register new user {}", form.getUserName());
 
         return "redirect:/users/login";
     }
@@ -63,6 +72,8 @@ public class UserControllerImpl implements UserController {
     @Override
     @GetMapping("/login")
     public String loginForm() {
+        LOG.info("Show login form");
+
         return "login";
     }
 
@@ -70,6 +81,7 @@ public class UserControllerImpl implements UserController {
     public String onFailedLogin(
         @ModelAttribute(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY) String username,
         RedirectAttributes redirectAttributes) {
+        LOG.info("Error during login");
 
         redirectAttributes.addFlashAttribute(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY, username);
         redirectAttributes.addFlashAttribute("badCredentials", true);

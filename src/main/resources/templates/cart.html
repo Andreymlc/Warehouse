@@ -18,27 +18,28 @@
           th:object="${orderCreate}">
         <p style="text-decoration: underline;" th:text="'Итоговая стоимость: ' + ${model.totalPrice()}">Название
             товара</p>
-        <div class="search">
+        <p th:if="${#fields.hasErrors('warehouseId')}" th:errors="*{warehouseId}" class="text-danger">Error message</p>
+        <div th:if="${not #lists.isEmpty(model.products())}" class="search">
             <p>Введите id склада:</p>
             <input sec:authorize="hasRole('ADMIN')" type="text" th:field="*{warehouseId}"
                    placeholder="Введите id склада">
         </div>
-        <button type="submit">Заказать</button>
+        <button th:if="${not #lists.isEmpty(model.products())}" type="submit">Заказать</button>
     </form>
     <form sec:authorize="hasRole('USER')"
           th:action="@{/orders/user/create}"
           th:method="post"
-          th:object="${orderCreate}">
-        <p style="text-decoration: underline;" th:text="'Итоговая стоимость: ' + ${model.totalPrice()}">Итоговая
-            стоимость</p>
+          th:object="${purchaseCreate}">
+        <p style="text-decoration: underline;" th:text="'Итоговая стоимость: ' + ${model.totalPrice()}">Итоговая стоимость</p>
         <p style="text-decoration: underline;" th:text="'У вас баллов: ' + ${model.pointsCount()}">У вас баллов</p>
-        <div class="search">
+        <p th:if="${#fields.hasErrors('pointsSpent')}" th:errors="*{pointsSpent}" class="text-danger">Error message</p>
+        <div th:if="${not #lists.isEmpty(model.products())}" class="search">
             <p>Введите кол-во баллов:</p>
             <input type="number" min="0" th:max="${model.totalPrice()}"
                    th:field="*{pointsSpent}"
                    placeholder="Введите количество баллов">
         </div>
-        <button type="submit">Заказать</button>
+        <button th:if="${not #lists.isEmpty(model.products())}" type="submit">Заказать</button>
     </form>
 </aside>
 <main>

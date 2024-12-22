@@ -1,8 +1,9 @@
-package com.example.Warehouse.utils.validation.category;
+package com.example.Warehouse.utils.validations.category;
 
 import com.example.Warehouse.domain.repositories.contracts.category.CategoryRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.springframework.cache.annotation.Cacheable;
 
 public class ExistingCategoryIdValidation implements ConstraintValidator<ExistingCategoryId, String> {
     private final CategoryRepository categoryRepo;
@@ -12,7 +13,8 @@ public class ExistingCategoryIdValidation implements ConstraintValidator<Existin
     }
 
     @Override
+    @Cacheable(value = "categoryId", key = "#id")
     public boolean isValid(String id, ConstraintValidatorContext constraintValidatorContext) {
-        return categoryRepo.findById(id).isPresent();
+        return id != null &&  categoryRepo.findById(id).isPresent();
     }
 }

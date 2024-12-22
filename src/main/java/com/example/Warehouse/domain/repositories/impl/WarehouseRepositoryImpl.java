@@ -24,13 +24,13 @@ public class WarehouseRepositoryImpl extends BaseRepository<BaseWarehouseReposit
     }
 
     @Override
-    public Page<Warehouse> findAllByFilter(Specification<Warehouse> specification, Pageable pageable) {
-        return repository.findAll(specification, pageable);
+    public Optional<Warehouse> findByName(String name) {
+        return repository.findByName(name);
     }
 
     @Override
-    public Page<Warehouse> findByNameContainingIgnoreCase(String name, Pageable pageable) {
-        return repository.findByNameContainingIgnoreCase(name, pageable);
+    public Page<Warehouse> findAllByFilter(Specification<Warehouse> specification, Pageable pageable) {
+        return repository.findAll(specification, pageable);
     }
 
     @Override

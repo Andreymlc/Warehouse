@@ -27,7 +27,9 @@
           th:method="post"
           th:object="${create}">
         <h4>Создание категории</h4>
+        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger">Error message</p>
         <input class="default-input" type="text" th:field="*{name}" placeholder="Навзание категории">
+        <p th:if="${#fields.hasErrors('discount')}" th:errors="*{discount}" class="text-danger">Error message</p>
         <input class="default-input" type="text" th:field="*{discount}" placeholder="Скидка">
         <button type="submit">Создать</button>
     </form>
@@ -82,14 +84,14 @@
                   th:method="post"
                   th:object="${edit}">
                 <input class="small-input" type="number" min="0" max="100" th:field="*{discount}" placeholder="Скидка">
-                <input type="hidden" th:field="*{id}" />
+                <input type="hidden" th:field="*{categoryId}" />
                 <button type="submit">Применить</button>
             </form>
             <div class="categories-buttons">
-                <a th:href="@{/catalog/categories/{id}/edit(
-                        id=${category.id()},
+                <a th:href="@{/catalog/categories/edit(
+                        categoryId=${category.id()},
                         name=${category.name()},
-                        discount=${category.discount()})}">Редактировать</a>
+                        discount=${category.discount()})}">Изменить</a>
                 <a th:href="@{/catalog/categories/{categoryId}/delete(categoryId=${category.id()})}"
                    onclick="return confirm('Вы уверены, что хотите удалить категорию?');">Удалить</a>
             </div>

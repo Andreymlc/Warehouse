@@ -186,3 +186,13 @@ button:hover {
     gap: 16px;
 
 }
+
+.text-danger {
+    margin: 0;
+    font-size: 15px;
+    color: #d9534f;
+}
+
+p {
+    font-size: 15px;
+}

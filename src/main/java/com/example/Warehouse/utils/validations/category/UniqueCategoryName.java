@@ -1,4 +1,4 @@
-package com.example.Warehouse.utils.validation.user;
+package com.example.Warehouse.utils.validations.category;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
-@Constraint(validatedBy = UniqueUsernameValidation.class)
-public @interface UniqueUsername {
-    String message() default "Username already exists!";
+@Constraint(validatedBy = UniqueCategoryNameValidation.class)
+public @interface UniqueCategoryName {
+    String message() default "Категория с таким именем уже существует";
 
     Class<?>[] groups() default {};
 

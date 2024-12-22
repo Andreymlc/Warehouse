@@ -1,4 +1,4 @@
-package com.example.Warehouse.utils.validation.warehouse;
+package com.example.Warehouse.utils.validations.warehouse;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Constraint(validatedBy = UniqueWarehouseNameValidation.class)
 public @interface UniqueWarehouseName {
-    String message() default "Category already exists";
+    String message() default "Склад с таким названием уже существует";
 
     Class<?>[] groups() default {};
 

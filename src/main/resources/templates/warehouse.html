@@ -13,31 +13,38 @@
 <body>
 <main>
     <div class="forms">
-        <form class="edit-container" th:action="@{/warehouses/{id}/set-minimum(id=${form.warehouseId()})}"
+        <form class="edit-container" th:action="@{/warehouses/set-minimum}"
               th:method="post"
               th:object="${minimum}">
             <h2>Установить минимум</h2>
+            <p th:if="${#fields.hasErrors('productId')}" th:errors="*{productId}" class="text-danger">Error message</p>
             <input th:field="*{productId}" placeholder="Id продукта">
+            <p th:if="${#fields.hasErrors('value')}" th:errors="*{value}" class="text-danger">Error message</p>
             <input type="number" min="0" th:field="*{value}" placeholder="Минимум для товара">
             <input type="hidden" th:field="*{warehouseId}"/>
             <button type="submit">Применить</button>
         </form>
-        <form class="edit-container" th:action="@{/warehouses/{id}/set-maximum(id=${form.warehouseId()})}"
+        <form class="edit-container" th:action="@{/warehouses/set-maximum}"
               th:method="post"
               th:object="${maximum}">
             <h2>Установить максимум</h2>
+            <p th:if="${#fields.hasErrors('productId')}" th:errors="*{productId}" class="text-danger">Error message</p>
             <input th:field="*{productId}" placeholder="Id продукта">
+            <p th:if="${#fields.hasErrors('value')}" th:errors="*{value}" class="text-danger">Error message</p>
             <input type="number" min="0" th:field="*{value}" placeholder="Максиум для товара">
             <input type="hidden" th:field="*{warehouseId}"/>
             <button type="submit">Применить</button>
         </form>
-        <form class="move-container" th:action="@{/warehouses/{warehouseId}/move(warehouseId=${form.warehouseId()})}"
+        <form class="move-container" th:action="@{/warehouses/move-product}"
               th:method="post"
               th:object="${moveForm}">
             <h2>Переместить продукт</h2>
+            <p th:if="${#fields.hasErrors('productId')}" th:errors="*{productId}" class="text-danger">Error message</p>
             <input th:field="*{productId}" placeholder="Id продукта">
+            <p th:if="${#fields.hasErrors('newWarehouseId')}" th:errors="*{newWarehouseId}" class="text-danger">Error message</p>
             <input th:field="*{newWarehouseId}" placeholder="Id склада назначения">
-            <input type="number" min="0" th:field="*{countItems}" placeholder="Количество товара для транспортировки ">
+            <p th:if="${#fields.hasErrors('quantityItems')}" th:errors="*{quantityItems}" class="text-danger">Error message</p>
+            <input type="number" min="0" th:field="*{quantityItems}" placeholder="Количество товара для транспортировки ">
             <input type="hidden" th:field="*{warehouseId}"/>
             <button type="submit">Применить</button>
         </form>

@@ -3,6 +3,7 @@ package com.example.Warehouse.controllers.impl;
 import com.example.Warehouse.models.dto.category.CategorySearchDto;
 import com.example.Warehouse.models.dto.product.ProductSearchDto;
 import com.example.Warehouse.models.dto.warehouse.WarehouseSearchDto;
+import com.example.Warehouse.models.forms.warehouse.WarehouseEditForm;
 import com.example.Warehouse.services.contracts.CategoryService;
 import com.example.Warehouse.services.contracts.ProductService;
 import com.example.Warehouse.services.contracts.WarehouseService;
@@ -43,7 +44,7 @@ public class HomeControllerImpl implements HomeController {
     private final CategoryService categoryService;
     private final WarehouseService warehouseService;
 
-    private static final Logger LOG = LogManager.getLogger(Controller.class);
+    private static final Logger LOG = LogManager.getLogger(HomeControllerImpl.class);
 
     public HomeControllerImpl(
         ModelMapper modelMapper,
@@ -59,13 +60,11 @@ public class HomeControllerImpl implements HomeController {
 
     @Override
     @GetMapping("/admin/warehouses")
-    public String homeAdminPage(
-        @Valid @ModelAttribute("form") WarehousesSearchForm form,
-        BindingResult bindingResult,
-        Model model) {
-
-        if (bindingResult.hasErrors()) return "admin-warehouses";
-
+    public String homeAdminWarehousesPage(
+        @ModelAttribute("form") WarehousesSearchForm form,
+        Model model
+    ) {
+        LOG.info("Find warehouses with search parameters: {}", form);
         var warehousesPage = warehouseService
             .findWarehouses(modelMapper.map(form, WarehouseSearchDto.class));
 
@@ -81,31 +80,26 @@ public class HomeControllerImpl implements HomeController {
 
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
-        model.addAttribute("create", new WarehouseCreateForm("", ""));
+        if (!model.containsAttribute("create")) model.addAttribute("create", new WarehouseCreateForm(null, null));
+        if (!model.containsAttribute("edit")) model.addAttribute("edit", new WarehouseEditForm(null, null, null));
+
+        LOG.info("Returning 'admin-warehouses' view with warehouses data");
 
         return "admin-warehouses";
     }
 
     @Override
     @GetMapping("/admin")
-    public String homeAdminProductsPage(
-        @Valid @ModelAttribute("form") ProductSearchForm form,
-        BindingResult bindingResult,
-        Model model) {
-
-        if (bindingResult.hasErrors()) return "admin-products";
-
-        LOG.info("Fetching products with search parameters: {}", form);
+    public String homeAdminPage(
+        @ModelAttribute("form") ProductSearchForm form,
+        Model model
+    ) {
+        LOG.info("Admin find products with search parameters: {}", form);
 
         var productsPage = productService
             .findProducts(modelMapper.map(form, ProductSearchDto.class));
 
-        LOG.info("Found {} products", productsPage.getTotalElements());
-
         var categories = categoryService.findAllNamesCategories(form.returnDeleted());
-
-        LOG.info("Fetched {} categories", categories.size());
-
         var productViewModels = productsPage
             .stream()
             .map(productDto -> modelMapper.map(productDto, ProductViewModel.class))
@@ -120,9 +114,9 @@ public class HomeControllerImpl implements HomeController {
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
         model.addAttribute("add", new AddProductToAdminCartForm(null));
-        model.addAttribute("createProduct", new ProductCreateForm(null, 0f, null));
+        if (!model.containsAttribute("createProduct")) model.addAttribute("createProduct", new ProductCreateForm(null, 0f, null));
 
-        LOG.info("Returning 'admin-products' view with product data and categories.");
+        LOG.info("Returning 'admin-products' view with products data");
 
         return "admin-products";
     }
@@ -130,15 +124,10 @@ public class HomeControllerImpl implements HomeController {
     @Override
     @GetMapping("/admin/categories")
     public String homeAdminCategoriesPage(
-        @Valid @ModelAttribute("form") CategorySearchForm form,
-        BindingResult bindingResult,
-        Model model) {
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("form", form);
-            return "admin-categories";
-        }
-
+        @ModelAttribute("form") CategorySearchForm form,
+        Model model
+    ) {
+        LOG.info("Find categories with search parameters: {}", form);
         var categoriesPage = categoryService
             .findCategories(modelMapper.map(form, CategorySearchDto.class));
 
@@ -154,8 +143,10 @@ public class HomeControllerImpl implements HomeController {
 
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
-        model.addAttribute("create", new CategoryCreateForm(null, 0));
-        model.addAttribute("edit", new CategoryEditForm(null, null, 0));
+        if (!model.containsAttribute("create")) model.addAttribute("create", new CategoryCreateForm(null, 0));
+        if (!model.containsAttribute("edit")) model.addAttribute("edit", new CategoryEditForm(null, null, 0));
+
+        LOG.info("Returning 'admin-categories' view with categories data");
 
         return "admin-categories";
     }
@@ -163,12 +154,10 @@ public class HomeControllerImpl implements HomeController {
     @Override
     @GetMapping("/user")
     public String homeUserPage(
-        @Valid @ModelAttribute("form") ProductSearchForm form,
-        BindingResult bindingResult,
-        Model model) {
-
-        if (bindingResult.hasErrors()) return "home-user";
-
+        @ModelAttribute("form") ProductSearchForm form,
+        Model model
+    ) {
+        LOG.info("User find products with search parameters: {}", form);
         var productsPage = productService
             .findProducts(modelMapper.map(form, ProductSearchDto.class));
 
@@ -188,6 +177,35 @@ public class HomeControllerImpl implements HomeController {
         model.addAttribute("form", form);
         model.addAttribute("model", viewModel);
         model.addAttribute("add", new AddProductToUserCartForm(null));
+
+        LOG.info("Returning 'home-user' view with products data");
+
+        return "home-user";
+    }
+
+    @GetMapping("/most-popular-products")
+    public String getFiveMostPopularProducts(Model model) {
+        LOG.info("User requests the five most popular products");
+        var productsPage = productService.findFiveMostPopular();
+
+        var categories = categoryService.findAllNamesCategories(false);
+
+        var productViewModels = productsPage
+            .stream()
+            .map(productDto -> modelMapper.map(productDto, ProductViewModel.class))
+            .toList();
+
+        var viewModel = new ProductsViewModel(
+            createBaseViewModel(1, 0),
+            categories,
+            productViewModels
+        );
+
+        model.addAttribute("model", viewModel);
+        model.addAttribute("form", new ProductSearchForm(null, null, null, false));
+        model.addAttribute("add", new AddProductToUserCartForm(null));
+
+        LOG.info("Returning 'home-user' view with five most popular products");
 
         return "home-user";
     }

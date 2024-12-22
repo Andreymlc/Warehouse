@@ -27,16 +27,15 @@
           th:method="post"
           th:object="${createProduct}">
         <h4>Создание продукта</h4>
-        <input class="default-input" type="text" th:field="*{name}" placeholder="Название товара">
-        <input class="default-input" type="text" th:field="*{category}" placeholder="Категория">
-        <input class="default-input" type="number" step="any" min="0" th:field="*{price}" placeholder="Цена">
-        <button type="submit">Создать</button>
         <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger">Error
             message</p>
+        <input class="default-input" type="text" th:field="*{name}" placeholder="Название товара">
         <p th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="text-danger">Error
             message</p>
-        <p th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-danger">Error
-            message</p>
+        <input class="default-input" type="text" th:field="*{category}" placeholder="Категория">
+        <p th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-danger">Error message</p>
+        <input class="default-input" type="number" step="any" min="0" th:field="*{price}" placeholder="Цена">
+        <button type="submit">Создать</button>
     </form>
 </aside>
 <main>
@@ -116,12 +115,12 @@
             <h4 th:text="'Количество: ' + ${product.quantity()}">Количество</h4>
             <div class="card-buttons">
                 <div class="left-buttons">
-                    <a th:href="@{/catalog/products/{id}/edit(
-                            id=${product.id()},
+                    <a th:href="@{/catalog/products/edit(
+                            productId=${product.id()},
                             name=${product.name()},
                             category=${product.category},
                             price=${product.price}
-                            )}">Редактировать</a>
+                            )}">Изменить</a>
                     <a class="delete-button" th:href="@{/catalog/products/{id}/delete(id=${product.id()})}"
                        onclick="return confirm('Вы уверены, что хотите удалить продукт?');">Удалить</a>
                 </div>
@@ -130,7 +129,6 @@
                             th:action="@{/cart/admin/add-product(productId=${product.id()})}"
                             th:method="post"
                             th:object="${add}">
-
                         <button type="submit" class="order">+</button>
                     </form>
                 </div>

@@ -8,6 +8,7 @@ import com.example.Warehouse.domain.entities.Product;
 import com.example.Warehouse.domain.repositories.contracts.product.ProductRepository;
 import com.example.Warehouse.domain.repositories.contracts.product.BaseProductRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,6 +20,11 @@ public class ProductRepositoryImpl extends BaseRepository<BaseProductRepository>
     @Override
     public Optional<Product> findById(String id) {
         return repository.findById(id);
+    }
+
+    @Override
+    public List<Product> findFiveMostPopular() {
+        return repository.findFiveMostPopular();
     }
 
     @Override

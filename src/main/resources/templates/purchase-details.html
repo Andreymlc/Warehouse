@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Детали покупки</title>
+    <link rel="stylesheet" th:href="@{/css/cart.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<header>
+    <div th:replace="~{/navbar}">Navbar</div>
+</header>
+<body>
+<aside>
+    <a th:href="@{/orders/user}">< Назад</a>
+    <h1 class="center-div">Информация по заказу</h1>
+    <h4 th:text="'Номер: ' + ${model.number()}">Номер покупки</h4>
+    <h4 th:text="'Статус: ' + ${model.status()}">Статус</h4>
+    <h4 th:text="'Потрачено баллов: ' + ${model.pointsSpent()}">Потрачено баллов</h4>
+    <h4 th:text="'Получено баллов: ' + ${model.cashback()}">Получено баллов</h4>
+    <h4 th:text="'Дата покупки: ' + ${#temporals.format(model.date(), 'HH:mm dd-MM')}">Дата покупки</h4>
+    <h4 th:text="'Итого: ' + ${model.totalPrice()}">Итоговая цена</h4>
+</aside>
+<main>
+    <div class="products" th:if="${#lists.isEmpty(model.products())}">
+        В заказе ничего нет 😮
+    </div>
+
+    <div class="cards" th:if="${not #lists.isEmpty(model.products())}">
+        <div class="card" th:each="product : ${model.products()}">
+            <h2 th:text="'Название: ' + ${product.name()}">Название Товара</h2>
+            <h4 th:text="'Категория: ' + ${product.category()}">Категория</h4>
+            <h4 th:text="'Цена: ' + ${product.totalPrice()}">Цена</h4>
+            <h4 th:text="'Количество: ' + ${product.quantity()}">Количество</h4>
+        </div>
+    </div>
+</main>
+</body>
+</html>

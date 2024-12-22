@@ -1,4 +1,4 @@
-package com.example.Warehouse.utils.validation.category;
+package com.example.Warehouse.utils.validations.category;
 
 import com.example.Warehouse.domain.repositories.contracts.category.CategoryRepository;
 import jakarta.validation.ConstraintValidator;
@@ -13,6 +13,6 @@ public class UniqueCategoryNameValidation implements ConstraintValidator<UniqueC
 
     @Override
     public boolean isValid(String name, ConstraintValidatorContext constraintValidatorContext) {
-        return categoryRepo.findByName(name).isEmpty();
+        return name != null &&  categoryRepo.findByName(name).isEmpty();
     }
 }

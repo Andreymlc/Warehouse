@@ -10,9 +10,12 @@ import com.example.Warehouse.models.dto.order.OrderItemDto;
 import com.example.Warehouse.services.contracts.OrderService;
 import com.example.Warehouse.services.contracts.WarehouseService;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +34,8 @@ public class OrderServiceImpl implements OrderService {
     private final WarehouseRepository warehouseRepo;
     private final WarehouseService warehouseService;
 
+    private static final Logger LOG = LogManager.getLogger(OrderServiceImpl.class);
+
     public OrderServiceImpl(
         ModelMapper modelMapper,
         UserRepository userRepo,
@@ -48,6 +53,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Cacheable(value = "orders", key = "#username + '-' + #page + '-' + #size")
     public Page<OrderDto> findOrders(String username, int page, int size) {
+        LOG.info(
+            "Cache not found. findOrders called, params: username - {}, page - {}, size - {}",
+            username, page, size
+        );
+
         var sort = Sort.by("date").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
@@ -58,8 +68,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "orders", allEntries = true)
+    @Caching(evict = {
+        @CacheEvict(value = "cart", key = "#username"),
+        @CacheEvict(value = {"orders", "products", "stocks"}, allEntries = true)
+    })
     public void addOrder(String username, String warehouseId) {
+        LOG.info(
+            "Cache 'orders, products, stocks, cartUsername' is cleared. addOrder called, params: username - {}, warehouseId - {}",
+            username, warehouseId
+        );
+
         var existingUser = userRepo.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 

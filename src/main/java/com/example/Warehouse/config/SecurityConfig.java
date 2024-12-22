@@ -35,8 +35,8 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/","/favicon.ico", "/error", "/users/login", "/users/register", "/users/login-error")
                         .permitAll()
-                        .requestMatchers("/cart/**", "/orders/**", "/home/admin/**").authenticated()
                         .requestMatchers("/catalog/**", "/warehouses/**", "/home/admin/**", "/orders/admin/**").hasRole(Roles.ADMIN.name())
+                        .requestMatchers("/cart/**", "/orders/**").authenticated()
                         .anyRequest().authenticated()
             )
             .formLogin(

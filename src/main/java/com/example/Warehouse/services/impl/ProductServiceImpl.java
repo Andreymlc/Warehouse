@@ -13,12 +13,17 @@ import com.example.Warehouse.services.contracts.StockService;
 import com.example.Warehouse.utils.specifications.ProductSpec;
 import com.example.Warehouse.utils.specifications.StockSpec;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -26,6 +31,8 @@ public class ProductServiceImpl implements ProductService {
     private final StockRepository stockRepo;
     private final ProductRepository productRepo;
     private final CategoryRepository categoryRepo;
+
+    private static final Logger LOG = LogManager.getLogger(ProductServiceImpl.class);
 
     public ProductServiceImpl(
         StockService stockService,
@@ -42,6 +49,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Cacheable(value = "products")
     public Page<ProductDto> findProducts(ProductSearchDto productDto) {
+        LOG.info("Cache not found. findProducts called, params: {}", productDto);
+
         var sort = productDto.priceSort().equals("asc")
             ? Sort.by("price").ascending()
             : Sort.by("price").descending();
@@ -75,6 +84,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Cacheable(value = "stocks")
     public Page<ProductStockDto> findProductsByWarehouse(ProductSearchByWarehouseDto productDto) {
+        LOG.info("Cache not found. findProductsByWarehouse called, params: {}", productDto);
+
         var pageable = PageRequest.of(productDto.page() - 1, productDto.size(), Sort.by("quantity"));
 
         Page<Stock> stoksPage = stockRepo.findAllByFilter(
@@ -89,26 +100,27 @@ public class ProductServiceImpl implements ProductService {
             pageable
         );
 
-        return
-            stoksPage.map(s -> {
-                    var product = s.getProduct();
+        return stoksPage.map(s -> {
+                var product = s.getProduct();
 
-                    return new ProductStockDto(
-                        product.getId(),
-                        product.getName(),
-                        s.getQuantity(),
-                        s.getMinStock(),
-                        s.getMaxStock(),
-                        product.getCategory().getName(),
-                        product.getIsDeleted()
-                    );
-                }
-            );
+                return new ProductStockDto(
+                    product.getId(),
+                    product.getName(),
+                    s.getQuantity(),
+                    s.getMinStock(),
+                    s.getMaxStock(),
+                    product.getCategory().getName(),
+                    product.getIsDeleted()
+                );
+            }
+        );
     }
 
     @Override
     @CacheEvict(value = "products", allEntries = true)
     public String addProduct(ProductAddDto productAddDto) {
+        LOG.info("Cache 'products' is cleared. addProduct called, params: {}", productAddDto);
+
         var existingCategory = categoryRepo.findByName(productAddDto.category())
             .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
 
@@ -123,29 +135,53 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @CacheEvict(value = {"products", "stocks"}, allEntries = true)
+    @Caching(evict = {
+        @CacheEvict(value = "product", key = "#productId"),
+        @CacheEvict(value = {"products", "stocks", "cart"}, allEntries = true)
+    })
     public void deleteProduct(String productId) {
-        var product = productRepo.findById(productId)
+        LOG.info("Cache 'products, stocks, cart, productId' is cleared. deleteProduct called, productId - {}", productId);
+
+        productRepo.findById(productId)
+            .ifPresent(p -> {
+                p.setIsDeleted(true);
+                productRepo.save(p);
+            });
+    }
+
+    @Override
+    @CacheEvict(value = {"products", "stocks", "cart"}, allEntries = true)
+    public void editProduct(ProductEditDto productDto) {
+        LOG.info("Cache 'products, stocks, cart' is cleared. editProduct called, params: {}", productDto);
+
+        var product = productRepo.findById(productDto.id())
             .orElseThrow(() -> new EntityNotFoundException("Продукт не найден"));
 
-        product.setIsDeleted(true);
+        product.setName(productDto.name());
+
+        var category = categoryRepo.findByName(productDto.categoryName())
+            .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
+
+        product.setCategory(category);
+        product.setPrice(productDto.price());
+
         productRepo.save(product);
     }
 
     @Override
-    @CacheEvict(value = {"products", "stocks"}, allEntries = true)
-    public void editProduct(String id, String name, String categoryName, float price) {
-        var product = productRepo.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Продукт не найден"));
-
-        product.setName(name);
-
-        var category = categoryRepo.findByName(categoryName)
-            .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
-
-        product.setCategory(category);
-        product.setPrice(price);
-
-        productRepo.save(product);
+    @Cacheable("most-popular")
+    public List<ProductDto> findFiveMostPopular() {
+        return productRepo.findFiveMostPopular()
+            .stream()
+            .map(p -> new ProductDto(
+                p.getId(),
+                p.getName(),
+                (float) Math.round(p.getPrice() * p.getCategory().getDiscount() * 100) / 100,
+                p.getPrice(),
+                p.getCategory().getName(),
+                stockService.findProductQuantityByProductId(p.getId()),
+                p.getIsDeleted()
+            ))
+            .toList();
     }
 }

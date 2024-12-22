@@ -1,4 +1,4 @@
-package com.example.Warehouse.utils.validation.user;
+package com.example.Warehouse.utils.validations.user;
 
 import com.example.Warehouse.domain.repositories.contracts.user.UserRepository;
 import jakarta.validation.ConstraintValidator;
@@ -13,6 +13,6 @@ public class UniqueUsernameValidation implements ConstraintValidator<UniqueUsern
 
     @Override
     public boolean isValid(String username, ConstraintValidatorContext constraintValidatorContext) {
-        return userRepo.findByUsername(username).isEmpty();
+        return username != null &&  userRepo.findByUsername(username).isEmpty();
     }
 }

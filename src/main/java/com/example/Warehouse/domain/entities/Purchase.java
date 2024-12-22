@@ -92,7 +92,7 @@ public class Purchase extends BaseEntity {
         this.user = user;
     }
 
-    @OneToMany(mappedBy = "purchase")
+    @OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL)
     public List<PurchaseItem> getPurchaseItems() {
         return purchaseItems;
     }

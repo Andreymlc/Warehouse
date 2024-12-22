@@ -1,9 +1,12 @@
 package com.example.Warehouse.services.contracts;
 
+import com.example.Warehouse.models.dto.product.ProductMoveDto;
 import com.example.Warehouse.models.dto.warehouse.AddStockDto;
 
 public interface StockService {
     void addStock(AddStockDto addStockDto);
+
+    void moveProduct(ProductMoveDto productDto);
 
     int findProductQuantityByProductId(String productId);
 
@@ -14,6 +17,4 @@ public interface StockService {
     void decrStockQuantity(String warehouseId, String productId, int quantity);
 
     void incrStockQuantity(String warehouseId, String productId, int quantity);
-
-    void moveProduct(String productId, String warehouseId, String newWarehouseId, int quantity);
 }

@@ -1,5 +1,5 @@
 body, html {
-    font-family: 'Popins', sans-serif ;
+    font-family: 'Popins', sans-serif;
     line-height: 1.6;
     height: 100%;
     width: 100%;
@@ -24,8 +24,34 @@ aside {
     font-size: 20px;
 }
 
+aside a {
+    text-decoration: none;
+    font-size: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 0.5em;
+    padding: 7px;
+    background-color: #444;
+    color: white;
+}
+
+aside a:hover {
+    background-color: #555;
+    color: white;
+    border: none;
+    border-radius: 0.5em;
+    padding: 7px;
+    transition: background-color 0.3s;
+}
+
 p {
     margin: 0;
+}
+
+.text-danger {
+    margin: 10px 0 0 0;
+    font-size: 15px;
+    color: #d9534f;
 }
 
 button {

@@ -16,6 +16,7 @@
           th:method="get"
           th:object="${form}">
         <div class="search">
+            <a class="top" th:href="@{/home/most-popular-products}">Топ 5 покупаемых товаров</a>
             <input type="text"
                    th:field="*{pages.substring}"
                    placeholder="Поиск товара по названию"/>
@@ -80,7 +81,8 @@
                 th:text="'Цена: ' + ${product.price()}">Цена</h4>
             <h4 th:text="'Количество: ' + ${product.quantity()}">Количество</h4>
 
-            <form class="add-product"
+            <p th:if="${product.quantity() == 0}">Продукт закончился 🙁</p>
+            <form th:if="${product.quantity() > 0}" class="add-product"
                   th:action="@{/cart/user/add-product(productId=${product.id()})}"
                   th:method="post"
                   th:object="${add}">

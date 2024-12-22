@@ -6,35 +6,34 @@ import com.example.Warehouse.models.forms.purchase.PurchaseChangeStatusForm;
 import com.example.Warehouse.models.forms.purchase.PurchaseCreateForm;
 import com.example.Warehouse.models.forms.purchase.PurchasesSearchForm;
 import jakarta.validation.Valid;
-import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.security.Principal;
 
 @RequestMapping("/orders")
 public interface OrderController extends BaseController {
 
     @GetMapping("/admin")
     String getOrders(
-        Authentication authentication,
-        @Valid @ModelAttribute("form") OrdersSearchForm form,
-        BindingResult bindingResult,
+        Principal principal,
+        @ModelAttribute("form") OrdersSearchForm form,
         Model model);
 
     @GetMapping("/user")
     String getPurchases(
-        Authentication authentication,
-        @Valid @ModelAttribute("form") PurchasesSearchForm form,
-        BindingResult bindingResult,
+        Principal principal,
+        @ModelAttribute("form") PurchasesSearchForm form,
         Model model);
 
     @GetMapping("/admin/manage-purchase")
     String managePurchasePage(
-        @Valid @ModelAttribute("form") PurchasesSearchForm form,
-        BindingResult bindingResult,
+        @ModelAttribute("form") PurchasesSearchForm form,
         Model model);
 
     @GetMapping("/admin/check")
@@ -51,16 +50,16 @@ public interface OrderController extends BaseController {
 
     @PostMapping("/admin/create")
     String createAdminOrder(
-        Authentication authentication,
+        Principal principal,
         @Valid @ModelAttribute("form") OrderCreateForm form,
         BindingResult bindingResult,
-        Model model);
+        RedirectAttributes redirectAttributes);
 
     @PostMapping("/user/create")
     String createUserPurchase(
-        Authentication authentication,
+        Principal principal,
         @Valid @ModelAttribute("form") PurchaseCreateForm form,
         BindingResult bindingResult,
-        Model model);
+        RedirectAttributes redirectAttributes);
 
 }

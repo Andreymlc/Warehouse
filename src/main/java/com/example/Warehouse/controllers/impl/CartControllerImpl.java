@@ -1,7 +1,5 @@
 package com.example.Warehouse.controllers.impl;
 
-import com.example.Warehouse.services.contracts.CartService;
-import com.example.Warehouse.services.contracts.UserService;
 import com.example.Warehouse.controllers.contracts.CartController;
 import com.example.Warehouse.models.forms.cart.AddProductToAdminCartForm;
 import com.example.Warehouse.models.forms.cart.AddProductToUserCartForm;
@@ -11,9 +9,12 @@ import com.example.Warehouse.models.viewmodels.base.BasePagesViewModel;
 import com.example.Warehouse.models.viewmodels.cart.CartAdminViewModel;
 import com.example.Warehouse.models.viewmodels.cart.CartUserViewModel;
 import com.example.Warehouse.models.viewmodels.product.ProductInCartViewModel;
+import com.example.Warehouse.services.contracts.CartService;
+import com.example.Warehouse.services.contracts.UserService;
 import jakarta.validation.Valid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +28,8 @@ public class CartControllerImpl implements CartController {
     private final ModelMapper modelMapper;
     private final CartService cartService;
     private final UserService userService;
+
+    private static final Logger LOG = LogManager.getLogger(CartControllerImpl.class);
 
     public CartControllerImpl(
         ModelMapper modelMapper,
@@ -44,6 +47,7 @@ public class CartControllerImpl implements CartController {
         Principal principal,
         Model model
     ) {
+        LOG.info("User {} requests cart", principal.getName());
         var cart = cartService.findCart(principal.getName());
 
         var productsViewModel = cart
@@ -62,7 +66,9 @@ public class CartControllerImpl implements CartController {
         );
 
         model.addAttribute("model", viewModel);
-        model.addAttribute("orderCreate", new PurchaseCreateForm(0));
+        if (!model.containsAttribute("purchaseCreate")) model.addAttribute("purchaseCreate", new PurchaseCreateForm(0));
+
+        LOG.info("Return 'cart' for User {}", principal.getName());
 
         return "cart";
     }
@@ -73,6 +79,7 @@ public class CartControllerImpl implements CartController {
         Principal principal,
         Model model
     ) {
+        LOG.info("Admin {} requests cart", principal.getName());
         var cart = cartService.findCart(principal.getName());
 
         var productsViewModel = cart
@@ -88,7 +95,9 @@ public class CartControllerImpl implements CartController {
         );
 
         model.addAttribute("model", viewModel);
-        model.addAttribute("orderCreate", new OrderCreateForm(null));
+        if (!model.containsAttribute("orderCreate")) model.addAttribute("orderCreate", new OrderCreateForm(null));
+
+        LOG.info("Return 'cart' for Admin {}", principal.getName());
 
         return "cart";
     }
@@ -101,7 +110,10 @@ public class CartControllerImpl implements CartController {
         BindingResult bindingResult,
         Model model
     ) {
+        LOG.info("Add product '{}' to User cart", add.productId());
         cartService.addProductToCart(principal.getName(), add.productId());
+
+        LOG.info("Successful add product '{}' to User cart", add.productId());
 
         return "redirect:/home/user?returnDeleted=false";
     }
@@ -114,7 +126,10 @@ public class CartControllerImpl implements CartController {
         BindingResult bindingResult,
         Model model
     ) {
+        LOG.info("Add product '{}' to Admin cart", add.productId());
         cartService.addProductToCart(principal.getName(), add.productId());
+
+        LOG.info("Successful add product '{}' to Admin cart", add.productId());
 
         return "redirect:/home/admin?returnDeleted=false";
     }
@@ -126,8 +141,10 @@ public class CartControllerImpl implements CartController {
         @PathVariable("productId") String productId,
         Model model
     ) {
+        LOG.info("Delete product '{}' from User cart", productId);
         cartService.deleteProductFromCart(principal.getName(), productId);
 
+        LOG.info("Successful delete product '{}' from User cart", productId);
         return "redirect:/cart/user";
     }
 
@@ -138,7 +155,10 @@ public class CartControllerImpl implements CartController {
         @PathVariable("productId") String productId,
         Model model
     ) {
+        LOG.info("Delete product '{}' from Admin cart", productId);
         cartService.deleteProductFromCart(principal.getName(), productId);
+
+        LOG.info("Successful delete product '{}' from Admin cart", productId);
 
         return "redirect:/cart/admin";
     }

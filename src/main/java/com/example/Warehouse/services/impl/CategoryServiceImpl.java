@@ -2,6 +2,7 @@ package com.example.Warehouse.services.impl;
 
 import com.example.Warehouse.domain.entities.Category;
 import com.example.Warehouse.domain.repositories.contracts.category.CategoryRepository;
+import com.example.Warehouse.exceptions.CategoryAlreadyExistsException;
 import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.models.dto.category.CategoryAddDto;
 import com.example.Warehouse.models.dto.category.CategoryDto;
@@ -10,6 +11,8 @@ import com.example.Warehouse.models.filters.CategoryFilter;
 import com.example.Warehouse.services.contracts.CategoryService;
 import com.example.Warehouse.utils.specifications.CategorySpec;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,6 +30,8 @@ public class CategoryServiceImpl implements CategoryService {
     private final ModelMapper modelMapper;
     private final CategoryRepository categoryRepo;
 
+    private static final Logger LOG = LogManager.getLogger(CategoryServiceImpl.class);
+
     public CategoryServiceImpl(
         ModelMapper modelMapper,
         CategoryRepository categoryRepo
@@ -38,6 +43,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @CacheEvict(value = "categories", allEntries = true)
     public String create(CategoryAddDto categoryDto) {
+        LOG.info("Cache 'categories' is cleared. categoryCreate called, params: {}", categoryDto);
+
         var existingCategory = categoryRepo.findByName(categoryDto.name());
 
         if (existingCategory.isPresent()) {
@@ -52,29 +59,37 @@ public class CategoryServiceImpl implements CategoryService {
             throw new InvalidDataException("Категория с таким имененм уже существует");
         }
 
-        //var cat = modelMapper.map(categoryDto, Category.class);
-
-        return categoryRepo.save(new Category(categoryDto.name(), 1 - (float) categoryDto.discount() / 100, false)).getId();
+        return categoryRepo.save(
+            new Category(
+                categoryDto.name(),
+                1 - (float) categoryDto.discount() / 100,
+                false
+            )
+        ).getId();
     }
 
     @Override
     @Transactional
-    @CacheEvict(value = {"categories", "products", "stocks"}, allEntries = true)
+    @CacheEvict(value = {"categories", "products", "stocks", "category", "categoryId", "cart"}, allEntries = true)
     public void delete(String id) {
-        var category = categoryRepo.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
+        LOG.info(
+            "Cache 'categories, products, stocks, category, categoryId, cart' is cleared. categoryDelete called, id - {}",
+            id
+        );
 
-        category.getProducts().forEach(p -> p.setIsDeleted(true));
-        category.setIsDeleted(true);
-        categoryRepo.save(category);
+        categoryRepo.findById(id)
+            .ifPresent(c -> {
+                c.getProducts().forEach(p -> p.setIsDeleted(true));
+                c.setIsDeleted(true);
+                categoryRepo.save(c);
+            });
     }
 
     @Override
-    @Cacheable(
-        value = "categories",
-        key = "#categoryDto.substring + '-' + #categoryDto.page + '-' + #categoryDto.size() + '-' + #categoryDto.returnDeleted"
-    )
+    @Cacheable(value = "categories")
     public Page<CategoryDto> findCategories(CategorySearchDto categoryDto) {
+        LOG.info("Cache not found. findCategories called, params: {}", categoryDto);
+
         Pageable pageable = PageRequest
             .of(categoryDto.page() - 1, categoryDto.size(), Sort.by("name"));
 
@@ -94,6 +109,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Cacheable("categories")
     public List<String> findAllNamesCategories(boolean returnDeleted) {
+        LOG.info("Cache not found. findAllNamesCategories called, returnDeleted - {}", returnDeleted);
+
         if (returnDeleted) {
             return categoryRepo.findAll()
                 .stream()
@@ -109,10 +126,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @CacheEvict(value = {"categories", "products", "stocks"}, allEntries = true)
+    @CacheEvict(value = {"categories", "products", "stocks", "category", "cart"}, allEntries = true)
     public void edit(String id, String name, int discount) {
+        LOG.info(
+            "Cache 'categories, products, stocks, category, cart' is cleared. categoryEdit called params: id - {}, name - {}, discount - {}",
+            id, name, discount
+        );
+
         var category = categoryRepo.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Категория не найдена"));
+
+        if (!category.getName().equals(name) && categoryRepo.findByName(name).isPresent()) {
+            throw new CategoryAlreadyExistsException();
+        }
 
         if (name != null) category.setName(name);
         category.setDiscount(1 - (float) discount / 100);

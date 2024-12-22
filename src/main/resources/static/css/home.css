@@ -201,19 +201,6 @@ button .active-button {
     transition: background-color 0.3s;
 }
 
-.delete-button a {
-    color: #fff;
-    border-radius: 0.5em;
-    padding: 5px;
-    background-color: #d9534f;
-    transition: background-color 0.3s;
-}
-
-.delete-button a:hover {
-    background-color: #c9302c;
-    box-shadow: 0 4px 10px rgba(217, 83, 79, 0.5);
-}
-
 .long-button {
     margin: 0;
     color: #555;
@@ -333,4 +320,33 @@ img {
 .right-buttons {
     display: flex;
     justify-content: flex-end;
+}
+
+.text-danger {
+    margin: 10px 0 0 0;
+    font-size: 15px;
+    color: #d9534f;
+}
+
+p {
+    margin: 10px 0 0 0;
+    font-size: 15px;
+}
+
+.top {
+    text-decoration: none;
+    font-size: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+    padding: 5px;
+    color: rgb(0, 119, 204);
+}
+
+.top:hover {
+    background-color: rgb(0, 119, 204);
+    color: white;
+    border: none;
+    border-radius: 0.5em;
+    padding: 5px;
+    transition: background-color 0.3s;
 }

@@ -16,5 +16,7 @@ public interface WarehouseService {
 
     void fill(String warehouseId, List<OrderItemDto> items);
 
+    void edit(String warehouseId, String name, String location);
+
     Page<WarehouseDto> findWarehouses(WarehouseSearchDto warehouseDto);
 }

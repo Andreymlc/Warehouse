@@ -4,10 +4,13 @@ import com.example.Warehouse.domain.entities.Stock;
 import com.example.Warehouse.domain.repositories.contracts.product.ProductRepository;
 import com.example.Warehouse.domain.repositories.contracts.stock.StockRepository;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
-import com.example.Warehouse.models.dto.warehouse.AddStockDto;
 import com.example.Warehouse.exceptions.InvalidDataException;
+import com.example.Warehouse.models.dto.product.ProductMoveDto;
+import com.example.Warehouse.models.dto.warehouse.AddStockDto;
 import com.example.Warehouse.services.contracts.StockService;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +20,8 @@ public class StockServiceImpl implements StockService {
     private final StockRepository stockRepo;
     private final ProductRepository productRepo;
     private final WarehouseRepository warehouseRepo;
+
+    private static final Logger LOG = LogManager.getLogger(StockServiceImpl.class);
 
     public StockServiceImpl(
         StockRepository stockRepo,
@@ -29,8 +34,10 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    @CacheEvict(value="stocks", allEntries = true)
+    @CacheEvict(value = "stocks", allEntries = true)
     public void addStock(AddStockDto addStockDto) {
+        LOG.info("Cache 'stocks' is cleared. addStock called, params: {}", addStockDto);
+
         var existingProduct = productRepo.findById(addStockDto.productId())
             .orElseThrow(() -> new EntityNotFoundException("Продукт не найден"));
 
@@ -54,31 +61,39 @@ public class StockServiceImpl implements StockService {
 
     @Override
     @Transactional
-    @CacheEvict(value="stocks", allEntries = true)
-    public void moveProduct(String productId, String warehouseId, String newWarehouseId, int quantity) {
-        var sourceStock = stockRepo.findForUpdateByProductIdAndWarehouseId(productId, warehouseId)
+    @CacheEvict(value = "stocks", allEntries = true)
+    public void moveProduct(ProductMoveDto productDto) {
+        LOG.info("Cache 'stocks' is cleared. moveProduct called, params: {}", productDto);
+
+        var sourceStock = stockRepo.findForUpdateByProductIdAndWarehouseId(productDto.productId(), productDto.warehouseId())
             .orElseThrow(() -> new EntityNotFoundException("Склад - источник с таким продуктом не найден"));
 
-        var arrivalWarehouse = warehouseRepo.findById(newWarehouseId)
+        var arrivalWarehouse = warehouseRepo.findById(productDto.newWarehouseI())
             .orElseThrow(() -> new InvalidDataException("Склад - получатель не найден"));
 
-        if (sourceStock.getQuantity() < quantity) {
+        if (sourceStock.getQuantity() < productDto.quantity()) {
             throw new InvalidDataException("На складе нет такого количества продукта");
         }
 
-        sourceStock.setQuantity(sourceStock.getQuantity() - quantity);
+        sourceStock.setQuantity(sourceStock.getQuantity() - productDto.quantity());
 
         var stockWithProduct = arrivalWarehouse
             .getStocks()
             .stream()
-            .filter(s -> s.getProduct().getId().equals(productId))
+            .filter(s -> s.getProduct().getId().equals(productDto.productId()))
             .toList();
 
         if (stockWithProduct.isEmpty())
-            addStock(new AddStockDto(quantity, productId, newWarehouseId, 1, quantity));
+            addStock(new AddStockDto(
+                productDto.quantity(),
+                productDto.productId(),
+                productDto.newWarehouseI(),
+                1,
+                productDto.quantity()
+            ));
         else {
             var stock = stockWithProduct.getFirst();
-            stockWithProduct.getFirst().setQuantity(quantity);
+            stockWithProduct.getFirst().setQuantity(productDto.quantity());
             stockRepo.save(stock);
         }
 
@@ -87,8 +102,13 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    @CacheEvict(value="stocks", allEntries = true)
+    @CacheEvict(value = "stocks", allEntries = true)
     public void setMinimum(int minimum, String productId, String warehouseId) {
+        LOG.info(
+            "Cache 'stocks' is cleared. setMinimum called, params: minimum - {}, productId - {}, warehouseId - {}",
+            minimum, productId, warehouseId
+        );
+
         var stock = stockRepo.findByProductIdAndWarehouseId(productId, warehouseId)
             .orElseThrow(() -> new EntityNotFoundException("Склад с таким продуктом не найден"));
 
@@ -98,8 +118,13 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    @CacheEvict(value="stocks", allEntries = true)
+    @CacheEvict(value = "stocks", allEntries = true)
     public void setMaximum(int maximum, String productId, String warehouseId) {
+        LOG.info(
+            "Cache 'stocks' is cleared. setMaximum called, params: minimum - {}, productId - {}, warehouseId - {}",
+            maximum, productId, warehouseId
+        );
+
         var stock = stockRepo.findByProductIdAndWarehouseId(productId, warehouseId)
             .orElseThrow(() -> new EntityNotFoundException("Склад с таким продуктом не найден"));
 
@@ -109,8 +134,13 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    @CacheEvict(value="stocks", allEntries = true)
+    @CacheEvict(value = "stocks", allEntries = true)
     public void incrStockQuantity(String warehouseId, String productId, int quantity) {
+        LOG.info(
+            "Cache 'stocks' is cleared. incrStockQuantity called, params: warehouseId - {}, productId - {}, quantity - {}",
+            warehouseId, productId, quantity
+        );
+
         var stock = stockRepo.findByProductIdAndWarehouseId(productId, warehouseId)
             .orElseThrow(() -> new EntityNotFoundException("Запас не найден"));
 
@@ -124,8 +154,13 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    @CacheEvict(value="stocks", allEntries = true)
+    @CacheEvict(value = "stocks", key = "#warehouseId", allEntries = true)
     public void decrStockQuantity(String warehouseId, String productId, int quantity) {
+        LOG.info(
+            "Cache 'stocks' is cleared. decrStockQuantity called, params: warehouseId - {}, productId - {}, quantity - {}",
+            warehouseId, productId, quantity
+        );
+
         var stock = stockRepo.findByProductIdAndWarehouseId(productId, warehouseId)
             .orElseThrow(() -> new EntityNotFoundException("Запас не найден"));
 

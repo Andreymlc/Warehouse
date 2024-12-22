@@ -1,4 +1,4 @@
-package com.example.Warehouse.utils.validation.warehouse;
+package com.example.Warehouse.utils.validations.warehouse;
 
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
 import jakarta.validation.ConstraintValidator;
@@ -13,6 +13,6 @@ public class ExistingWarehouseValidation implements ConstraintValidator<Existing
 
     @Override
     public boolean isValid(String id, ConstraintValidatorContext constraintValidatorContext) {
-        return warehouseRepo.findById(id).isPresent();
+        return id != null && warehouseRepo.findById(id).isPresent();
     }
 }

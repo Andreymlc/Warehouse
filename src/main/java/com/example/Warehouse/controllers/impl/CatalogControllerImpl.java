@@ -3,6 +3,7 @@ package com.example.Warehouse.controllers.impl;
 import com.example.Warehouse.controllers.contracts.CatalogController;
 import com.example.Warehouse.models.dto.category.CategoryAddDto;
 import com.example.Warehouse.models.dto.product.ProductAddDto;
+import com.example.Warehouse.models.dto.product.ProductEditDto;
 import com.example.Warehouse.models.forms.category.CategoryCreateForm;
 import com.example.Warehouse.models.forms.category.CategoryEditForm;
 import com.example.Warehouse.models.forms.product.ProductCreateForm;
@@ -11,6 +12,8 @@ import com.example.Warehouse.models.viewmodels.base.BasePagesViewModel;
 import com.example.Warehouse.services.contracts.CategoryService;
 import com.example.Warehouse.services.contracts.ProductService;
 import jakarta.validation.Valid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +27,8 @@ public class CatalogControllerImpl implements CatalogController {
     private final ModelMapper modelMapper;
     private final ProductService productService;
     private final CategoryService categoryService;
+
+    private static final Logger LOG = LogManager.getLogger(CatalogControllerImpl.class);
 
     public CatalogControllerImpl(
         ModelMapper modelMapper,
@@ -44,10 +49,19 @@ public class CatalogControllerImpl implements CatalogController {
         Model model
     ) {
         if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("createProduct", createProduct);
+            redirectAttributes.addFlashAttribute(
+                "org.springframework.validation.BindingResult.createProduct",
+                bindingResult
+            );
+
             return "redirect:/home/admin?returnDeleted=false";
         }
 
+        LOG.info("Create product with parameters: {}", createProduct);
         productService.addProduct(modelMapper.map(createProduct, ProductAddDto.class));
+
+        LOG.info("Successful create product with parameters: {}", createProduct);
 
         return "redirect:/home/admin?returnDeleted=false";
     }
@@ -55,33 +69,42 @@ public class CatalogControllerImpl implements CatalogController {
     @Override
     @GetMapping("/products/{productId}/delete")
     public String deleteProduct(@PathVariable("productId") String productId) {
+        LOG.info("Delete product with id: {}", productId);
         productService.deleteProduct(productId);
+
+        LOG.info("Successful delete product with id: {}", productId);
 
         return "redirect:/home/admin?returnDeleted=false";
     }
 
     @Override
-    @GetMapping("/products/{productId}/edit")
+    @GetMapping("/products/edit")
     public String showEditProduct(
-        @PathVariable("productId") String productId,
-        @Valid @ModelAttribute("edit") ProductEditForm edit,
+        @ModelAttribute("edit") ProductEditForm edit,
         Model model
     ) {
-
+        LOG.info("Request show the product '{}' editing page", edit.productId());
         model.addAttribute("form", edit);
 
         return "product-edit";
     }
 
     @Override
-    @PostMapping("/products/{productId}/edit")
+    @PostMapping("/products/edit")
     public String editProduct(
-        @PathVariable("productId") String productId,
         @Valid @ModelAttribute("edit") ProductEditForm edit,
+        BindingResult bindingResult,
         Model model
     ) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("edit", edit);
+            return "product-edit";
+        }
 
-        productService.editProduct(productId, edit.name(), edit.category(), edit.price());
+        LOG.info("Edit product with id: {}", edit.productId());
+        productService.editProduct(modelMapper.map(edit, ProductEditDto.class));
+
+        LOG.info("Successful edit product with id: {}", edit.productId());
 
         return "redirect:/home/admin?returnDeleted=false";
     }
@@ -91,14 +114,23 @@ public class CatalogControllerImpl implements CatalogController {
     public String createCategory(
         @Valid @ModelAttribute("create") CategoryCreateForm create,
         BindingResult bindingResult,
+        RedirectAttributes redirectAttributes,
         Model model
     ) {
-
         if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("create", create);
+            redirectAttributes.addFlashAttribute(
+                "org.springframework.validation.BindingResult.create",
+                bindingResult
+            );
+
             return "redirect:/home/admin/categories?returnDeleted=false";
         }
 
+        LOG.info("Create category with parameters: {}", create);
         categoryService.create(new CategoryAddDto(create.name(), create.discount()));
+
+        LOG.info("Successful create category with parameters: {}", create);
 
         return "redirect:/home/admin/categories?returnDeleted=false";
     }
@@ -106,32 +138,43 @@ public class CatalogControllerImpl implements CatalogController {
     @Override
     @GetMapping("/categories/{categoryId}/delete")
     public String deleteCategory(@PathVariable("categoryId") String categoryId) {
+        LOG.info("Delete category with id: {}", categoryId);
         categoryService.delete(categoryId);
+
+        LOG.info("Successful delete category with id: {}", categoryId);
 
         return "redirect:/home/admin/categories?returnDeleted=false";
     }
 
     @Override
-    @GetMapping("/categories/{categoryId}/edit")
+    @GetMapping("/categories/edit")
     public String showEditCategory(
-        @PathVariable("categoryId") String categoryId,
-        @Valid @ModelAttribute("edit") CategoryEditForm edit,
+        @ModelAttribute("edit") CategoryEditForm edit,
         Model model
     ) {
+        LOG.info("Request show the category '{}' editing page", edit.categoryId());
         model.addAttribute("form", edit);
 
         return "category-edit";
     }
 
     @Override
-    @PostMapping("/categories/{categoryId}/edit")
+    @PostMapping("/categories/edit")
     public String editCategory(
-        @PathVariable("categoryId") String categoryId,
         @Valid @ModelAttribute("edit") CategoryEditForm edit,
+        BindingResult bindingResult,
         Model model
     ) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("edit", edit);
 
-        categoryService.edit(categoryId, edit.name(), edit.discount());
+            return "category-edit";
+        }
+
+        LOG.info("Edit category with id: {}", edit.categoryId());
+        categoryService.edit(edit.categoryId(), edit.name(), edit.discount());
+
+        LOG.info("Successful edit category with id: {}", edit.categoryId());
 
         return "redirect:/home/admin/categories?returnDeleted=false";
     }

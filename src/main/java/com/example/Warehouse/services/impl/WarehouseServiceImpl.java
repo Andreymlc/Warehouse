@@ -3,6 +3,7 @@ package com.example.Warehouse.services.impl;
 import com.example.Warehouse.domain.entities.Stock;
 import com.example.Warehouse.domain.entities.Warehouse;
 import com.example.Warehouse.domain.repositories.contracts.warehouse.WarehouseRepository;
+import com.example.Warehouse.exceptions.WarehouseAlreadyExistsException;
 import com.example.Warehouse.models.dto.order.OrderItemDto;
 import com.example.Warehouse.models.dto.warehouse.AddStockDto;
 import com.example.Warehouse.models.dto.warehouse.WarehouseAddDto;
@@ -13,6 +14,8 @@ import com.example.Warehouse.services.contracts.StockService;
 import com.example.Warehouse.services.contracts.WarehouseService;
 import com.example.Warehouse.utils.specifications.WarehouseSpec;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,6 +35,8 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final StockService stockService;
     private final WarehouseRepository warehouseRepo;
 
+    private static final Logger LOG = LogManager.getLogger(WarehouseServiceImpl.class);
+
     public WarehouseServiceImpl(
         ModelMapper modelMapper,
         StockServiceImpl stockService,
@@ -43,11 +48,10 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    @Cacheable(
-        value = "warehouses",
-        key = "#warehouseDto.substring + '-' + #warehouseDto.size + '-' + #warehouseDto.page + '-' + #warehouseDto.returnDeleted"
-    )
+    @Cacheable(value = "warehouses")
     public Page<WarehouseDto> findWarehouses(WarehouseSearchDto warehouseDto) {
+        LOG.info("Cache not found. findWarehouses called, params: {}", warehouseDto);
+
         Pageable pageable = PageRequest
             .of(warehouseDto.page() - 1, warehouseDto.size(), Sort.by("name"));
 
@@ -74,10 +78,13 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     @CacheEvict(value = "warehouses", allEntries = true)
     public String add(WarehouseAddDto warehouseDto) {
+        LOG.info("Cache 'warehouses' is cleared. addWarehouse called, params: {}", warehouseDto);
+
         return warehouseRepo.save(modelMapper.map(warehouseDto, Warehouse.class)).getId();
     }
 
     public void fill(String warehouseId, List<OrderItemDto> items) {
+        LOG.info("fillWarehouse called, params: warehouseId - {}, items - {}", warehouseId, items);
 
         var existingWarehouse = warehouseRepo.findById(warehouseId)
             .orElseThrow(() -> new EntityNotFoundException("Склад не найден"));
@@ -108,12 +115,32 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    @CacheEvict(value = "warehouses", allEntries = true)
+    @CacheEvict(value = {"warehouses", "stocks", "products"}, allEntries = true)
     public void delete(String warehouseId) {
+        LOG.info("Cache 'warehouses' is cleared. deleteWarehouse called, warehouseId - {}", warehouseId);
+
+        warehouseRepo.findById(warehouseId)
+            .ifPresent(w -> {
+                w.setIsDeleted(true);
+                warehouseRepo.save(w);
+            });
+    }
+
+    @Override
+    @CacheEvict(value = "warehouses", allEntries = true)
+    public void edit(String warehouseId, String name, String location) {
+        LOG.info("Cache 'warehouses' is cleared. editWarehouse called, warehouseId - {}", warehouseId);
+
         var warehouse = warehouseRepo.findById(warehouseId)
             .orElseThrow(() -> new EntityNotFoundException("Склад не найден"));
 
-        warehouse.setIsDeleted(true);
+        if (!warehouse.getName().equals(name) && warehouseRepo.findByName(name).isPresent()) {
+            throw new WarehouseAlreadyExistsException();
+        }
+
+        warehouse.setName(name);
+        warehouse.setLocation(location);
+
         warehouseRepo.save(warehouse);
     }
 }

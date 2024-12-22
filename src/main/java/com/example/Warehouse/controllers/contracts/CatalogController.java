@@ -1,8 +1,6 @@
 package com.example.Warehouse.controllers.contracts;
 
 import com.example.Warehouse.models.forms.product.ProductEditForm;
-import com.example.Warehouse.utils.validation.category.ExistingCategoryId;
-import com.example.Warehouse.utils.validation.product.ExistProduct;
 import jakarta.validation.Valid;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,37 +23,36 @@ public interface CatalogController extends BaseController {
     @GetMapping("/products/{productId}/delete")
     String deleteProduct(@PathVariable("productId") String productId);
 
-    @GetMapping("/products/{productId}/edit")
+    @GetMapping("/products/edit")
     String showEditProduct(
-        @PathVariable("productId") String productId,
-        @Valid @ModelAttribute("edit") ProductEditForm form,
+        @ModelAttribute("edit") ProductEditForm form,
         Model model);
 
-    @PostMapping("/products/{productId}/edit")
+    @PostMapping("/products/edit")
     String editProduct(
-        @PathVariable("productId") String productId,
         @Valid @ModelAttribute("edit") ProductEditForm form,
+        BindingResult bindingResult,
         Model model);
 
     @PostMapping("/categories/create")
     String createCategory(
         @Valid @ModelAttribute("create") CategoryCreateForm create,
         BindingResult bindingResult,
+        RedirectAttributes redirectAttributes,
         Model model);
 
     @GetMapping("/categories/{categoryId}/delete")
     String deleteCategory(@PathVariable("categoryId") String categoryId);
 
-    @GetMapping("/categories/{categoryId}/edit")
+    @GetMapping("/categories/edit")
     String showEditCategory(
-        @PathVariable("categoryId") String categoryId,
-        @Valid @ModelAttribute("edit") CategoryEditForm edit,
+        @ModelAttribute("edit") CategoryEditForm edit,
         Model model);
 
-    @PostMapping("/categories/{categoryId}/edit")
+    @PostMapping("/categories/edit")
     String editCategory(
-        @PathVariable("categoryId") String categoryId,
         @Valid @ModelAttribute("edit") CategoryEditForm edit,
+        BindingResult bindingResult,
         Model model);
 
 }

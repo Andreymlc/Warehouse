@@ -8,6 +8,8 @@ import com.example.Warehouse.models.dto.product.ProductCartDto;
 import com.example.Warehouse.exceptions.InvalidDataException;
 import com.example.Warehouse.services.contracts.CartService;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ public class CartServiceImpl implements CartService {
     private final UserRepository userRepo;
     private final ProductRepository productRepo;
 
+    private static final Logger LOG = LogManager.getLogger(CartServiceImpl.class);
+
     public CartServiceImpl(
         UserRepository userRepo,
         ProductRepository productRepo
@@ -31,6 +35,8 @@ public class CartServiceImpl implements CartService {
     @Override
     @Cacheable("cart")
     public CartDto findCart(String username) {
+        LOG.info("Cache not found. findCart called, username - {}", username);
+
         var user = userRepo.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 
@@ -45,24 +51,27 @@ public class CartServiceImpl implements CartService {
             var category = product.getCategory();
 
             productCartDto.add(new ProductCartDto(
-                    product.getId(),
-                    product.getName(),
-                    category.getName(),
-                    item.getQuantity(),
-                    (float) Math.round(product.getPrice() * category.getDiscount() * 100) / 100 * item.getQuantity()
-                )
-            );
+                product.getId(),
+                product.getName(),
+                category.getName(),
+                item.getQuantity(),
+                (float) Math.round(product.getPrice() * category.getDiscount() * 100) / 100 * item.getQuantity()
+            ));
 
             totalPrice += productCartDto.getLast().totalPrice();
         }
-
 
         return new CartDto(totalPrice, productCartDto);
     }
 
     @Override
-    @CacheEvict(value = "cart", allEntries = true)
+    @CacheEvict(value = "cart", key = "#username")
     public void addProductToCart(String username, String productId) {
+        LOG.info(
+            "Cache 'cart' is cleared. addProductToCart called, params: username: {}, productId: {}",
+            username, productId
+        );
+
         var existingUser = userRepo.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 
@@ -87,8 +96,13 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    @CacheEvict(value = "cart", allEntries = true)
+    @CacheEvict(value = "cart", key = "#username")
     public void deleteProductFromCart(String username, String productId) {
+        LOG.info(
+            "Cache 'cart' is cleared. deleteProductFromCart called, params: username: {}, productId: {}",
+            username, productId
+        );
+
         var existingUser = userRepo.findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 

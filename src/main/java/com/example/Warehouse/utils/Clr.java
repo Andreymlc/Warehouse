@@ -12,9 +12,12 @@ import com.example.Warehouse.services.contracts.CategoryService;
 import com.example.Warehouse.services.contracts.ProductService;
 import com.example.Warehouse.services.contracts.StockService;
 import com.example.Warehouse.services.contracts.WarehouseService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -29,6 +32,8 @@ public class Clr implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final CategoryService categoryService;
     private final WarehouseService warehouseService;
+
+    private static final Logger LOG = LogManager.getLogger(Clr.class);
 
     @Autowired
     public Clr(
@@ -51,7 +56,7 @@ public class Clr implements CommandLineRunner {
         var existingWarehouse = warehouseService.findWarehouses(new WarehouseSearchDto(1, 12, "", true));
 
         if (existingWarehouse.isEmpty()) {
-            System.out.println("База дынных пуста. Заполняем..");
+            LOG.info("База дынных пуста. Заполняем..");
 
             List<WarehouseAddDto> initialWarehouses = Arrays.asList(
                 new WarehouseAddDto("Склад 1", "Останкино"),
@@ -79,7 +84,7 @@ public class Clr implements CommandLineRunner {
             );
 
             for (var category : initialCategories) {
-                System.out.println("Id: " + categoryService.create(category));
+                categoryService.create(category);
             }
 
             List<ProductAddDto> initialProducts = Arrays.asList(
@@ -119,7 +124,7 @@ public class Clr implements CommandLineRunner {
             roleRepository.save(new Role(Roles.USER));
             roleRepository.save(new Role(Roles.ADMIN));
 
-            System.out.println("Начальные данные добавлены успешно");
+            LOG.info("Начальные данные добавлены успешно");
         }
     }
 }

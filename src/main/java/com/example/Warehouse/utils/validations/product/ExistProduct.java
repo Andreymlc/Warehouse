@@ -1,4 +1,4 @@
-package com.example.Warehouse.utils.validation.warehouse;
+package com.example.Warehouse.utils.validations.product;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
-@Constraint(validatedBy = ExistingWarehouseValidation.class)
-public @interface ExistingWarehouse {
-    String message() default "Category not found";
+@Constraint(validatedBy = ExistProductValidation.class)
+public @interface ExistProduct {
+    String message() default "Продукт не найден";
 
     Class<?>[] groups() default {};
 

@@ -15,7 +15,7 @@ main {
 }
 
 .card {
-    border: 2px dashed #555;
+    border: 2px solid rgb(0, 119, 204);
     border-radius: 8px;
     padding: 8px;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -67,7 +67,7 @@ main {
     transition: background-color 0.3s;
 }
 
-.delete-button a {
+.delete-button{
     color: #fff;
     padding: 5px;
     border-radius: 0.5em;
@@ -75,7 +75,7 @@ main {
     transition: background-color 0.3s;
 }
 
-.delete-button a:hover {
+.delete-button:hover {
     background-color: #c9302c;
     border: none;
     box-shadow: 0 4px 10px rgba(217, 83, 79, 0.5);

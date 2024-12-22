@@ -1,4 +1,4 @@
-package com.example.Warehouse.utils.validation.category;
+package com.example.Warehouse.utils.validations.category;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
