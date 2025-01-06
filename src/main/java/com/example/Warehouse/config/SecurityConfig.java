@@ -33,23 +33,23 @@ public class SecurityConfig {
                     authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                         .permitAll()
-                        .requestMatchers("/","/favicon.ico", "/error", "/users/login", "/users/register", "/users/login-error", "/home/user")
+                        .requestMatchers("/","/favicon.ico", "/error", "/auth/login", "/auth/register", "/auth/login-error", "/catalog", "/catalog/most-popular-products")
                         .permitAll()
-                        .requestMatchers("/catalog/**", "/warehouses/**", "/home/admin/**", "/orders/admin/**").hasRole(Roles.ADMIN.name())
+                        .requestMatchers("/catalog/admin/**", "/warehouses/**", "/catalog/categpries/**", "/catalog/products/**", "/orders/admin/**").hasRole(Roles.ADMIN.name())
                         .requestMatchers("/cart/**", "/orders/**").authenticated()
                         .anyRequest().authenticated()
             )
             .formLogin(
                 (formLogin) ->
                     formLogin
-                        .loginPage("/users/login")
+                        .loginPage("/auth/login")
                         .usernameParameter(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY)
                         .passwordParameter(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_PASSWORD_KEY)
                         .defaultSuccessUrl("/")
-                        .failureForwardUrl("/users/login-error")
+                        .failureForwardUrl("/auth/login-error")
             ).userDetailsService(userDetailsService())
             .logout((logout) ->
-                logout.logoutUrl("/users/logout")
+                logout.logoutUrl("/auth/logout")
                     .logoutSuccessUrl("/")
                     .invalidateHttpSession(true)
             ).securityContext(

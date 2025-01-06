@@ -1,6 +1,8 @@
 package com.example.Warehouse.controllers.contracts;
 
+import com.example.Warehouse.models.forms.category.CategorySearchForm;
 import com.example.Warehouse.models.forms.product.ProductEditForm;
+import com.example.Warehouse.models.forms.product.ProductSearchForm;
 import jakarta.validation.Valid;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,19 @@ public interface CatalogController extends BaseController {
         BindingResult bindingResult,
         RedirectAttributes redirectAttributes,
         Model model);
+
+    @GetMapping("/admin/products")
+    String productAdminPage(
+        @ModelAttribute("form") ProductSearchForm form,
+        Model model);
+
+    @GetMapping
+    String productUserPage(
+        @ModelAttribute("form") ProductSearchForm form,
+        Model model);
+
+    @GetMapping("/most-popular-products")
+    String getFiveMostPopularProducts(Model model);
 
     @GetMapping("/products/{productId}/delete")
     String deleteProduct(@PathVariable("productId") String productId);
@@ -39,6 +54,11 @@ public interface CatalogController extends BaseController {
         @Valid @ModelAttribute("create") CategoryCreateForm create,
         BindingResult bindingResult,
         RedirectAttributes redirectAttributes,
+        Model model);
+
+    @GetMapping("/admin/categories")
+    String homeAdminCategoriesPage(
+        @ModelAttribute("form") CategorySearchForm form,
         Model model);
 
     @GetMapping("/categories/{categoryId}/delete")

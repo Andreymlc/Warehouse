@@ -47,7 +47,6 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException("Пользователь с таким именем уже существует");
 
         var user = new User(
-            registerUserDto.email(),
             0,
             registerUserDto.userName(),
             passwordEncoder.encode(registerUserDto.password())

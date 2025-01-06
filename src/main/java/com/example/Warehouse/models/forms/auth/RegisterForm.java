@@ -5,19 +5,10 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public final class RegisterForm {
-    private String email;
     private boolean role;
     private String userName;
     private String password;
     private String confirmPassword;
-
-    public @Email(message = "Некорректный E-mail") String getEmail() {
-        return email;
-    }
-
-    public void setEmail(@Email(message = "Некорректный E-mail") String email) {
-        this.email = email;
-    }
 
     public boolean isRole() {
         return role;

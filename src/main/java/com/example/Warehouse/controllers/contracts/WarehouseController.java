@@ -5,6 +5,7 @@ import com.example.Warehouse.models.forms.product.ProductSetMinMaxForm;
 import com.example.Warehouse.models.forms.product.ProductWarehouseSearchForm;
 import com.example.Warehouse.models.forms.warehouse.WarehouseCreateForm;
 import com.example.Warehouse.models.forms.warehouse.WarehouseEditForm;
+import com.example.Warehouse.models.forms.warehouse.WarehousesSearchForm;
 import jakarta.validation.Valid;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,6 +20,11 @@ public interface WarehouseController extends BaseController {
         @Valid @ModelAttribute("create") WarehouseCreateForm create,
         BindingResult bindingResult,
         RedirectAttributes redirectAttributes,
+        Model model);
+
+    @GetMapping
+    String homeAdminWarehousesPage(
+        @ModelAttribute("form") WarehousesSearchForm form,
         Model model);
 
     @PostMapping("/edit")

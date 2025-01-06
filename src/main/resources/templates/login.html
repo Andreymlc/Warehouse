@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <title>Вход</title>
     <link rel="stylesheet" th:href="@{/css/auth.css}"/>
+    <link rel="icon" href="/icon/favicon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 <main>
-    <form th:action="@{/users/login}"
+    <form th:action="@{/auth/login}"
           th:method="post"
           class="auth">
         <p class="auth-title">Вход</p>
         <input id="username" th:value="${username}" name="username" type="text" placeholder="Имя пользователя">
         <input id="password" name="password" type="password" aria-describedby="passwordHelp" placeholder="Пароль">
         <button  type="submit">Войти</button>
-        <a href="/users/register">Регистрация</a>
+        <a href="/auth/register">Регистрация</a>
     </form>
     <p class="text-danger" th:if="${badCredentials}">
         Некорректное имя пользователя или пароль

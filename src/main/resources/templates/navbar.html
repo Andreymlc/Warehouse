@@ -1,13 +1,14 @@
 <nav xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
     <ul>
         <li>
+            <img src="/icon/logo.png" alt="Logo"/>
             <h2>Warehouse</h2>
         </li>
         <li sec:authorize="hasRole('ADMIN')">
-            <a th:href="@{/home/admin(returnDeleted=false)}">Главная</a>
+            <a th:href="@{/catalog/admin/products(returnDeleted=false)}">Главная</a>
         </li>
         <li sec:authorize="hasRole('USER')">
-            <a th:href="@{/home/user(returnDeleted=false)}">Каталог</a>
+            <a th:href="@{/catalog(returnDeleted=false)}">Каталог</a>
         </li>
         <li sec:authorize="hasRole('ADMIN')">
             <a th:href="@{/orders/admin}">Мои заказы</a>
@@ -24,21 +25,21 @@
         <li sec:authorize="hasRole('USER')">
             <a th:href="@{/cart/user}">Корзина</a><!--span-->
         </li>
-        <li>
+        <li style="font-weight: bold" sec:authorize="isAuthenticated()">
             <th:block sec:authentication="name"></th:block>
         </li>
         <li sec:authorize="isAuthenticated()">
             <form
-                    th:method="post"
-                    th:action="@{/users/logout}">
+                th:method="post"
+                th:action="@{/auth/logout}">
                 <button type="submit" value="Logout">Logout</button>
             </form>
         </li>
         <li sec:authorize="!isAuthenticated()">
-            <a th:href="@{/users/register}">Register</a>
+            <a th:href="@{/auth/register}">Register</a>
         </li>
         <li sec:authorize="!isAuthenticated()">
-            <a th:href="@{/users/login}">Login</a>
+            <a th:href="@{/auth/login}">Login</a>
         </li>
     </ul>
 </nav>

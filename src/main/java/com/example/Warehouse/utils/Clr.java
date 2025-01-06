@@ -76,11 +76,11 @@ public class Clr implements CommandLineRunner {
             }
 
             var initialCategories = Arrays.asList(
-                new CategoryAddDto("Мебель", 1),
-                new CategoryAddDto("Одежда", 1),
-                new CategoryAddDto("Концелярия", 1),
-                new CategoryAddDto("Обувь", 1),
-                new CategoryAddDto("Еда", 1)
+                new CategoryAddDto("Мебель", 0),
+                new CategoryAddDto("Одежда", 0),
+                new CategoryAddDto("Концелярия", 0),
+                new CategoryAddDto("Обувь", 0),
+                new CategoryAddDto("Еда", 0)
             );
 
             for (var category : initialCategories) {

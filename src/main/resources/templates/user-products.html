@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Пользователь главная</title>
-    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/catalog.css}">
     <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="icon" href="/icon/favicon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <header>
@@ -12,11 +13,11 @@
 </header>
 <body class="center-div">
 <main class="center-main">
-    <form th:action="@{/home/user}"
+    <form th:action="@{/catalog}"
           th:method="get"
           th:object="${form}">
         <div class="search">
-            <a class="top" th:href="@{/home/most-popular-products}">Топ 5 покупаемых товаров</a>
+            <a class="top" th:href="@{/catalog/most-popular-products}">Топ 5 покупаемых товаров</a>
             <input type="text"
                    th:field="*{pages.substring}"
                    placeholder="Поиск товара по названию"/>
@@ -53,7 +54,7 @@
                     th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
                     th:classappend="${pageNumber == form.pages.page()} ? 'active'">
                 <a class="page-picker"
-                   th:href="@{/home/user(
+                   th:href="@{/catalog/user/products(
                                     category=${form.category()},
                                     priceSort=${form.priceSort()},
                                     pages.page=${pageNumber},

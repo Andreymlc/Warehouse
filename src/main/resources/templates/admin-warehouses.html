@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Админ склады</title>
-    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/catalog.css}">
     <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="icon" href="/icon/favicon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <header>
@@ -14,13 +15,13 @@
 <aside>
     <ul>
         <li>
-            <a class="active-button" th:href="@{/home/admin/warehouses(returnDeleted=${form.returnDeleted})}">Все склады</a>
+            <a class="active-button" th:href="@{/warehouses(returnDeleted=${form.returnDeleted})}">Все склады</a>
         </li>
         <li>
-            <a th:href="@{/home/admin(returnDeleted=${form.returnDeleted})}">Каталог товаров</a>
+            <a th:href="@{/catalog/admin/products(returnDeleted=${form.returnDeleted})}">Каталог товаров</a>
         </li>
         <li>
-            <a th:href="@{/home/admin/categories(returnDeleted=${form.returnDeleted})}">Категории</a>
+            <a th:href="@{/catalog/admin/categories(returnDeleted=${form.returnDeleted})}">Категории</a>
         </li>
     </ul>
     <form class="standard-form" th:action="@{/warehouses/create}"
@@ -35,7 +36,7 @@
     </form>
 </aside>
 <main>
-    <form th:action="@{/home/admin/warehouses}"
+    <form th:action="@{/warehouses}"
           th:method="get"
           th:object="${form}">
         <div class="search">
@@ -58,7 +59,7 @@
                     th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
                     th:classappend="${pageNumber == form.pages().page()} ? 'active'">
                 <a class="page-picker"
-                   th:href="@{/home/admin/warehouses(
+                   th:href="@{/warehouses(
                                        returnDeleted=${form.returnDeleted},
                                        pages.page=${pageNumber},
                                        pages.size=${form.pages().size()},
@@ -77,7 +78,7 @@
         <div class="card" th:each="warehouse : ${model.warehouses()}">
             <div style="display: flex;">
                 <h2 th:text="'Название: ' + ${warehouse.name()}">Название склада</h2>
-                <img th:if="${warehouse.isDeleted()}" src="/css/icon/trash-can_115312.png" alt="Удален"/>
+                <img th:if="${warehouse.isDeleted()}" src="/icon/trash-can_115312.png" alt="Удален"/>
             </div>
             <h4 th:text="'Локация: ' + ${warehouse.location()}">Локация</h4>
             <h5 th:text="'ID: ' + ${warehouse.id()}">ID</h5>

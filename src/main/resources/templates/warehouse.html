@@ -5,6 +5,7 @@
     <title>Управление складом</title>
     <link rel="stylesheet" th:href="@{/css/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/warehouse.css}">
+    <link rel="icon" href="/icon/favicon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <header>
@@ -81,8 +82,8 @@
     <div class="pages" th:if="${model.base().totalPages() > 1}">
         <ul class="pages-ul">
             <li
-                    th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
-                    th:classappend="${pageNumber == form.pages.page()} ? 'active'">
+                th:each="pageNumber : ${#numbers.sequence(1, model.base().totalPages())}"
+                th:classappend="${pageNumber == form.pages.page()} ? 'active'">
                 <a class="page-picker"
                    th:href="@{/warehouses/{warehouseId}/manage(
                                 warehouseId=${form.warehouseId},
@@ -103,7 +104,7 @@
         <div class="card" th:each="product : ${model.products()}">
             <div style="display: flex;">
                 <h2 th:text="'Название: ' + ${product.name()}">Название Товара</h2>
-                <img th:if="${product.isDeleted()}" src="/css/icon/trash-can_115312.png" alt="Удален"/>
+                <img th:if="${product.isDeleted()}" src="/icon/trash-can_115312.png" alt="Удален"/>
             </div>
             <h4 th:text="'Категория: ' + ${product.category()}">Категория</h4>
             <h4 th:text="'Количество: ' + ${product.quantity()}">Количество</h4>

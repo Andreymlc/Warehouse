@@ -120,7 +120,7 @@ public class CartControllerImpl implements CartController {
                 bindingResult
             );
 
-            return "redirect:/home/user?returnDeleted=false";
+            return "redirect:/catalog?returnDeleted=false";
         }
 
         LOG.info("Add product '{}' to User cart", add.productId());
@@ -128,7 +128,7 @@ public class CartControllerImpl implements CartController {
 
         LOG.info("Successful add product '{}' to User cart", add.productId());
 
-        return "redirect:/home/user?returnDeleted=false";
+        return "redirect:/catalog?returnDeleted=false";
     }
 
     @Override
@@ -148,7 +148,7 @@ public class CartControllerImpl implements CartController {
                 bindingResult
             );
 
-            return "redirect:/home/user?returnDeleted=false";
+            return "redirect:/catalog/admin/products?returnDeleted=false";
         }
 
         LOG.info("Add product '{}' to Admin cart", add.productId());
@@ -156,7 +156,7 @@ public class CartControllerImpl implements CartController {
 
         LOG.info("Successful add product '{}' to Admin cart", add.productId());
 
-        return "redirect:/home/admin?returnDeleted=false";
+        return "redirect:/catalog/admin/products?returnDeleted=false";
     }
 
     @Override

@@ -4,25 +4,25 @@
         <meta charset="UTF-8">
         <title>Регистрация</title>
         <link rel="stylesheet" th:href="@{/css/auth.css}"/>
+        <link rel="icon" href="/icon/favicon.png" type="image/x-icon">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     </head>
     <body>
         <main>
-            <form th:action="@{/users/register}"
+            <form th:action="@{/auth/register}"
                   th:object="${form}"
                   th:method="post"
                   class="auth">
                 <p class="auth-title">Регистрация</p>
                 <input th:field="*{userName}" name="username" type="text" placeholder="Имя пользователя">
-                <input th:field="*{email}" name="email" type="text" placeholder="Почта">
-                <input th:field="*{password}" name="password" type="text" placeholder="Пароль">
-                <input th:field="*{confirmPassword}" name="confirmPassword" type="text" placeholder="Пароль еще раз">
+                <input th:field="*{password}" name="password" type="password" placeholder="Пароль">
+                <input th:field="*{confirmPassword}" name="confirmPassword" type="password" placeholder="Пароль еще раз">
                 <div>
                     Админ:
                     <input th:field="*{role}" class="role-checkbox" type="checkbox">
                 </div>
                 <button type="submit">Зарегистрироваться</button>
-                <a href="/users/login">Вход</a>
+                <a href="/auth/login">Вход</a>
             </form>
         </main>
     </body>

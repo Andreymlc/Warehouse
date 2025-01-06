@@ -4,14 +4,18 @@ import com.example.Warehouse.controllers.contracts.WarehouseController;
 import com.example.Warehouse.models.dto.product.ProductMoveDto;
 import com.example.Warehouse.models.dto.product.ProductSearchByWarehouseDto;
 import com.example.Warehouse.models.dto.warehouse.WarehouseAddDto;
+import com.example.Warehouse.models.dto.warehouse.WarehouseSearchDto;
 import com.example.Warehouse.models.forms.product.ProductMoveForm;
 import com.example.Warehouse.models.forms.product.ProductSetMinMaxForm;
 import com.example.Warehouse.models.forms.product.ProductWarehouseSearchForm;
 import com.example.Warehouse.models.forms.warehouse.WarehouseCreateForm;
 import com.example.Warehouse.models.forms.warehouse.WarehouseEditForm;
+import com.example.Warehouse.models.forms.warehouse.WarehousesSearchForm;
 import com.example.Warehouse.models.viewmodels.base.BasePagesViewModel;
 import com.example.Warehouse.models.viewmodels.product.ProductStockViewModel;
 import com.example.Warehouse.models.viewmodels.product.ProductsStockViewModel;
+import com.example.Warehouse.models.viewmodels.warehouse.WarehouseViewModel;
+import com.example.Warehouse.models.viewmodels.warehouse.WarehousesViewModel;
 import com.example.Warehouse.services.contracts.CategoryService;
 import com.example.Warehouse.services.contracts.ProductService;
 import com.example.Warehouse.services.contracts.StockService;
@@ -66,7 +70,7 @@ public class WarehouseControllerImpl implements WarehouseController {
                 bindingResult
             );
 
-            return "redirect:/home/admin/warehouses?returnDeleted=false";
+            return "redirect:/warehouses?returnDeleted=false";
         }
 
         LOG.info("Create warehouse with parameters: {}", create);
@@ -74,7 +78,37 @@ public class WarehouseControllerImpl implements WarehouseController {
 
         LOG.info("Successful create warehouse with parameters: {}", create);
 
-        return "redirect:/home/admin/warehouses?returnDeleted=false";
+        return "redirect:/warehouses?returnDeleted=false";
+    }
+
+    @Override
+    @GetMapping
+    public String homeAdminWarehousesPage(
+        @ModelAttribute("form") WarehousesSearchForm form,
+        Model model
+    ) {
+        LOG.info("Find warehouses with search parameters: {}", form);
+        var warehousesPage = warehouseService
+            .findWarehouses(modelMapper.map(form, WarehouseSearchDto.class));
+
+        var warehouseViewModels = warehousesPage
+            .stream()
+            .map(warehouseDto -> modelMapper.map(warehouseDto, WarehouseViewModel.class))
+            .toList();
+
+        var viewModel = new WarehousesViewModel(
+            createBaseViewModel(warehousesPage.getTotalPages(), 0),
+            warehouseViewModels
+        );
+
+        model.addAttribute("form", form);
+        model.addAttribute("model", viewModel);
+        if (!model.containsAttribute("create")) model.addAttribute("create", new WarehouseCreateForm(null, null));
+        if (!model.containsAttribute("edit")) model.addAttribute("edit", new WarehouseEditForm(null, null, null));
+
+        LOG.info("Returning 'admin-warehouses' view with warehouses data");
+
+        return "admin-warehouses";
     }
 
     @Override
@@ -212,7 +246,7 @@ public class WarehouseControllerImpl implements WarehouseController {
 
         LOG.info("Successful delete category with id: {}", warehouseId);
 
-        return "redirect:/home/admin/warehouses?returnDeleted=false";
+        return "redirect:/warehouses?returnDeleted=false";
     }
 
     @GetMapping("/edit")
@@ -245,7 +279,7 @@ public class WarehouseControllerImpl implements WarehouseController {
 
         LOG.info("Successful edit category with id: {}", edit.warehouseId());
 
-        return "redirect:/home/admin/warehouses?returnDeleted=false";
+        return "redirect:/warehouses?returnDeleted=false";
     }
 
     @Override

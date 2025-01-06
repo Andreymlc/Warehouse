@@ -42,7 +42,6 @@ public class MapperConfig {
         modelMapper.typeMap(RegisterForm.class, RegisterUserDto.class).setProvider(ctx -> {
             RegisterForm source = (RegisterForm) ctx.getSource();
             return new RegisterUserDto(
-                source.getEmail(),
                 source.isRole(),
                 source.getUserName(),
                 source.getPassword(),

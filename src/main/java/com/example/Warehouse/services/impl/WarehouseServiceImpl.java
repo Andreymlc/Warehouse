@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -116,7 +117,10 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    @CacheEvict(value = {"warehouses", "stocks", "products"}, allEntries = true)
+    @Caching(evict = {
+        @CacheEvict(value = "warehouse", key = "#warehouseId"),
+        @CacheEvict(value = {"warehouses", "stocks", "products"}, allEntries = true)
+    })
     public void delete(String warehouseId) {
         LOG.info("Cache 'warehouses' is cleared. deleteWarehouse called, warehouseId - {}", warehouseId);
 

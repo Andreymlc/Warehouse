@@ -2,7 +2,7 @@ package com.example.Warehouse.controllers.impl;
 
 import com.example.Warehouse.models.dto.auth.RegisterUserDto;
 import com.example.Warehouse.services.contracts.UserService;
-import com.example.Warehouse.controllers.contracts.UserController;
+import com.example.Warehouse.controllers.contracts.AuthController;
 import com.example.Warehouse.models.forms.auth.RegisterForm;
 import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
@@ -19,14 +19,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 @Controller
-@RequestMapping("/users")
-public class UserControllerImpl implements UserController {
+@RequestMapping("/auth")
+public class AuthControllerImpl implements AuthController {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
     private static final Logger LOG = LogManager.getLogger(Controller.class);
 
-    public UserControllerImpl(
+    public AuthControllerImpl(
         UserService userService,
         ModelMapper modelMapper
     ) {
@@ -58,7 +58,7 @@ public class UserControllerImpl implements UserController {
             redirectAttributes.addFlashAttribute("userRegistrationDto", form);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userRegistrationDto", bindingResult);
 
-            return "redirect:/users/register";
+            return "redirect:/auth/register";
         }
 
         LOG.info("Register new user {}", form.getUserName());
@@ -66,7 +66,7 @@ public class UserControllerImpl implements UserController {
 
         LOG.info("Successful register new user {}", form.getUserName());
 
-        return "redirect:/users/login";
+        return "redirect:/auth/login";
     }
 
     @Override
@@ -86,6 +86,6 @@ public class UserControllerImpl implements UserController {
         redirectAttributes.addFlashAttribute(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY, username);
         redirectAttributes.addFlashAttribute("badCredentials", true);
 
-        return "redirect:/users/login";
+        return "redirect:/auth/login";
     }
 }

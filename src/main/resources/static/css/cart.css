@@ -4,21 +4,22 @@ body, html {
     height: 100%;
     width: 100%;
     display: flex;
-    justify-content: center;
+    position: fixed;
 }
 
 main {
     width: 80%;
     display: flex;
-    margin-top: 105px;
+    margin-top: 75px;
     align-items: flex-start;
 }
 
 aside {
     width: 20%;
-    margin-top: 105px;
+    margin-top: 60px;
     margin-left: 20px;
     margin-right: 20px;
+    padding-top: 20px;
     border-right: 2px solid #555555;
     tab-size: 15px;
     font-size: 20px;

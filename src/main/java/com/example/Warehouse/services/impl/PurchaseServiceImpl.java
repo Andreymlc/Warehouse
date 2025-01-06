@@ -57,11 +57,10 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    @Transactional
+    @Transactional()
     @Caching(evict = {
-        @CacheEvict(value = "cart", key = "#username"),
-        @CacheEvict(value = "points", key = "#username"),
-        @CacheEvict(value = "purchases", allEntries = true)
+        @CacheEvict(value = "purchases", allEntries = true),
+        @CacheEvict(value = {"cart", "points"}, key = "#username")
     })
     public void addPurchase(String username, int pointsSpent) {
         LOG.info(

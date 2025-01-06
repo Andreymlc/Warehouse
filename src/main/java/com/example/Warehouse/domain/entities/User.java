@@ -8,7 +8,6 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity {
-    private String email;
     private Integer points;
     private String username;
     private String passwordHash;
@@ -22,12 +21,10 @@ public class User extends BaseEntity {
     }
 
     public User(
-        String email,
         Integer points,
         String username,
         String passwordHash
     ) {
-        this.email = email;
         this.points = points;
         this.username = username;
         this.passwordHash = passwordHash;
@@ -40,15 +37,6 @@ public class User extends BaseEntity {
 
     public void setUsername(String userName) {
         this.username = userName;
-    }
-
-    @Column(name = "email", nullable = false)
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     @Column(name = "password_hash", nullable = false)

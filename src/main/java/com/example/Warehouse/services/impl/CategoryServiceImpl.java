@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -70,11 +71,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    @CacheEvict(value = {"categories", "products", "stocks", "category", "categoryId", "cart"}, allEntries = true)
+    @Caching(evict = {
+        @CacheEvict(value = "categoryId", key = "#id"),
+        @CacheEvict(value = {"categories", "products", "stocks", "category", "cart"}, allEntries = true)
+    })
     public void delete(String id) {
         LOG.info(
-            "Cache 'categories, products, stocks, category, categoryId, cart' is cleared. categoryDelete called, id - {}",
-            id
+            "Cache 'categories, products, stocks, category, categoryId::{}, cart' is cleared. categoryDelete called, id - {}",
+            id, id
         );
 
         categoryRepo.findById(id)

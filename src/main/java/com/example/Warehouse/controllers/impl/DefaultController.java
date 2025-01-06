@@ -10,8 +10,8 @@ public class DefaultController {
     @GetMapping("/")
     public String defaultAfterLogin(HttpServletRequest request) {
         if (request.isUserInRole("ROLE_ADMIN")) {
-            return "redirect:/home/admin?returnDeleted=false";
+            return "redirect:/catalog/admin/products?returnDeleted=false";
         }
-        return "redirect:/home/user?returnDeleted=false";
+        return "redirect:/catalog?returnDeleted=false";
     }
 }

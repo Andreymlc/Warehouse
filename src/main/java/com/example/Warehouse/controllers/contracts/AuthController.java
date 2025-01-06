@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@RequestMapping("/users")
-public interface UserController {
+@RequestMapping("/auth")
+public interface AuthController {
 
     @GetMapping("/register")
     String registerForm();

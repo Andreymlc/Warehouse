@@ -7,7 +7,7 @@ nav {
     width: 100%;
     background-color: #333;
     color: white;
-    padding: 10px 20px;
+    padding: 15px 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -21,7 +21,8 @@ nav ul {
 }
 
 nav li {
-    display: inline;
+    display: flex;
+    align-items: center;
 }
 
 nav a {
@@ -38,6 +39,9 @@ nav a:hover {
 
 nav button {
     width: max-content;
+    height: max-content;
+    margin: 0;
+    font-size: 14px;
     padding: 8px 16px;
     text-decoration: none;
     color: white;
@@ -61,4 +65,14 @@ span {
     padding: 2px 6px;
     min-width: 20px;
     text-align: center;
+}
+
+nav img {
+    width: 32px;
+    height: 32px;
+    padding-bottom: 8px;
+}
+
+h2 {
+    margin: 0 0 0 10px;
 }
